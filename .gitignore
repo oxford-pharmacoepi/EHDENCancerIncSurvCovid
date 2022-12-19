@@ -1,0 +1,11 @@
+output/*
+output full 20_12/*
+CodeToRun_local.R
+.Rproj.user*
+.Rhistory
+postgresql-42.2.18.jar
+Cohorts/ExposureCohorts/sql/test hosp.sql
+errorReportSql.txt
+CodeToRun_local_HM.R
+Results*
+.Rproj.user
