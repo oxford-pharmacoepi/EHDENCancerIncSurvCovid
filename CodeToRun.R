@@ -20,7 +20,7 @@ library(ggplot2)
 # database metadata and connection details -----
 # The name/ acronym for the database
 db.name<-"CPRDAurum"
-#db.name<-"CPRDGold"
+
 # Set output folder location -----
 # the path to a folder where the results from this analysis will be saved
 # to set the location within the project with folder called "ouput, we can use: here("output")
@@ -35,7 +35,7 @@ password<- Sys.getenv("DB_PASSWORD")
 port<-Sys.getenv("DB_PORT") 
 host<-Sys.getenv("DB_HOST") 
 server_dbi<-Sys.getenv("DB_SERVER_cdm_aurum_202106_dbi")
-#server_dbi<-Sys.getenv("DB_SERVER_cdmgold202007_dbi")
+
 
 # Specify cdm_reference via DBI connection details -----
 # In this study we also use the DBI package to connect to the database
@@ -62,7 +62,7 @@ results_database_schema<-"results"
 # Name of outcome table in the result table where the outcome cohorts will be stored
 # Note, if there is an existing table in your results schema with the same names
 # it will be overwritten 
-outcome_table_stem<-"dementadruginc"
+outcome_table_stem<-"cancerincprev"
 
 # create cdm reference ----
 cdm <- CDMConnector::cdm_from_con(con = db, 
@@ -78,6 +78,6 @@ cdm$person %>%
 # create_outcome_cohorts<-FALSE # set to false if already instantiated
 # create_strata_cohorts<-FALSE # set to false if already instantiated
 
-source(here("RunStudy.R"))
+#source(here("RunStudy.R"))
 # after the study is run you should have a zip folder in your output folder to share
 
