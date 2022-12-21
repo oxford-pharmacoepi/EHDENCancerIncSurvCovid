@@ -40,9 +40,9 @@ inc <- estimateIncidence(
   denominatorTable = "denominator",
   outcomeTable = outcome_table_name,
   interval = "years",
-  outcomeWashout = 0,
+  outcomeWashout = NULL,
   repeatedEvents = FALSE,
-  completeDatabaseIntervals = TRUE, # try this with and without
+  completeDatabaseIntervals = TRUE,
   minCellCount = 5
 )
 
@@ -105,13 +105,13 @@ inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit 
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantHeadNeckCancer", "Head and Neck")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
-  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach"))
-
-inc_yrs_plot <- as.data.frame(inc_yrs_plot)
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
+  mutate(time = format(incidence_start_date, format="%Y")) %>%
+  as.data.frame()
 
 plotAll <- inc_yrs_plot %>%
-  ggplot( aes(x = time, y = ir_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
-  geom_ribbon(aes(ymin = ir_100000_pys_95CI_lower, ymax = ir_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
+  ggplot( aes(x = time, y = incidence_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
+  geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
   geom_line(color = "black", size = 0.25) +
   geom_point(size = 2.5) +
   xlab("Year") +
@@ -136,7 +136,7 @@ dev.off()
 
 # period prevalence
 pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
-  filter(denominator_cohort_id == 3 &&
+  filter(denominator_cohort_id == 3 &
            denominator_age_group == "18;150") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
@@ -146,10 +146,8 @@ pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit 
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
-  mutate(time = format(prevalence_start_date, format="%Y"))
-
-
-pp_yrs_plot <- as.data.frame(pp_yrs_plot)
+  mutate(time = format(prevalence_start_date, format="%Y")) %>%
+  as.data.frame()
 
 plotAll <- pp_yrs_plot %>%
   ggplot( aes(x = time, y = prevalence, group=outcome_cohort_name, color = outcome_cohort_name)) +
@@ -179,7 +177,7 @@ dev.off()
 # # plot the results stratified by gender
 
 inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
-    filter(denominator_cohort_id == 1 | denominator_cohort_id == 2 &&
+    filter(denominator_cohort_id == 1 | denominator_cohort_id == 2 &
            denominator_age_group == "18;150") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
@@ -188,12 +186,13 @@ inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit 
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantHeadNeckCancer", "Head and Neck")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
-  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) 
-inc_yrs_plot <- as.data.frame(inc_yrs_plot)
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
+  mutate(time = format(incidence_start_date, format="%Y")) %>%
+  as.data.frame()
 
 plotGender <- inc_yrs_plot %>%
-  ggplot( aes(x = time, y = ir_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
-  geom_ribbon(aes(ymin = ir_100000_pys_95CI_lower, ymax = ir_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
+  ggplot( aes(x = time, y = incidence_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
+  geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
   geom_line(color = "black", size = 0.25) +
   geom_point(size = 2.5) +
   xlab("Year") +
@@ -220,7 +219,7 @@ dev.off()
 
 # period prevalence
 pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
-  filter(denominator_cohort_id == 1 | denominator_cohort_id == 2 &&
+  filter(denominator_cohort_id == 1 | denominator_cohort_id == 2 &
            denominator_age_group == "18;150") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
@@ -269,7 +268,7 @@ dev.off()
 
 # incidence
 inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
-  filter(denominator_age_group != "18;150" &&
+  filter(denominator_age_group != "18;150" &
            denominator_sex == "Both") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
@@ -293,8 +292,8 @@ agelabels <- c(
   `90;150` = "90+ Years")
 
 plotAge <- inc_yrs_plot %>%
-  ggplot( aes(x = time, y = ir_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
-  geom_ribbon(aes(ymin = ir_100000_pys_95CI_lower, ymax = ir_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
+  ggplot( aes(x = time, y = incidence_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
+  geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
   geom_line(color = "black", size = 0.25) +
   geom_point(size = 2.5) +
   xlab("Year") +
@@ -389,8 +388,8 @@ dev.off()
 #             `80;150` = "80+ Years")
 # 
 # plotAge <- inc_yrs_plot2 %>%
-#   ggplot( aes(x = time, y = ir_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
-#   geom_ribbon(aes(ymin = ir_100000_pys_95CI_lower, ymax = ir_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
+#   ggplot( aes(x = time, y = incidence_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
+#   geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
 #   geom_line(color = "black", size = 0.25) +
 #   geom_point(size = 2.5) + 
 #   xlab("Year") + 
@@ -438,8 +437,8 @@ dev.off()
 #                `80;150` = "80+ Years")
 # 
 # plotAgeGender <- inc_yrs_plot %>%
-#   ggplot( aes(x = time, y = ir_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
-#   geom_ribbon(aes(ymin = ir_100000_pys_95CI_lower, ymax = ir_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
+#   ggplot( aes(x = time, y = incidence_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
+#   geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
 #   geom_line(color = "black", size = 0.25) +
 #   geom_point(size = 2.5) + 
 #   xlab("Year") + 
