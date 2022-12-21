@@ -96,7 +96,7 @@ info(logger, "- Plotting incidence results: cancer populations")
 
 # incidence
 inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
-  filter(denominator_cohort_id == 3 &&
+  filter(denominator_cohort_id == 3 &
            denominator_age_group == "18;150") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
@@ -202,7 +202,6 @@ plotGender <- inc_yrs_plot %>%
   labs(colour = "Cancer") +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
         panel.background = element_blank() ,
-        axis.line = element_line(colour = "black", size = 0.6) ,
         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
         legend.key = element_rect(fill = "transparent", colour = "transparent"))
 
@@ -229,10 +228,8 @@ pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit 
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
-  mutate(time = format(prevalence_start_date, format="%Y"))
-
-
-pp_yrs_plot <- as.data.frame(pp_yrs_plot)
+  mutate(time = format(prevalence_start_date, format="%Y")) %>%
+  as.data.frame()
 
 plotGender <- pp_yrs_plot %>%
   ggplot( aes(x = time, y = prevalence, group=outcome_cohort_name, color = outcome_cohort_name)) +
@@ -246,7 +243,6 @@ plotGender <- pp_yrs_plot %>%
   labs(colour = "Cancer") +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
         panel.background = element_blank() ,
-        axis.line = element_line(colour = "black", size = 0.6) ,
         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
         legend.key = element_rect(fill = "transparent", colour = "transparent"))
 
@@ -277,9 +273,10 @@ inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit 
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantHeadNeckCancer", "Head and Neck")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
-  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach"))
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
+  mutate(time = format(incidence_start_date, format="%Y")) %>%
+  as.data.frame()
 
-inc_yrs_plot <- as.data.frame(inc_yrs_plot)
 
 agelabels <- c(
   `18;29` = "18-29 Years",
@@ -303,7 +300,6 @@ plotAge <- inc_yrs_plot %>%
   labs(colour = "Cancer") +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
         panel.background = element_blank() ,
-        axis.line = element_line(colour = "black", size = 0.6) ,
         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
         legend.key = element_rect(fill = "transparent", colour = "transparent"))
 
@@ -322,7 +318,7 @@ dev.off()
 
 # period prevalence
 pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
-  filter(denominator_age_group != "18;150" &&
+  filter(denominator_age_group != "18;150" &
            denominator_sex == "Both") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
@@ -332,10 +328,8 @@ pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit 
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
-  mutate(time = format(prevalence_start_date, format="%Y"))
-
-
-pp_yrs_plot <- as.data.frame(pp_yrs_plot)
+  mutate(time = format(prevalence_start_date, format="%Y")) %>%
+  as.data.frame()
 
 plotAge <- pp_yrs_plot %>%
   ggplot( aes(x = time, y = prevalence, group=outcome_cohort_name, color = outcome_cohort_name)) +
@@ -349,7 +343,6 @@ plotAge <- pp_yrs_plot %>%
   labs(colour = "Cancer") +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
         panel.background = element_blank() ,
-        axis.line = element_line(colour = "black", size = 0.6) ,
         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
         legend.key = element_rect(fill = "transparent", colour = "transparent"))
 
@@ -365,105 +358,111 @@ print(plotAge, newpage = FALSE)
 dev.off()
 
 
-
-
-
-
-# 
-# inc_yrs_plot2 <- study_results$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
-#   filter(denominator_cohort_id == 12 | denominator_cohort_id == 6 | denominator_cohort_id == 9 &&
-#            denominator_sex == "Both"
-#          
-#          ) %>%
-#   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "memantine", "Memantine")) %>%
-#   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "donepezil", "Donepezil")) %>%
-#   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "rivastigmine", "Rivastigmine")) %>%
-#   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "galantamine", "Galantamine")) 
-# 
-# inc_yrs_plot2 <- as.data.frame(inc_yrs_plot2)
-# 
-# 
-# agelabels <- c(`40;64` = "40-64 Years", 
-#             `65;79` = "65-79 Years",
-#             `80;150` = "80+ Years")
-# 
-# plotAge <- inc_yrs_plot2 %>%
-#   ggplot( aes(x = time, y = incidence_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
-#   geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
-#   geom_line(color = "black", size = 0.25) +
-#   geom_point(size = 2.5) + 
-#   xlab("Year") + 
-#   ylab("Incidence Rate (per 100000 py)") +
-#   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF")) + #blue, #red, #lightblue, #green
-#   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF")) +
-#   labs(colour = "Cancer Type") +
-#   theme(axis.text.x = element_text(angle = 45, hjust=1), 
-#         panel.background = element_blank() ,
-#         #axis.line = element_line(colour = "black", size = 0.6) ,
-#         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-#         legend.key = element_rect(fill = "transparent", colour = "transparent")
-#   ) 
-# 
-# plotAge <- plotAge + facet_wrap(~denominator_age_group, labeller=labeller(denominator_age_group = agelabels), scales="free_y") +
-#   theme(strip.background = element_rect(colour="black", fill=NA),
-#         panel.border = element_rect(fill = NA, color = "black"))
-# 
-# plotname <- paste0("IncidenceRatesAge", db.name,".pdf")
-# 
-# pdf(here("Results",db.name, plotname),
-#     width = 15, height = 5)
-# print(plotAge, newpage = FALSE)
-# dev.off()
-# 
-# 
 # ###########################################
 # # plot the results stratified by age AND gender
-# 
-# inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
-#   filter(denominator_age_group != "40;150" &&
-#            denominator_sex != "Both"
-#          
-#   ) %>%
-#   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "memantine", "Memantine")) %>%
-#   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "donepezil", "Donepezil")) %>%
-#   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "rivastigmine", "Rivastigmine")) %>%
-#   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "galantamine", "Galantamine")) 
-# 
-# inc_yrs_plot <- as.data.frame(inc_yrs_plot)
-# 
-# 
-# agelabels <- c(`40;64` = "40-64 Years", 
-#                `65;79` = "65-79 Years",
-#                `80;150` = "80+ Years")
-# 
-# plotAgeGender <- inc_yrs_plot %>%
-#   ggplot( aes(x = time, y = incidence_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
-#   geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
-#   geom_line(color = "black", size = 0.25) +
-#   geom_point(size = 2.5) + 
-#   xlab("Year") + 
-#   ylab("Incidence Rate (per 100000 py)") +
-#   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF")) + #blue, #red, #lightblue, #green
-#   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF")) +
-#   labs(colour = "Dementia Medications") +
-#   theme(axis.text.x = element_text(angle = 45, hjust=1), 
-#         panel.background = element_blank() ,
-#         #axis.line = element_line(colour = "black", size = 0.6) ,
-#         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-#         legend.key = element_rect(fill = "transparent", colour = "transparent")
-#   ) 
-# 
-# plotAgeGender <- plotAgeGender + facet_grid(denominator_sex ~ denominator_age_group , labeller=labeller(denominator_age_group = agelabels), scales = "free") +
-#   theme(strip.background = element_rect(colour="black", fill=NA),
-#         panel.border = element_rect(fill = NA, color = "black"))
-# 
-# plotname <- paste0("IncidenceRatesAgeGender", db.name,".pdf")
-# 
-# pdf(here("Results",db.name, plotname),
-#     width = 15, height = 7)
-# print(plotAgeGender, newpage = FALSE)
-# dev.off()
-# 
-# 
-# print(paste0("- Plotted incidence results: cancer populations"))
-# info(logger, "- Plotted incidence results: cancer populations")
+
+# incidence
+inc_yrs_plot <- study_results$incidence_estimates %>% 
+  filter(denominator_age_group != "40;150" &
+           denominator_sex != "Both") %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantBreastCancer", "Breast")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantColorectalCancer", "Colorectal")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantHeadNeckCancer", "Head and Neck")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
+  mutate(time = format(incidence_start_date, format="%Y")) %>%
+  as.data.frame()
+
+agelabels <- c(
+  `18;29` = "18-29 Years",
+  `30;39` = "30-39 Years",
+  `40;49` = "40-49 Years",
+  `50;59` = "50-59 Years",
+  `60;69` = "60-69 Years",
+  `70;79` = "70-79 Years",
+  `80;89` = "80-89 Years",
+  `90;150` = "90+ Years")
+
+plotAgeGender <- inc_yrs_plot %>%
+  ggplot( aes(x = time, y = incidence_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
+  geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
+  geom_line(color = "black", size = 0.25) +
+  geom_point(size = 2.5) +
+  xlab("Year") +
+  ylab("Incidence Rate (per 100000 py)") +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  labs(colour = "Cancer") +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.background = element_blank() ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")
+  )
+
+plotAgeGender <- plotAgeGender + facet_grid(denominator_sex ~ denominator_age_group , labeller=labeller(denominator_age_group = agelabels), scales = "free") +
+  theme(strip.background = element_rect(colour="black", fill=NA),
+        panel.border = element_rect(fill = NA, color = "black"))
+
+plotname <- paste0("IncidenceRatesAgeGender", db.name,".pdf")
+
+pdf(here("Results",db.name, plotname),
+    width = 15, height = 7)
+print(plotAgeGender, newpage = FALSE)
+dev.off()
+
+# period prevalence
+pp_yrs_plot <- study_results$prevalence_estimates %>% 
+  filter(denominator_age_group != "40;150" &
+           denominator_sex != "Both") %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantBreastCancer", "Breast")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantColorectalCancer", "Colorectal")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantHeadNeckCancer", "Head and Neck")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
+  mutate(time = format(incidence_start_date, format="%Y")) %>%
+  as.data.frame()
+
+agelabels <- c(
+  `18;29` = "18-29 Years",
+  `30;39` = "30-39 Years",
+  `40;49` = "40-49 Years",
+  `50;59` = "50-59 Years",
+  `60;69` = "60-69 Years",
+  `70;79` = "70-79 Years",
+  `80;89` = "80-89 Years",
+  `90;150` = "90+ Years")
+
+plotAgeGender <- pp_yrs_plot %>%
+  ggplot( aes(x = time, y = prevalence, group=outcome_cohort_name, color = outcome_cohort_name)) +
+  geom_ribbon(aes(ymin = prevalence_95CI_lower, ymax = prevalence_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
+  geom_line(color = "black", size = 0.25) +
+  geom_point(size = 2.5) +
+  xlab("Year") +
+  ylab("Period Prevalence") +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  labs(colour = "Cancer") +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.background = element_blank() ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent"))
+
+plotAgeGender <- plotAgeGender + facet_grid(denominator_sex ~ denominator_age_group , labeller=labeller(denominator_age_group = agelabels), scales = "free") +
+  theme(strip.background = element_rect(colour="black", fill=NA),
+        panel.border = element_rect(fill = NA, color = "black"))
+
+plotname <- paste0("PeriodPrevRatesAgeGender", db.name,".pdf")
+
+pdf(here("Results",db.name, plotname),
+    width = 15, height = 7)
+print(plotAgeGender, newpage = FALSE)
+dev.off()
+
+print(paste0("- Plotted prevalence results: cancer populations"))
+info(logger, "- Plotted prevalence results: cancer populations")
