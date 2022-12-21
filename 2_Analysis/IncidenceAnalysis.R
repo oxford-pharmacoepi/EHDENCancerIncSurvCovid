@@ -4,6 +4,7 @@
 print(paste0("- Getting denominator: cancer populations"))
 info(logger, "- Getting denominator: cancer populations")
 
+#get denomminator
 cdm$denominator <- generateDenominatorCohortSet(
   cdm = cdm,
   startDate = as.Date("2000-01-01"),
@@ -57,8 +58,8 @@ prev_period <- estimatePeriodPrevalence(
 )
 
 
-print(paste0("- Getting incidence and period prevalence: cancer population"))
-info(logger, "- Getting incidence and period prevalence: cancer population")
+print(paste0("- Got incidence and period prevalence: cancer population"))
+info(logger, "- Got incidence and period prevalence: cancer population")
 
 
 # Get the results ----------------
@@ -71,23 +72,23 @@ study_results<- gatherIncidencePrevalenceResults(list(inc, prev_period),
                              outcomeCohortName = outcome_cohorts$cohortName,
                              databaseName = db.name)
 
-print(paste0("- Got incidence results: cancer populations"))
-info(logger, "- Got incidence results: cancer populations")
+print(paste0("- Got incidence and period prevalence results: cancer populations"))
+info(logger, "- Got incidence and period prevalence results: cancer populations")
 
 # Export the results -----
-print(paste0("- Exporting incidence results: cancer populations"))
-info(logger, "- Exporting incidence results: cancer populations")
+print(paste0("- Exporting incidence and period prevalence results: cancer populations"))
+info(logger, "- Exporting incidence and period prevalence results: cancer populations")
 
 exportIncidencePrevalenceResults(result=study_results,
                                  zipName= paste0(db.name, "IPResults"),
                                  outputFolder=here::here("Results", db.name))
 
 
-print(paste0("- Exported incidence results: cancer populations"))
-info(logger, "- Exported incidence results: cancer populations")
+print(paste0("- Exported incidence and period prevalence results: cancer populations"))
+info(logger, "- Exported incidence and period prevalence results: cancer populations")
 
-print(paste0("- Plotting incidence results: cancer populations"))
-info(logger, "- Plotting incidence results: cancer populations")
+print(paste0("- Plotting incidence and period prevalence results: cancer populations"))
+info(logger, "- Plotting incidence and period prevalence results: cancer populations")
 
 
 
@@ -464,5 +465,5 @@ pdf(here("Results",db.name, plotname),
 print(plotAgeGender, newpage = FALSE)
 dev.off()
 
-print(paste0("- Plotted prevalence results: cancer populations"))
-info(logger, "- Plotted prevalence results: cancer populations")
+print(paste0("- Plotted incidence and period prevalence results: cancer populations"))
+info(logger, "- Plotted incidence and period prevalence results: cancer populations")
