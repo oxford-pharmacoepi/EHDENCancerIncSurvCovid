@@ -364,7 +364,7 @@ dev.off()
 
 # incidence
 inc_yrs_plot <- study_results$incidence_estimates %>% 
-  filter(denominator_age_group != "40;150" &
+  filter(denominator_age_group != "18;150" &
            denominator_sex != "Both") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
@@ -416,7 +416,7 @@ dev.off()
 
 # period prevalence
 pp_yrs_plot <- study_results$prevalence_estimates %>% 
-  filter(denominator_age_group != "40;150" &
+  filter(denominator_age_group != "18;150" &
            denominator_sex != "Both") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
@@ -426,7 +426,7 @@ pp_yrs_plot <- study_results$prevalence_estimates %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
-  mutate(time = format(incidence_start_date, format="%Y")) %>%
+  mutate(time = format(prevalence_start_date, format="%Y")) %>%
   as.data.frame()
 
 agelabels <- c(
@@ -467,3 +467,5 @@ dev.off()
 
 print(paste0("- Plotted incidence and period prevalence results: cancer populations"))
 info(logger, "- Plotted incidence and period prevalence results: cancer populations")
+
+
