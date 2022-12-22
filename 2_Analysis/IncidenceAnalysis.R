@@ -47,15 +47,15 @@ inc <- estimateIncidence(
   minCellCount = 5
 )
 
-prev_period <- estimatePeriodPrevalence(
-  cdm = cdm,
-  denominatorTable = "denominator",
-  outcomeTable = outcome_table_name,
-  interval = "years",
-  completeDatabaseIntervals = TRUE, 
-  fullContribution = FALSE,
-  minCellCount = 5
-)
+# prev_period <- estimatePeriodPrevalence(
+#   cdm = cdm,
+#   denominatorTable = "denominator",
+#   outcomeTable = outcome_table_name,
+#   interval = "years",
+#   completeDatabaseIntervals = TRUE, 
+#   fullContribution = FALSE,
+#   minCellCount = 5
+# )
 
 prev_period <- estimatePeriodPrevalence(
   cdm = cdm,
