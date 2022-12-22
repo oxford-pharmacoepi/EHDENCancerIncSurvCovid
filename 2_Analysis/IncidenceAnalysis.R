@@ -57,6 +57,16 @@ prev_period <- estimatePeriodPrevalence(
   minCellCount = 5
 )
 
+prev_period <- estimatePeriodPrevalence(
+  cdm = cdm,
+  denominatorTable = "denominator",
+  outcomeTable = outcome_table_name,
+  interval = "years",
+  completeDatabaseIntervals = TRUE, 
+  fullContribution = TRUE,
+  minCellCount = 5
+)
+
 
 print(paste0("- Got incidence and period prevalence: cancer population"))
 info(logger, "- Got incidence and period prevalence: cancer population")
@@ -468,4 +478,4 @@ dev.off()
 print(paste0("- Plotted incidence and period prevalence results: cancer populations"))
 info(logger, "- Plotted incidence and period prevalence results: cancer populations")
 
-
+#####
