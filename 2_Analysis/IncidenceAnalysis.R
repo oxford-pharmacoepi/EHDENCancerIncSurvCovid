@@ -43,6 +43,7 @@ inc <- estimateIncidence(
   cdm = cdm,
   denominatorTable = "denominator",
   outcomeTable = outcome_table_name,
+  denominatorCohortId = NULL,
   outcomeCohortId = outcome_cohorts$cohortId,
   outcomeCohortName = outcome_cohorts$cohortName,
   interval = "years",
@@ -86,7 +87,7 @@ info(logger, "- Gathering incidence and period prevalence results: cancer popula
 
 
 study_results<- gatherIncidencePrevalenceResults(cdm =cdm, 
-                                                 resultList=list(inc),
+                                                 resultList=list(inc,prev_period ),
                                                  databaseName = db.name)
 
 
