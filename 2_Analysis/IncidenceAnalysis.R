@@ -698,6 +698,8 @@ cdm$denominator <- generateDenominatorCohortSet(
 inc <- estimateIncidence(
   cdm = cdm,
   denominatorTable = "denominator",
+  outcomeCohortId = outcome_cohorts$cohortId,
+  outcomeCohortName = outcome_cohorts$cohortName,
   outcomeTable = outcome_table_name,
   interval = "overall",
   outcomeWashout = NULL,
@@ -707,10 +709,9 @@ inc <- estimateIncidence(
 )
 
 
-study_results2<- gatherIncidencePrevalenceResults(list(inc),
-                                                 outcomeCohortId = outcome_cohorts$cohortId,
-                                                 outcomeCohortName = outcome_cohorts$cohortName,
-                                                 databaseName = db.name)
+study_results2<- gatherIncidencePrevalenceResults(cdm = cdm,
+                                                  list(inc),
+                                                  databaseName = db.name)
 
 asdf <- study_results2$incidence_estimates
 
