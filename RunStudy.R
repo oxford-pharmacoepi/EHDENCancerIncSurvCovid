@@ -23,7 +23,7 @@ info(logger, 'RUNNING INCIDENCE RATE ANALYSIS')
 source(here("2_Analysis","IncidenceAnalysis.R"))
 info(logger, 'INCIDENCE RATE ANALYSIS RAN')
 
-# add code for combining and exporting results
+# add code for combining and exporting results ---
 
 print("Done!")
 print("-- If all has worked, there should now be a zip folder with your results in the output folder to share")
