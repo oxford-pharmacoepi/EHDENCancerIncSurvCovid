@@ -19,7 +19,7 @@ library(ggplot2)
 # database metadata and connection details -----
 # The name/ acronym for the database
 db.name<-"CPRDAurum"
-#db.name<-"CPRDAurumCovid"
+#db.name<-"CPRDGold"
 
 # Set output folder location -----
 # the path to a folder where the results from this analysis will be saved
@@ -35,7 +35,7 @@ password<- Sys.getenv("DB_PASSWORD")
 port<-Sys.getenv("DB_PORT") 
 host<-Sys.getenv("DB_HOST") 
 server_dbi<-Sys.getenv("DB_SERVER_cdm_aurum_202106_dbi") #aurum
-#server_dbi<-Sys.getenv("DB_SERVER_p20_059_cdm_aurum_dbi") #aurum covid
+#server_dbi<-Sys.getenv("DB_SERVER_cdmgold202007_dbi") #gold
 
 
 # Specify cdm_reference via DBI connection details -----
