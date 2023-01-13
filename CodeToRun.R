@@ -4,7 +4,6 @@
 #remotes::install_github("darwin-eu-dev/IncidencePrevalence",force = TRUE)
 
 # load r packages
-library(SqlRender)
 library(CirceR)
 library(IncidencePrevalence)
 library(here)
@@ -80,6 +79,6 @@ cdm$person %>%
 # create_outcome_cohorts<-FALSE # set to false if already instantiated
 # create_strata_cohorts<-FALSE # set to false if already instantiated
 
-source(here("RunStudy.R"))
+#source(here("RunStudy.R"))
 # after the study is run you should have a zip folder in your output folder to share
 
