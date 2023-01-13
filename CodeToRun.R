@@ -76,9 +76,6 @@ cdm$person %>%
   tally()
 
 # Run the study ------
-# create_outcome_cohorts<-FALSE # set to false if already instantiated
-# create_strata_cohorts<-FALSE # set to false if already instantiated
-
 source(here("RunStudy.R"))
 # after the study is run you should have a zip folder in your output folder to share
 
