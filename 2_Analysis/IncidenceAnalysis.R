@@ -102,6 +102,9 @@ exportIncidencePrevalenceResults(result=study_results,
                                  zipName= paste0(db.name, "IPResults"),
                                  outputFolder=here::here("Results", db.name))
 
+# save study results as a separate R.data file
+save(study_results, file = here::here("Results", db.name, "study_results.RData"))
+#load(file = here::here("Results", db.name, "study_results.RData"))
 
 print(paste0("- Exported incidence and period prevalence results: cancer populations"))
 info(logger, "- Exported incidence and period prevalence results: cancer populations")
@@ -297,6 +300,7 @@ inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit 
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
   mutate(time = format(incidence_start_date, format="%Y")) %>%
+  mutate(time = as.numeric(time)) %>%
   as.data.frame()
 
 
@@ -320,6 +324,7 @@ plotAge <- inc_yrs_plot %>%
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
   labs(colour = "Cancer") +
+  scale_x_continuous(breaks=seq(min(inc_yrs_plot$time), max(inc_yrs_plot$time), 2)) +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
         panel.background = element_blank() ,
         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
@@ -332,7 +337,7 @@ plotAge <- plotAge + facet_wrap(~denominator_age_group, scales="free_y", labelle
 plotname <- paste0("IncidenceRatesAge", db.name,".pdf")
 
 pdf(here("Results",db.name, plotname),
-    width = 12, height = 6)
+    width = 10, height = 6)
 print(plotAge, newpage = FALSE)
 dev.off()
 
@@ -351,6 +356,7 @@ pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit 
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
   mutate(time = format(prevalence_start_date, format="%Y")) %>%
+  mutate(time = as.numeric(time)) %>%
   as.data.frame()
 
 plotAge <- pp_yrs_plot %>%
@@ -363,6 +369,7 @@ plotAge <- pp_yrs_plot %>%
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
   labs(colour = "Cancer") +
+  scale_x_continuous(breaks=seq(min(inc_yrs_plot$time), max(inc_yrs_plot$time), 2)) +
   scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
         panel.background = element_blank() ,
@@ -376,7 +383,7 @@ plotAge <- plotAge + facet_wrap(~denominator_age_group, scales="free_y", labelle
 plotname <- paste0("PeriodPrevRatesAge", db.name,".pdf")
 
 pdf(here("Results",db.name, plotname),
-    width = 12, height = 6)
+    width = 10, height = 6)
 print(plotAge, newpage = FALSE)
 dev.off()
 
@@ -397,6 +404,7 @@ inc_yrs_plot <- study_results$incidence_estimates %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
   mutate(time = format(incidence_start_date, format="%Y")) %>%
+  mutate(time = as.numeric(time)) %>%
   as.data.frame()
 
 agelabels <- c(
@@ -419,6 +427,7 @@ plotAgeGender <- inc_yrs_plot %>%
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
   labs(colour = "Cancer") +
+  scale_x_continuous(breaks=seq(min(inc_yrs_plot$time), max(inc_yrs_plot$time), 2)) +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
         panel.background = element_blank() ,
         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
@@ -429,10 +438,11 @@ plotAgeGender <- plotAgeGender + facet_grid(denominator_sex ~ denominator_age_gr
   theme(strip.background = element_rect(colour="black", fill=NA),
         panel.border = element_rect(fill = NA, color = "black"))
 
+
 plotname <- paste0("IncidenceRatesAgeGender", db.name,".pdf")
 
 pdf(here("Results",db.name, plotname),
-    width = 18, height = 6)
+    width = 20, height = 8)
 print(plotAgeGender, newpage = FALSE)
 dev.off()
 
@@ -449,6 +459,7 @@ pp_yrs_plot <- study_results$prevalence_estimates %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
   mutate(time = format(prevalence_start_date, format="%Y")) %>%
+  mutate(time = as.numeric(time)) %>%
   as.data.frame()
 
 agelabels <- c(
@@ -471,6 +482,7 @@ plotAgeGender <- pp_yrs_plot %>%
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
   labs(colour = "Cancer") +
+  scale_x_continuous(breaks=seq(min(inc_yrs_plot$time), max(inc_yrs_plot$time), 2)) +
   scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
         panel.background = element_blank() ,
@@ -484,7 +496,7 @@ plotAgeGender <- plotAgeGender + facet_grid(denominator_sex ~ denominator_age_gr
 plotname <- paste0("PeriodPrevRatesAgeGender", db.name,".pdf")
 
 pdf(here("Results",db.name, plotname),
-    width = 18, height = 6)
+    width = 20, height = 8)
 print(plotAgeGender, newpage = FALSE)
 dev.off()
 
