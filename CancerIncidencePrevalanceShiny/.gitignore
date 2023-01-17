@@ -5,3 +5,5 @@ shiny/data/*.rds
 *.dcf
 Results/*
 .Rhistory
+CancerIncidencePrevalanceShiny/networkResults*
+CancerIncidencePrevalanceShiny/data*
