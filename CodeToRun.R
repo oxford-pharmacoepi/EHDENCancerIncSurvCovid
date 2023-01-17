@@ -16,6 +16,7 @@ library(stringr)
 library(CDMConnector)
 library(ggplot2)
 
+
 # database metadata and connection details -----
 # The name/ acronym for the database
 #db.name<-"CPRDAurum"
