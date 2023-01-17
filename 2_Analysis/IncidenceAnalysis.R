@@ -8,7 +8,7 @@ info(logger, "- Getting denominator: cancer populations")
 cdm$denominator <- generateDenominatorCohortSet(
   cdm = cdm,
   startDate = as.Date("2000-01-01"),
-  endDate = as.Date("2019-01-01"),
+  endDate = as.Date("2019-31-12"),
   ageGroup =list(
     c(18, 150),
     c(18, 29),
