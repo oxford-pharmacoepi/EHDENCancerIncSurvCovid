@@ -10,4 +10,4 @@ library(quarto)
 source(here("mergeResults.R"))
 
 # launch shiny
-shiny::runApp(here("shiny"))
+#shiny::runApp(here("shiny"))
