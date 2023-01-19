@@ -36,7 +36,8 @@ tabPanel("Background",
     tags$h5("This app is a companion to the study focussing on determining the incidence and prevalence for specific cancers. 
     We will focus on the 8 cancers (Breast, Colorectal, Lung, Liver, Stomach, Head/neck, Prostate and Pancreas). 
     The databases use data from 2000-2019. We used the the data for this time period in accordance with the approved CPRD application
-            for the EHDEN wp2 HTA cancer survival use case where we did not the impact of the COVID on the results"),
+            for the EHDEN wp2 HTA cancer survival study. We did not want the impact of the COVID pandemic influencing the results 
+            so it was decided to restrict the analysis up to 31 Dec 2019"),
   HTML('<br>'),
   tags$hr()
 ), 
