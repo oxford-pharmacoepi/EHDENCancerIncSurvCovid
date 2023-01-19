@@ -5,6 +5,15 @@ outcome_table_name<-paste0(outcome_table_stem,"_o")
 if (!file.exists(output.folder)){
   dir.create(output.folder, recursive = TRUE)}
 
+# add functions ----
+# risk table
+RiskSetCount <- function(timeindex, survivaltime) {
+  atrisk <- NULL
+  for (t in timeindex)
+    atrisk <- c(atrisk, sum(survivaltime >= t))
+  return(atrisk)
+}
+
 start<-Sys.time()
 
 # start log ----
@@ -23,6 +32,7 @@ info(logger, 'RUNNING INCIDENCE RATE ANALYSIS')
 source(here("2_Analysis","IncidenceAnalysis.R"))
 info(logger, 'INCIDENCE RATE ANALYSIS RAN')
 
+# Run survival analysis -----
 info(logger, 'RUNNING SURVIVAL ANALYSIS')
 source(here("2_Analysis","SurvivalAnalysis.R"))
 info(logger, 'SURVIVAL ANALYSIS RAN')
