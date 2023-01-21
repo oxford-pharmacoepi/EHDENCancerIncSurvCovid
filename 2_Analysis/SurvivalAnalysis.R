@@ -1,7 +1,11 @@
 # get data into format for survival analysis ---
 
-#link to the incidence population using participants function
+#link to the incidence population using participants function in incidence prevalence
+participants_inc <- participants(inc)
+participants(result = incidence)
+participants(result = incidence, analysisId = 1)
 
+#cancerincprev
 # get variables for analysis ---
 Pop<-cdm$person %>% 
   inner_join(cdm$ehdenwp2cancerextrap,
