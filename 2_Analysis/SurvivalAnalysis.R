@@ -1,11 +1,40 @@
 # get data into format for survival analysis ---
 
-#link to the incidence population using participants function in incidence prevalence
-participants_inc <- participants(inc)
-participants(result = incidence)
-participants(result = incidence, analysisId = 1)
+#save all results so can come back to it later
+# results file
 
-#cancerincprev
+participants_inc <- participants(result = inc)
+saveRDS(participants_inc, 
+        here(output.folder, "ParticipantsInc.rds")) # 1 gb of data
+#save study results
+save(study_results, 
+        here(output.folder, "studyResults.rds"))
+
+readRDS(here(output.folder, "ParticipantsInc.rds"))
+
+
+
+
+#link to the incidence population using participants function in incidence prevalence
+# the code below grabs all the analysis for each cancer for whole population without stratifications (all age groups and both genders)
+participantsAnalysis <- study_results$incidence_estimates_CPRDAurum %>%
+  filter(denominator_age_group == "18;150" & denominator_sex == "Both") %>% distinct(analysis_id, outcome_cohort_name) 
+
+# eventually will create a loop which will loop over each 
+# participants_inc <- participants(result = inc, analysisId = 32) %>%
+#   filter(!is.na(outcome_start_date)) %>% collect()
+
+
+participants_inc <- participants(result = inc, analysisId = 3)
+#asdsd <- cdm$denominator %>% filter(cohort_definition_id == 1) %>% collect()
+
+participants_inc <- participants(result = inc, analysisId = 3)
+
+asdf <- participants_inc %>% filter(!is.na(outcome_start_date)) %>% collect()
+
+
+
+#cancerincprev # these are the original cohorts
 # get variables for analysis ---
 Pop<-cdm$person %>% 
   inner_join(cdm$ehdenwp2cancerextrap,

@@ -4,7 +4,7 @@
 print(paste0("- Getting denominator: cancer populations"))
 info(logger, "- Getting denominator: cancer populations")
 
-#get denomminator
+#get denominator
 cdm$denominator <- generateDenominatorCohortSet(
   cdm = cdm,
   startDate = as.Date("2000-01-01"),
@@ -46,7 +46,7 @@ inc <- estimateIncidence(
   denominatorCohortId = NULL,
   outcomeCohortId = outcome_cohorts$cohortId,
   outcomeCohortName = outcome_cohorts$cohortName,
-  interval = "years",
+  interval = c("years", "overall"), 
   outcomeWashout = NULL,
   repeatedEvents = FALSE,
   completeDatabaseIntervals = TRUE,
@@ -67,7 +67,7 @@ prev_period <- estimatePeriodPrevalence(
   outcomeCohortName = outcome_cohorts$cohortName,
   outcomeLookbackDays = 0, # not sure if this should be NULL
   outcomeTable = outcome_table_name,
-  interval = "years",
+  interval = c("years", "overall"), 
   completeDatabaseIntervals = TRUE, 
   fullContribution = TRUE,
   minCellCount = 5
@@ -90,6 +90,13 @@ study_results<- gatherIncidencePrevalenceResults(cdm =cdm,
                                                  resultList=list(inc,prev_period ),
                                                  databaseName = db.name)
 
+# save study results as a separate R.data file
+save(study_results, file = here::here("Results", db.name, "study_results.RData"))
+#load(file = here::here("Results", db.name, "study_results.RData"))
+
+#get participants for incidence analysis (required for SurvivalAnalysis.R)
+participants_inc <- participants(result = inc)
+saveRDS(participants_inc, here(output.folder, "ParticipantsInc.rds")) # 1 gb of data
 
 print(paste0("- Got incidence and period prevalence results: cancer populations"))
 info(logger, "- Got incidence and period prevalence results: cancer populations")
@@ -102,9 +109,6 @@ exportIncidencePrevalenceResults(result=study_results,
                                  zipName= paste0(db.name, "IPResults"),
                                  outputFolder=here::here("Results", db.name))
 
-# save study results as a separate R.data file
-save(study_results, file = here::here("Results", db.name, "study_results.RData"))
-#load(file = here::here("Results", db.name, "study_results.RData"))
 
 print(paste0("- Exported incidence and period prevalence results: cancer populations"))
 info(logger, "- Exported incidence and period prevalence results: cancer populations")
@@ -137,8 +141,8 @@ plotAll <- inc_yrs_plot %>%
   geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
   geom_line(color = "black", size = 0.25) +
   geom_point(size = 2.5) +
-  xlab("Year") +
-  ylab("Incidence Rate (per 100000 py)") +
+  xlab("Calender Year") +
+  ylab("Incidence rate per 100000 person-years") +
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
   labs(colour = "Cancer") +
@@ -177,8 +181,8 @@ plotAll <- pp_yrs_plot %>%
   geom_ribbon(aes(ymin = prevalence_95CI_lower, ymax = prevalence_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
   geom_line(color = "black", size = 0.25) +
   geom_point(size = 2.5) +
-  xlab("Year") +
-  ylab("Period Prevalence") +
+  xlab("Calender Year") +
+  ylab("Prevalence") +
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
   labs(colour = "Cancer") +
@@ -219,8 +223,8 @@ plotGender <- inc_yrs_plot %>%
   geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
   geom_line(color = "black", size = 0.25) +
   geom_point(size = 2.5) +
-  xlab("Year") +
-  ylab("Incidence Rate (per 100000 py)") +
+  xlab("Calender Year") +
+  ylab("Incidence rate per 100000 person-years") +
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
   labs(colour = "Cancer") +
@@ -260,8 +264,8 @@ plotGender <- pp_yrs_plot %>%
   geom_ribbon(aes(ymin = prevalence_95CI_lower, ymax = prevalence_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
   geom_line(color = "black", size = 0.25) +
   geom_point(size = 2.5) +
-  xlab("Year") +
-  ylab("Period Prevalence") +
+  xlab("Calender Year") +
+  ylab("Prevalence") +
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
   labs(colour = "Cancer") +
@@ -319,8 +323,8 @@ plotAge <- inc_yrs_plot %>%
   geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
   geom_line(color = "black", size = 0.25) +
   geom_point(size = 1.5) +
-  xlab("Year") +
-  ylab("Incidence Rate (per 100000 py)") +
+  xlab("Calender Year") +
+  ylab("Incidence rate per 100000 person-years") +
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
   labs(colour = "Cancer") +
@@ -364,8 +368,8 @@ plotAge <- pp_yrs_plot %>%
   geom_ribbon(aes(ymin = prevalence_95CI_lower, ymax = prevalence_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
   geom_line(color = "black", size = 0.25) +
   geom_point(size = 1.5) +
-  xlab("Year") +
-  ylab("Period Prevalence") +
+  xlab("Calender Year") +
+  ylab("Prevalence") +
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
   labs(colour = "Cancer") +
@@ -422,8 +426,8 @@ plotAgeGender <- inc_yrs_plot %>%
   geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
   geom_line(color = "black", size = 0.25) +
   geom_point(size = 1.5) +
-  xlab("Year") +
-  ylab("Incidence Rate (per 100000 py)") +
+  xlab("Calender Year") +
+  ylab("Incidence rate per 100000 person-years") +
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
   labs(colour = "Cancer") +
@@ -477,8 +481,8 @@ plotAgeGender <- pp_yrs_plot %>%
   geom_ribbon(aes(ymin = prevalence_95CI_lower, ymax = prevalence_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
   geom_line(color = "black", size = 0.25) +
   geom_point(size = 1.5) +
-  xlab("Year") +
-  ylab("Period Prevalence") +
+  xlab("Calender Year") +
+  ylab("Prevalence") +
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
   labs(colour = "Cancer") +
@@ -528,7 +532,7 @@ info(logger, "- Plotted incidence and period prevalence results: cancer populati
 #   geom_line(color = "black", size = 0.25) +
 #   geom_point(size = 2.5) +
 #   xlab("Year") +
-#   ylab("Incidence Rate (per 100000 py)") +
+#   ylab("Incidence rate per 100000 person-years") +
 #   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
 #   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
 #   labs(colour = "Age") +
@@ -575,7 +579,7 @@ info(logger, "- Plotted incidence and period prevalence results: cancer populati
 #   geom_line(color = "black", size = 0.25) +
 #   geom_point(size = 2.5) +
 #   xlab("Year") +
-#   ylab("Incidence Rate (per 100000 py)") +
+#   ylab("Incidence rate per 100000 person-years") +
 #   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
 #   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
 #   labs(colour = "Age") +
@@ -621,7 +625,7 @@ info(logger, "- Plotted incidence and period prevalence results: cancer populati
 #   geom_line(color = "black", size = 0.25) +
 #   geom_point(size = 2.5) +
 #   xlab("Year") +
-#   ylab("Incidence Rate (per 100000 py)") +
+#   ylab("Incidence rate per 100000 person-years") +
 #   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
 #   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
 #   labs(colour = "Age") +
