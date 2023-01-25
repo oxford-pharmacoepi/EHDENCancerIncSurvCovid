@@ -60,6 +60,20 @@ print(paste0("- Getting period prevalence: cancer populations"))
 info(logger, "- Getting period prevalence: cancer populations")
 
 # Estimate period prevalence ---------
+# prev_period <- estimatePeriodPrevalence(
+#   cdm = cdm,
+#   denominatorTable = "denominator",
+#   outcomeCohortId = outcome_cohorts$cohortId,
+#   outcomeCohortName = outcome_cohorts$cohortName,
+#   outcomeLookbackDays = 0, # not sure if this should be NULL
+#   outcomeTable = outcome_table_name,
+#   interval = c("years", "overall"),
+#   completeDatabaseIntervals = TRUE,
+#   fullContribution = TRUE,
+#   minCellCount = 5
+# )
+
+# above doesnt work
 prev_period <- estimatePeriodPrevalence(
   cdm = cdm,
   denominatorTable = "denominator",
@@ -67,7 +81,7 @@ prev_period <- estimatePeriodPrevalence(
   outcomeCohortName = outcome_cohorts$cohortName,
   outcomeLookbackDays = 0, # not sure if this should be NULL
   outcomeTable = outcome_table_name,
-  interval = c("years", "overall"), 
+  interval = c("years"), 
   completeDatabaseIntervals = TRUE, 
   fullContribution = TRUE,
   minCellCount = 5
@@ -169,8 +183,8 @@ dev.off()
 
 # period prevalence
 pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
-  filter(denominator_cohort_id == 3 &
-           denominator_age_group == "18;150"  & 
+  filter((denominator_cohort_id == 3 &
+           denominator_age_group == "18;150" ) & 
            analysis_interval == "years") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
@@ -212,8 +226,8 @@ dev.off()
 # # plot the results stratified by gender
 
 inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
-    filter(denominator_cohort_id == 1 | denominator_cohort_id == 2 &
-           denominator_age_group == "18;150" &
+    filter((denominator_cohort_id == 1 | denominator_cohort_id == 2 &
+           denominator_age_group == "18;150") &
              analysis_interval == "years") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
@@ -254,8 +268,8 @@ dev.off()
 
 # period prevalence
 pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
-  filter(denominator_cohort_id == 1 | denominator_cohort_id == 2 &
-           denominator_age_group == "18;150" &
+  filter((denominator_cohort_id == 1 | denominator_cohort_id == 2 &
+           denominator_age_group == "18;150" ) &
            analysis_interval == "years") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
@@ -302,8 +316,8 @@ dev.off()
 
 # incidence
 inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
-  filter(denominator_age_group != "18;150" &
-           denominator_sex == "Both" &
+  filter((denominator_age_group != "18;150" &
+           denominator_sex == "Both" ) &
            analysis_interval == "years") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
@@ -359,8 +373,8 @@ dev.off()
 
 # period prevalence
 pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
-  filter(denominator_age_group != "18;150" &
-           denominator_sex == "Both" &
+  filter((denominator_age_group != "18;150" &
+           denominator_sex == "Both" ) &
            analysis_interval == "years") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
@@ -408,8 +422,8 @@ dev.off()
 
 # incidence
 inc_yrs_plot <- study_results$incidence_estimates %>% 
-  filter(denominator_age_group != "18;150" &
-           denominator_sex != "Both" &
+  filter((denominator_age_group != "18;150" &
+           denominator_sex != "Both" ) &
            analysis_interval == "years") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
@@ -464,8 +478,8 @@ dev.off()
 
 # period prevalence
 pp_yrs_plot <- study_results$prevalence_estimates %>% 
-  filter(denominator_age_group != "18;150" &
-           denominator_sex != "Both" &
+  filter((denominator_age_group != "18;150" &
+           denominator_sex != "Both") &
            analysis_interval == "years") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
