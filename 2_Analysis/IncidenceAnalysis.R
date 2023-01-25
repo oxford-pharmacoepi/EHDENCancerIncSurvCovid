@@ -50,7 +50,8 @@ inc <- estimateIncidence(
   outcomeWashout = NULL,
   repeatedEvents = FALSE,
   completeDatabaseIntervals = TRUE,
-  minCellCount = 5
+  minCellCount = 5,
+  returnParticipants = TRUE
 )
 
 print(paste0("- Got incidence: cancer populations"))
@@ -109,8 +110,8 @@ save(study_results, file = here::here(output.folder, "study_results.RData"))
 #load(file = here::here("Results", db.name, "study_results.RData"))
 
 #get participants for incidence analysis (required for SurvivalAnalysis.R)
-participants_inc <- participants(result = inc)
-saveRDS(participants_inc, here(output.folder, "ParticipantsInc.rds")) # 1 gb of data
+participants_inc <- participants(inc)
+saveRDS(participants_inc, here::here(output.folder, "ParticipantsInc.rds")) # 1 gb of data
 
 #save settings for incidence analysis (required for SurvivalAnalysis.R)
 settings_inc <- settings(inc)

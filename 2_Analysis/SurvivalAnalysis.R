@@ -1,18 +1,14 @@
 # get data into format for survival analysis ---
 
-#save all results so can come back to it later
-# results file
+# get the analysis ids's of the people we want to extract. From the incidence analysis we want the whole population and both genders
 
-participants_inc <- participants(result = inc)
-saveRDS(participants_inc, 
-        here(output.folder, "ParticipantsInc.rds")) # 1 gb of data
-#save study results
-save(study_results, 
-        here(output.folder, "studyResults.rds"))
+#extract settings for survival
+settings_surv <- settings_inc %>%
+  filter(analysis_interval == "overall" & denominator_cohort_id == 3)
 
-readRDS(here(output.folder, "ParticipantsInc.rds"))
-
-
+#extract the participants for each cancer
+participants_surv <- participants(result = incidence, analysisId = settings_surv$analysis_id[i]) %>%
+  filter(!is.na(outcome_start_date)) %>% collect()
 
 
 #link to the incidence population using participants function in incidence prevalence
