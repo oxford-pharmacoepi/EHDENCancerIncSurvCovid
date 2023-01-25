@@ -15,6 +15,8 @@ library(log4r)
 library(stringr)
 library(CDMConnector)
 library(ggplot2)
+library(lubridate)
+library(tidyr)
 
 
 # database metadata and connection details -----
