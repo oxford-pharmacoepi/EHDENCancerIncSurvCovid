@@ -68,7 +68,7 @@ prev_period <- estimatePeriodPrevalence(
   outcomeCohortName = outcome_cohorts$cohortName,
   outcomeLookbackDays = 0, # not sure if this should be NULL
   outcomeTable = outcome_table_name,
-  interval = c("years", "overall"),
+  interval = c("years"),
   completeDatabaseIntervals = TRUE,
   fullContribution = TRUE,
   minCellCount = 5
@@ -121,7 +121,29 @@ info(logger, "- Exported incidence and period prevalence results: cancer populat
 print(paste0("- Plotting incidence and period prevalence results: cancer populations"))
 info(logger, "- Plotting incidence and period prevalence results: cancer populations")
 
+############################################################
+# overall period prevalence
 
+prev_period_overall <- estimatePeriodPrevalence(
+  cdm = cdm,
+  denominatorTable = "denominator",
+  outcomeCohortId = outcome_cohorts$cohortId,
+  outcomeCohortName = outcome_cohorts$cohortName,
+  outcomeLookbackDays = 0, # not sure if this should be NULL
+  outcomeTable = outcome_table_name,
+  interval = c("years", "overall"),
+  completeDatabaseIntervals = FALSE,
+  fullContribution = FALSE,
+  minCellCount = 5
+)
+
+study_results1<- gatherIncidencePrevalenceResults(cdm =cdm, 
+                                                 resultList=list(prev_period_overall),
+                                                 databaseName = db.name)
+
+exportIncidencePrevalenceResults(result=study_results1,
+                                 zipName= paste0(db.name, "IPResults_overall"),
+                                 outputFolder=here::here("Results", db.name))
 
 ###########################################
 # plot the results for whole population
