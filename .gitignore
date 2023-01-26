@@ -13,3 +13,4 @@ CPRDAurumIPResults
 IncidenceAnalysis1.R
 1_InstantiateCohorts/CopyOutcomeCohorts/*
 troubleshooting.R
+logfile.log
