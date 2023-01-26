@@ -124,6 +124,20 @@ Pop<-Pop %>%
   filter(time_days != 0)
 
 
+### start code here ######
+
+
+
+
+
+
+
+
+
+
+
+
+
 # capture output in list
 observedkm <- list()
 observedmedianKM <- list()

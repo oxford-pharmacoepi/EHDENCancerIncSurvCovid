@@ -61,20 +61,6 @@ print(paste0("- Getting period prevalence: cancer populations"))
 info(logger, "- Getting period prevalence: cancer populations")
 
 # Estimate period prevalence ---------
-# prev_period <- estimatePeriodPrevalence(
-#   cdm = cdm,
-#   denominatorTable = "denominator",
-#   outcomeCohortId = outcome_cohorts$cohortId,
-#   outcomeCohortName = outcome_cohorts$cohortName,
-#   outcomeLookbackDays = 0, # not sure if this should be NULL
-#   outcomeTable = outcome_table_name,
-#   interval = c("years", "overall"),
-#   completeDatabaseIntervals = TRUE,
-#   fullContribution = TRUE,
-#   minCellCount = 5
-# )
-
-# above doesnt work
 prev_period <- estimatePeriodPrevalence(
   cdm = cdm,
   denominatorTable = "denominator",
@@ -82,8 +68,8 @@ prev_period <- estimatePeriodPrevalence(
   outcomeCohortName = outcome_cohorts$cohortName,
   outcomeLookbackDays = 0, # not sure if this should be NULL
   outcomeTable = outcome_table_name,
-  interval = c("years"), 
-  completeDatabaseIntervals = TRUE, 
+  interval = c("years", "overall"),
+  completeDatabaseIntervals = TRUE,
   fullContribution = TRUE,
   minCellCount = 5
 )
