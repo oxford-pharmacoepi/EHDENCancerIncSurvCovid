@@ -480,9 +480,7 @@ for(j in 1:nrow(outcome_cohorts)) {
     
     
     print(paste0("Gender*Age stratification KM analysis not carried out for ", outcome_cohorts$cohortName[j], " due to only 1 gender present age stratification will have results " , Sys.time()))
-    
   }
-  
 }
 
 # take the results from a list (one element for each cancer) and put into dataframe ----
@@ -501,3 +499,47 @@ risktableskm_age_gender <- risktableskm_age_gender %>%
   mutate(across(everything(), as.character))
 
 info(logger, 'KM analysis for AGE*GENDER stratification COMPLETE')
+
+# combine all the survival results -----
+survivalResults <- bind_rows(
+  observedkmcombined , # all 
+  observedkmcombined_gender , # gender strat 
+  observedkmcombined_age , # age strat
+  observedkmcombined_age_gender # age gender strat
+) %>%
+  mutate(Database = db.name)
+
+#risk table # error with characters and double formats
+riskTableResults <- bind_rows(
+  risktableskm , # all
+  risktableskm_gender , # gender strat
+  risktableskm_age , # age strat
+  risktableskm_age_gender # age*gender strat 
+) %>%
+  mutate(Database = db.name)
+
+#median results
+medianKMResults <- bind_rows( 
+  medkmcombined , # all
+  medkmcombined_gender , # gender
+  medkmcombined_age , # age strat
+  medkmcombined_age_gender # age*gender strat 
+) %>%
+  mutate(Database = db.name)
+
+
+# put results all together in a list
+survival_study_results <- list(survivalResults ,
+                               riskTableResults,
+                               medianKMResults )
+
+names(survival_study_results) <- c(paste0("survival_estimates_", db.name),
+                                   paste0("risk_table_results_", db.name),
+                                   paste0("median_survival_results_", db.name) )
+
+
+# zip results
+print("Zipping results to output folder")
+exportSurvivalResults(result=survival_study_results,
+                      zipName= paste0(db.name, "SurvivalResults"),
+                      outputFolder=here::here("Results", db.name))

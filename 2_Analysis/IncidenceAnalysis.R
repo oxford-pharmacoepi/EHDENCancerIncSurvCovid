@@ -99,7 +99,7 @@ participants_inc <- participants(inc)
 
 #save settings for incidence analysis (required for SurvivalAnalysis.R)
 settings_inc <- settings(inc)
-save(settings_inc, file = here::here(output.folder, "SettingsInc.RData")) 
+save(settings_inc, file = here::here(qcfolder, "SettingsInc.RData")) 
 
 print(paste0("- Got incidence and period prevalence results: cancer populations"))
 info(logger, "- Got incidence and period prevalence results: cancer populations")
@@ -159,7 +159,7 @@ plotAll <- inc_yrs_plot %>%
 
 plotname <- paste0("IncidenceRatesWholePop", db.name,".pdf")
 
-pdf(here("3_QC",db.name, plotname),
+pdf(here(qcfolder, plotname),
     width = 7, height = 5)
 print(plotAll, newpage = FALSE)
 dev.off()
@@ -201,7 +201,7 @@ plotAll <- pp_yrs_plot %>%
 
 plotname <- paste0("PeriodPrevRatesWholePop", db.name,".pdf")
 
-pdf(here("3_QC",db.name, plotname),
+pdf(here(qcfolder, plotname),
     width = 7, height = 5)
 print(plotAll, newpage = FALSE)
 dev.off()
@@ -246,7 +246,7 @@ plotGender <- plotGender + facet_wrap(~denominator_sex, scales="free_y") +
 
 plotname <- paste0("IncidenceRatesGender", db.name,".pdf")
 
-pdf(here("3_QC",db.name, plotname),
+pdf(here(qcfolder, plotname),
     width = 11, height = 5)
 print(plotGender, newpage = FALSE)
 dev.off()
@@ -290,7 +290,7 @@ plotGender <- plotGender + facet_wrap(~denominator_sex , scales="free_y") +
 
 plotname <- paste0("PeriodPrevRatesGender", db.name,".pdf")
 
-pdf(here("3_QC",db.name, plotname),
+pdf(here(qcfolder, plotname),
     width = 11, height = 5)
 print(plotGender, newpage = FALSE)
 dev.off()
@@ -349,7 +349,7 @@ plotAge <- plotAge + facet_wrap(~denominator_age_group, scales="free_y", labelle
 
 plotname <- paste0("IncidenceRatesAge", db.name,".pdf")
 
-pdf(here("3_QC",db.name, plotname),
+pdf(here(qcfolder, plotname),
     width = 10, height = 6)
 print(plotAge, newpage = FALSE)
 dev.off()
@@ -396,7 +396,7 @@ plotAge <- plotAge + facet_wrap(~denominator_age_group, scales="free_y", labelle
 
 plotname <- paste0("PeriodPrevRatesAge", db.name,".pdf")
 
-pdf(here("3_QC",db.name, plotname),
+pdf(here(qcfolder, plotname),
     width = 10, height = 6)
 print(plotAge, newpage = FALSE)
 dev.off()
@@ -456,7 +456,7 @@ plotAgeGender <- plotAgeGender + facet_grid(denominator_sex ~ denominator_age_gr
 
 plotname <- paste0("IncidenceRatesAgeGender", db.name,".pdf")
 
-pdf(here("3_QC",db.name, plotname),
+pdf(here(qcfolder, plotname),
     width = 20, height = 8)
 print(plotAgeGender, newpage = FALSE)
 dev.off()
@@ -511,7 +511,7 @@ plotAgeGender <- plotAgeGender + facet_grid(denominator_sex ~ denominator_age_gr
 
 plotname <- paste0("PeriodPrevRatesAgeGender", db.name,".pdf")
 
-pdf(here("3_QC",db.name, plotname),
+pdf(here(qcfolder, plotname),
     width = 20, height = 8)
 print(plotAgeGender, newpage = FALSE)
 dev.off()
