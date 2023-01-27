@@ -120,7 +120,9 @@ print(paste0("- Plotting incidence and period prevalence results: cancer populat
 info(logger, "- Plotting incidence and period prevalence results: cancer populations")
 
 ###########################################
-# plot the results for whole population
+# run plots for checking QC checking
+
+# whole population
 
 # incidence
 inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
@@ -157,7 +159,7 @@ plotAll <- inc_yrs_plot %>%
 
 plotname <- paste0("IncidenceRatesWholePop", db.name,".pdf")
 
-pdf(here("Results",db.name, plotname),
+pdf(here("3_QC",db.name, plotname),
     width = 7, height = 5)
 print(plotAll, newpage = FALSE)
 dev.off()
@@ -199,7 +201,7 @@ plotAll <- pp_yrs_plot %>%
 
 plotname <- paste0("PeriodPrevRatesWholePop", db.name,".pdf")
 
-pdf(here("Results",db.name, plotname),
+pdf(here("3_QC",db.name, plotname),
     width = 7, height = 5)
 print(plotAll, newpage = FALSE)
 dev.off()
@@ -244,7 +246,7 @@ plotGender <- plotGender + facet_wrap(~denominator_sex, scales="free_y") +
 
 plotname <- paste0("IncidenceRatesGender", db.name,".pdf")
 
-pdf(here("Results",db.name, plotname),
+pdf(here("3_QC",db.name, plotname),
     width = 11, height = 5)
 print(plotGender, newpage = FALSE)
 dev.off()
@@ -288,7 +290,7 @@ plotGender <- plotGender + facet_wrap(~denominator_sex , scales="free_y") +
 
 plotname <- paste0("PeriodPrevRatesGender", db.name,".pdf")
 
-pdf(here("Results",db.name, plotname),
+pdf(here("3_QC",db.name, plotname),
     width = 11, height = 5)
 print(plotGender, newpage = FALSE)
 dev.off()
@@ -347,7 +349,7 @@ plotAge <- plotAge + facet_wrap(~denominator_age_group, scales="free_y", labelle
 
 plotname <- paste0("IncidenceRatesAge", db.name,".pdf")
 
-pdf(here("Results",db.name, plotname),
+pdf(here("3_QC",db.name, plotname),
     width = 10, height = 6)
 print(plotAge, newpage = FALSE)
 dev.off()
@@ -394,7 +396,7 @@ plotAge <- plotAge + facet_wrap(~denominator_age_group, scales="free_y", labelle
 
 plotname <- paste0("PeriodPrevRatesAge", db.name,".pdf")
 
-pdf(here("Results",db.name, plotname),
+pdf(here("3_QC",db.name, plotname),
     width = 10, height = 6)
 print(plotAge, newpage = FALSE)
 dev.off()
@@ -454,7 +456,7 @@ plotAgeGender <- plotAgeGender + facet_grid(denominator_sex ~ denominator_age_gr
 
 plotname <- paste0("IncidenceRatesAgeGender", db.name,".pdf")
 
-pdf(here("Results",db.name, plotname),
+pdf(here("3_QC",db.name, plotname),
     width = 20, height = 8)
 print(plotAgeGender, newpage = FALSE)
 dev.off()
@@ -509,154 +511,10 @@ plotAgeGender <- plotAgeGender + facet_grid(denominator_sex ~ denominator_age_gr
 
 plotname <- paste0("PeriodPrevRatesAgeGender", db.name,".pdf")
 
-pdf(here("Results",db.name, plotname),
+pdf(here("3_QC",db.name, plotname),
     width = 20, height = 8)
 print(plotAgeGender, newpage = FALSE)
 dev.off()
 
 print(paste0("- Plotted incidence and period prevalence results: cancer populations"))
 info(logger, "- Plotted incidence and period prevalence results: cancer populations")
-
-
-##########################################################################
-# plot per cancer
-# plot all ages for 1 cancer e.g. colorectal incidence
-# inc_yrs_plot <- study_results$incidence_estimates %>% 
-#   filter(denominator_age_group != "18;150" &
-#            denominator_sex != "Both" & outcome_cohort_name == "MalignantColorectalCancer") %>%
-#   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantColorectalCancer", "Colorectal")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "18;29", "18-29 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "30;39", "30-39 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "40;49", "40-49 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "50;59", "50-59 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "60;69", "60-69 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "70;79", "70-79 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "80;89", "80-89 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "90;150", "90+ Years")) %>%
-#   mutate(time = format(incidence_start_date, format="%Y")) %>%
-#   as.data.frame()
-# 
-# plotAgeGender <- inc_yrs_plot %>%
-#   ggplot( aes(x = time, y = incidence_100000_pys, group=denominator_age_group, color = denominator_age_group)) +
-#   geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = denominator_age_group), alpha = .3, color = NA, show.legend = FALSE) +
-#   geom_line(color = "black", size = 0.25) +
-#   geom_point(size = 2.5) +
-#   xlab("Year") +
-#   ylab("Incidence rate per 100000 person-years") +
-#   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
-#   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
-#   labs(colour = "Age") +
-#   #coord_cartesian(ylim = c(0, 25)) +
-#   theme(axis.text.x = element_text(angle = 45, hjust=1),
-#         panel.background = element_blank() ,
-#         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-#         legend.key = element_rect(fill = "transparent", colour = "transparent")
-#   )
-# 
-# 
-# plotAgeGender <- plotAgeGender + facet_wrap(~denominator_sex , scales = "free") +
-#   theme(strip.background = element_rect(colour="black", fill=NA),
-#         panel.border = element_rect(fill = NA, color = "black"))
-# 
-# plotname <- paste0("IncidenceRatesAgeGenderCRC", db.name,".pdf")
-# 
-# pdf(here("Results",db.name, plotname),
-#     width = 15, height = 7)
-# print(plotAgeGender, newpage = FALSE)
-# dev.off()
-# 
-# 
-# ######
-# # plot all ages for 1 cancer e.g. LUNG incidence
-# inc_yrs_plot <- study_results$incidence_estimates %>% 
-#   filter(denominator_age_group != "18;150" &
-#            denominator_sex != "Both" & outcome_cohort_name == "MalignantLungCancer") %>%
-#   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "18;29", "18-29 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "30;39", "30-39 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "40;49", "40-49 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "50;59", "50-59 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "60;69", "60-69 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "70;79", "70-79 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "80;89", "80-89 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "90;150", "90+ Years")) %>%
-#   mutate(time = format(incidence_start_date, format="%Y")) %>%
-#   as.data.frame()
-# 
-# plotAgeGender <- inc_yrs_plot %>%
-#   ggplot( aes(x = time, y = incidence_100000_pys, group=denominator_age_group, color = denominator_age_group)) +
-#   geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = denominator_age_group), alpha = .3, color = NA, show.legend = FALSE) +
-#   geom_line(color = "black", size = 0.25) +
-#   geom_point(size = 2.5) +
-#   xlab("Year") +
-#   ylab("Incidence rate per 100000 person-years") +
-#   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
-#   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
-#   labs(colour = "Age") +
-#   #coord_cartesian(ylim = c(0, 25)) +
-#   theme(axis.text.x = element_text(angle = 45, hjust=1),
-#         panel.background = element_blank() ,
-#         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-#         legend.key = element_rect(fill = "transparent", colour = "transparent")
-#   )
-# 
-# 
-# plotAgeGender <- plotAgeGender + facet_wrap(~denominator_sex , scales = "free") +
-#   theme(strip.background = element_rect(colour="black", fill=NA),
-#         panel.border = element_rect(fill = NA, color = "black"))
-# 
-# plotname <- paste0("IncidenceRatesAgeGenderLUNG", db.name,".pdf")
-# 
-# pdf(here("Results",db.name, plotname),
-#     width = 15, height = 7)
-# print(plotAgeGender, newpage = FALSE)
-# dev.off()
-# 
-# ######
-# # plot all ages for 1 cancer e.g. LIVER incidence
-# inc_yrs_plot <- study_results$incidence_estimates %>% 
-#   filter(denominator_age_group != "18;150" &
-#            denominator_sex != "Both" & outcome_cohort_name == "MalignantLiverCancer") %>%
-#   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "18;29", "18-29 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "30;39", "30-39 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "40;49", "40-49 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "50;59", "50-59 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "60;69", "60-69 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "70;79", "70-79 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "80;89", "80-89 Years")) %>%
-#   mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "90;150", "90+ Years")) %>%
-#   mutate(time = format(incidence_start_date, format="%Y")) %>%
-#   as.data.frame()
-# 
-# plotAgeGender <- inc_yrs_plot %>%
-#   ggplot( aes(x = time, y = incidence_100000_pys, group=denominator_age_group, color = denominator_age_group)) +
-#   geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = denominator_age_group), alpha = .3, color = NA, show.legend = FALSE) +
-#   geom_line(color = "black", size = 0.25) +
-#   geom_point(size = 2.5) +
-#   xlab("Year") +
-#   ylab("Incidence rate per 100000 person-years") +
-#   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
-#   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
-#   labs(colour = "Age") +
-#   #coord_cartesian(ylim = c(0, 25)) +
-#   theme(axis.text.x = element_text(angle = 45, hjust=1),
-#         panel.background = element_blank() ,
-#         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-#         legend.key = element_rect(fill = "transparent", colour = "transparent")
-#   )
-# 
-# 
-# plotAgeGender <- plotAgeGender + facet_wrap(~denominator_sex , scales = "free") +
-#   theme(strip.background = element_rect(colour="black", fill=NA),
-#         panel.border = element_rect(fill = NA, color = "black"))
-# 
-# plotname <- paste0("IncidenceRatesAgeGenderLIVER", db.name,".pdf")
-# 
-# pdf(here("Results",db.name, plotname),
-#     width = 15, height = 7)
-# print(plotAgeGender, newpage = FALSE)
-# dev.off()
-
-
-

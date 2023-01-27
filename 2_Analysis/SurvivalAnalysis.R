@@ -501,5 +501,3 @@ risktableskm_age_gender <- risktableskm_age_gender %>%
   mutate(across(everything(), as.character))
 
 info(logger, 'KM analysis for AGE*GENDER stratification COMPLETE')
-
-

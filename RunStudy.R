@@ -1,7 +1,11 @@
 # table names----
 outcome_table_name<-paste0(outcome_table_stem,"_o")
 
-# output files ----
+# QC plot folder ----
+if (!file.exists(here("3_QC"))){
+  dir.create("3_QC", recursive = TRUE)}
+
+# output files ---- 
 if (!file.exists(output.folder)){
   dir.create(output.folder, recursive = TRUE)}
 
