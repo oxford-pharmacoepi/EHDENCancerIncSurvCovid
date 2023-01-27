@@ -78,14 +78,3 @@ print("-- If all has worked, there should now be two zip folders with the incide
 print("-- Thank you for running the study! :)")
 Sys.time()-start
 readLines(log_file)
-
-
-
-
-
-
-
-
-
-
-
