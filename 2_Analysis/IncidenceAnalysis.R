@@ -93,11 +93,9 @@ study_results<- gatherIncidencePrevalenceResults(cdm =cdm,
 
 # save study results as a separate R.data file
 save(study_results, file = here::here(output.folder, "study_results.RData"))
-#load(file = here::here("Results", db.name, "study_results.RData"))
 
 #get participants for incidence analysis (required for SurvivalAnalysis.R)
 participants_inc <- participants(inc)
-#saveRDS(participants_inc, here::here(output.folder, "ParticipantsInc.rds")) # 1 gb of data
 
 #save settings for incidence analysis (required for SurvivalAnalysis.R)
 settings_inc <- settings(inc)
@@ -120,30 +118,6 @@ info(logger, "- Exported incidence and period prevalence results: cancer populat
 
 print(paste0("- Plotting incidence and period prevalence results: cancer populations"))
 info(logger, "- Plotting incidence and period prevalence results: cancer populations")
-
-############################################################
-# overall period prevalence
-
-prev_period_overall <- estimatePeriodPrevalence(
-  cdm = cdm,
-  denominatorTable = "denominator",
-  outcomeCohortId = outcome_cohorts$cohortId,
-  outcomeCohortName = outcome_cohorts$cohortName,
-  outcomeLookbackDays = 0, # not sure if this should be NULL
-  outcomeTable = outcome_table_name,
-  interval = c("years", "overall"),
-  completeDatabaseIntervals = FALSE,
-  fullContribution = FALSE,
-  minCellCount = 5
-)
-
-study_results1<- gatherIncidencePrevalenceResults(cdm =cdm, 
-                                                 resultList=list(prev_period_overall),
-                                                 databaseName = db.name)
-
-exportIncidencePrevalenceResults(result=study_results1,
-                                 zipName= paste0(db.name, "IPResults_overall"),
-                                 outputFolder=here::here("Results", db.name))
 
 ###########################################
 # plot the results for whole population

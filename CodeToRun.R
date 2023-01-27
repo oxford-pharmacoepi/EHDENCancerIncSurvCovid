@@ -1,7 +1,7 @@
 # Load packages ------
 
 # to install latest version of IncidencePrevalence
-remotes::install_github("darwin-eu-dev/IncidencePrevalence",force = TRUE)
+#remotes::install_github("darwin-eu-dev/IncidencePrevalence",force = TRUE)
 
 # load r packages
 library(CirceR)
@@ -17,6 +17,10 @@ library(CDMConnector)
 library(ggplot2)
 library(lubridate)
 library(tidyr)
+library(broom)
+library(survival)
+library(bshazard)
+library(DatabaseConnector)
 
 
 # database metadata and connection details -----
