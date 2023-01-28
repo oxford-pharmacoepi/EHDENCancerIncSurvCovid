@@ -92,7 +92,7 @@ study_results<- gatherIncidencePrevalenceResults(cdm =cdm,
                                                  databaseName = db.name)
 
 # save study results as a separate R.data file
-save(study_results, file = here::here(output.folder, "study_results.RData"))
+#save(study_results, file = here::here(output.folder, "study_results.RData"))
 
 #get participants for incidence analysis (required for SurvivalAnalysis.R)
 participants_inc <- participants(inc)
