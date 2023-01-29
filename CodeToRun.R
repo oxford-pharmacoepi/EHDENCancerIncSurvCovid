@@ -26,8 +26,8 @@ library(DatabaseConnector)
 # database metadata and connection details -----
 # The name/ acronym for the database
 #db.name<-"CPRDAurum"
-#db.name<-"CPRDGold"
-db.name<-"CPRDAurumCovid"
+db.name<-"CPRDGold"
+#db.name<-"CPRDAurumCovid"
 
 # Set output folder location -----
 # the path to a folder where the results from this analysis will be saved
@@ -43,8 +43,8 @@ password<- Sys.getenv("DB_PASSWORD")
 port<-Sys.getenv("DB_PORT") 
 host<-Sys.getenv("DB_HOST") 
 #server_dbi<-Sys.getenv("DB_SERVER_cdm_aurum_202106_dbi") #aurum
-#server_dbi<-Sys.getenv("DB_SERVER_cdmgold202007_dbi") #gold
-server_dbi<-Sys.getenv("DB_SERVER_p20_059_cdm_aurum_dbi") #aurum covid
+server_dbi<-Sys.getenv("DB_SERVER_cdmgold202007_dbi") #gold
+#server_dbi<-Sys.getenv("DB_SERVER_p20_059_cdm_aurum_dbi") #aurum covid
 
 
 # Specify cdm_reference via DBI connection details -----
@@ -87,4 +87,3 @@ cdm$person %>%
 # Run the study ------
 source(here("RunStudy.R"))
 # after the study is run you should have a zip folder in your output folder to share
-

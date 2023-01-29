@@ -25,9 +25,6 @@ cdm$denominator <- generateDenominatorCohortSet(
   verbose = TRUE
 )
 
-#cdm$denominator %>% tally() # to check numbers in denominator population
-#attrition(cdm$denominator) # to grab the attrition
-
 print(paste0("- Got denominator: cancer populations"))
 info(logger, "- Got denominator: cancer populations")
 
@@ -66,7 +63,7 @@ prev_period <- estimatePeriodPrevalence(
   denominatorTable = "denominator",
   outcomeCohortId = outcome_cohorts$cohortId,
   outcomeCohortName = outcome_cohorts$cohortName,
-  outcomeLookbackDays = 0, # not sure if this should be NULL
+  outcomeLookbackDays = 0, 
   outcomeTable = outcome_table_name,
   interval = c("years"),
   completeDatabaseIntervals = TRUE,
@@ -90,16 +87,6 @@ info(logger, "- Gathering incidence and period prevalence results: cancer popula
 study_results<- gatherIncidencePrevalenceResults(cdm =cdm, 
                                                  resultList=list(inc,prev_period ),
                                                  databaseName = db.name)
-
-# save study results as a separate R.data file
-#save(study_results, file = here::here(output.folder, "study_results.RData"))
-
-#get participants for incidence analysis (required for SurvivalAnalysis.R)
-#participants_inc <- participants(inc)
-
-#save settings for incidence analysis (required for SurvivalAnalysis.R)
-#settings_inc <- settings(inc)
-#save(settings_inc, file = here::here(qcfolder, "SettingsInc.RData")) 
 
 print(paste0("- Got incidence and period prevalence results: cancer populations"))
 info(logger, "- Got incidence and period prevalence results: cancer populations")
