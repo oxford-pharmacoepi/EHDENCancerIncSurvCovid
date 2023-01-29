@@ -95,11 +95,11 @@ study_results<- gatherIncidencePrevalenceResults(cdm =cdm,
 #save(study_results, file = here::here(output.folder, "study_results.RData"))
 
 #get participants for incidence analysis (required for SurvivalAnalysis.R)
-participants_inc <- participants(inc)
+#participants_inc <- participants(inc)
 
 #save settings for incidence analysis (required for SurvivalAnalysis.R)
-settings_inc <- settings(inc)
-save(settings_inc, file = here::here(qcfolder, "SettingsInc.RData")) 
+#settings_inc <- settings(inc)
+#save(settings_inc, file = here::here(qcfolder, "SettingsInc.RData")) 
 
 print(paste0("- Got incidence and period prevalence results: cancer populations"))
 info(logger, "- Got incidence and period prevalence results: cancer populations")

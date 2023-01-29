@@ -1,7 +1,7 @@
 # KM survival analysis ---
 
 #extract settings for survival
-settings_surv <- settings_inc %>%
+settings_surv <- settings(inc) %>%
   filter(analysis_interval == "overall" & denominator_cohort_id == 3)
 
 pops <- list()
