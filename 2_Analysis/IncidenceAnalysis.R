@@ -67,7 +67,7 @@ prev_period <- estimatePeriodPrevalence(
   outcomeTable = outcome_table_name,
   interval = c("years"),
   completeDatabaseIntervals = TRUE,
-  fullContribution = TRUE,
+  fullContribution = c(TRUE,FALSE) ,
   minCellCount = 5
 )
 
