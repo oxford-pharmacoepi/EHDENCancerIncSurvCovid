@@ -65,7 +65,7 @@ info(logger, 'GOT STUDY COHORTS')
 
 # Run incidence rate analysis ----
 info(logger, 'RUNNING INCIDENCE RATE ANALYSIS')
-source(here("2_Analysis","IncidenceAnalysis.R"))
+source(here("2_Analysis","IncidenceAnalysis1.R"))
 info(logger, 'INCIDENCE RATE ANALYSIS RAN')
 
 # Run survival analysis -----

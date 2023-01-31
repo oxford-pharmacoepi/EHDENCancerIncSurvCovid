@@ -1,7 +1,7 @@
 # KM survival analysis ---
 
 #extract settings for survival
-settings_surv <- settings(inc) %>%
+settings_surv <- settings(inc_overall) %>%
   filter(analysis_interval == "overall" & denominator_cohort_id == 3)
 
 pops <- list()
@@ -9,7 +9,7 @@ pops <- list()
 for (i in 1:length(settings_surv$analysis_id)){
 #extract the participants for each cancer
   pops[[i]] <-cdm$person %>% 
-  inner_join(participants(inc, analysisId = settings_surv$analysis_id[i]) %>% filter(!is.na(outcome_start_date)),
+  inner_join(participants(inc_overall, analysisId = settings_surv$analysis_id[i]) %>% filter(!is.na(outcome_start_date)),
              by = c("person_id" = "subject_id" )) %>%
   select(person_id,gender_concept_id, 
          year_of_birth, month_of_birth, day_of_birth,
@@ -124,9 +124,9 @@ Pop<-Pop %>%
 
 
 # remove people with end of observation end date == cohort entry
-Pop<-Pop %>%
-  filter(time_days != 0)
-
+# Pop<-Pop %>%
+#   filter(time_days != 0)
+table(Pop$outcome_cohort_name)
 
 ### KAPLAIN MEIER CODE ####
 
