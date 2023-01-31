@@ -29,12 +29,12 @@ print(paste0("- Got denominator: cancer populations"))
 info(logger, "- Got denominator: cancer populations")
 
 
-# Estimate incidence -------
+# Estimate yearly incidence -------
 print(paste0("- Getting incidence and period prevalence: cancer populations"))
 info(logger, "- Getting incidence and period prevalence: cancer populations")
 
-print(paste0("- Getting incidence: cancer populations"))
-info(logger, "- Getting incidence: cancer populations")
+print(paste0("- Getting yearly incidence: cancer populations"))
+info(logger, "- Getting yearly incidence: cancer populations")
 
 inc <- estimateIncidence(
   cdm = cdm,
@@ -43,12 +43,12 @@ inc <- estimateIncidence(
   denominatorCohortId = NULL,
   outcomeCohortId = outcome_cohorts$cohortId,
   outcomeCohortName = outcome_cohorts$cohortName,
-  interval = c("years", "overall"), 
+  interval = c("years"), 
   outcomeWashout = NULL,
   repeatedEvents = FALSE,
   completeDatabaseIntervals = TRUE,
   minCellCount = 5,
-  returnParticipants = TRUE
+  returnParticipants = FALSE
 )
 
 print(paste0("- Got incidence: cancer populations"))
@@ -66,8 +66,8 @@ prev_period <- estimatePeriodPrevalence(
   outcomeLookbackDays = 0, 
   outcomeTable = outcome_table_name,
   interval = c("years"),
-  completeDatabaseIntervals = TRUE,
-  fullContribution = c(TRUE,FALSE) ,
+  completeDatabaseIntervals = TRUE, # prev only estimate for intervals where db captures all of the interval
+  fullContribution = FALSE , # individuals only required to be present for one day in interval
   minCellCount = 5
 )
 
@@ -107,16 +107,14 @@ print(paste0("- Plotting incidence and period prevalence results: cancer populat
 info(logger, "- Plotting incidence and period prevalence results: cancer populations")
 
 ###########################################
-# run plots for checking QC checking
+# run plots for checking QC checking -----
 
 # whole population
-
 # incidence
 inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
   filter(denominator_cohort_id == 3 &
            denominator_age_group == "18;150" &
-           analysis_interval == "years"
-           ) %>%
+           analysis_interval == "years") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "ProstateCancerMaleOnly", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantBreastCancer", "Breast")) %>%
@@ -157,7 +155,8 @@ dev.off()
 pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
   filter((denominator_cohort_id == 3 &
            denominator_age_group == "18;150" ) & 
-           analysis_interval == "years") %>%
+           analysis_interval == "years",
+         analysis_full_contribution == "FALSE") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "ProstateCancerMaleOnly", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantBreastCancer", "Breast")) %>%
@@ -242,7 +241,8 @@ dev.off()
 pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
   filter((denominator_cohort_id == 1 | denominator_cohort_id == 2 &
            denominator_age_group == "18;150" ) &
-           analysis_interval == "years") %>%
+           analysis_interval == "years",
+         analysis_full_contribution == "FALSE") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "ProstateCancerMaleOnly", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantBreastCancer", "Breast")) %>%
@@ -284,7 +284,7 @@ dev.off()
 
 
 # ###########################################
-# # plot the results stratified by age
+# # plot the results stratified by age ----
 
 # incidence
 inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
@@ -347,7 +347,8 @@ dev.off()
 pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
   filter((denominator_age_group != "18;150" &
            denominator_sex == "Both" ) &
-           analysis_interval == "years") %>%
+           analysis_interval == "years",
+         analysis_full_contribution == "FALSE") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "ProstateCancerMaleOnly", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantBreastCancer", "Breast")) %>%
@@ -390,7 +391,7 @@ dev.off()
 
 
 # ###########################################
-# # plot the results stratified by age AND gender
+# # plot the results stratified by age AND gender ----
 
 # incidence
 inc_yrs_plot <- study_results$incidence_estimates %>% 
@@ -452,7 +453,8 @@ dev.off()
 pp_yrs_plot <- study_results$prevalence_estimates %>% 
   filter((denominator_age_group != "18;150" &
            denominator_sex != "Both") &
-           analysis_interval == "years") %>%
+           analysis_interval == "years",
+         analysis_full_contribution == "FALSE") %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "ProstateCancerMaleOnly", "Prostate")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantBreastCancer", "Breast")) %>%
@@ -505,3 +507,51 @@ dev.off()
 
 print(paste0("- Plotted incidence and period prevalence results: cancer populations"))
 info(logger, "- Plotted incidence and period prevalence results: cancer populations")
+
+
+#get the overall incidence from 2000 to 2019 -----
+print(paste0("- Getting overall incidence: cancer populations"))
+info(logger, "- Getting overall incidence: cancer populations")
+
+inc_overall <- estimateIncidence(
+  cdm = cdm,
+  denominatorTable = "denominator",
+  outcomeTable = outcome_table_name,
+  denominatorCohortId = NULL,
+  outcomeCohortId = outcome_cohorts$cohortId,
+  outcomeCohortName = outcome_cohorts$cohortName,
+  interval = c("overall"),
+  outcomeWashout = NULL,
+  repeatedEvents = FALSE,
+  completeDatabaseIntervals = TRUE,
+  minCellCount = 5,
+  returnParticipants = TRUE
+)
+
+print(paste0("- Got incidence: cancer populations"))
+info(logger, "- Got incidence: cancer populations")
+
+# Get the results ----------------
+print(paste0("- Gathering overall incidence results: cancer populations"))
+info(logger, "- Gathering overall incidence results: cancer populations")
+
+
+study_results_overall<- gatherIncidencePrevalenceResults(cdm =cdm,
+                                                 resultList=list(inc_overall),
+                                                 databaseName = db.name)
+
+
+print(paste0("- Got overall incidence results: cancer populations"))
+info(logger, "- Got overall incidence results: cancer populations")
+
+# Export the results -----
+print(paste0("- Exporting incidence overall results: cancer populations"))
+info(logger, "- Exporting incidence overall results: cancer populations")
+
+exportIncidencePrevalenceResults(result=study_results_overall,
+                                 zipName= paste0(db.name, "IPResults_overall"),
+                                 outputFolder=here::here("Results", db.name))
+
+
+print(paste0("- Exported overall incidence results: cancer populations"))
+info(logger, "- Exported overall incidence results: cancer populations")
