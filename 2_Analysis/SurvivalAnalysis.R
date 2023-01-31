@@ -145,8 +145,7 @@ for(j in 1:nrow(outcome_cohorts)) {
   #carry out km estimate
   observedkm[[j]] <- survfit (Surv(time_years, status) ~ 1, data=data) %>%
     tidy() %>%
-    mutate(Method = "Kaplan-Meier", Cancer = outcome_cohorts$cohortName[j], Age = "All", Gender = "Both") %>%
-    filter(n.risk >= 5) #remove entries with less than 5 patients
+    mutate(Method = "Kaplan-Meier", Cancer = outcome_cohorts$cohortName[j], Age = "All", Gender = "Both") 
   
   print(paste0("KM for observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
   
@@ -183,16 +182,19 @@ for(j in 1:nrow(outcome_cohorts)) {
 
 # take the results from a list (one element for each cancer) and put into dataframe for KM survival
 observedkmcombined <- dplyr::bind_rows(observedkm) %>%
-  rename(est = estimate ,ucl = conf.high, lcl = conf.low )
+  rename(est = estimate ,ucl = conf.high, lcl = conf.low ) %>%
+  mutate(Stratification = "None")
 
-medkmcombined <- dplyr::bind_rows(observedmedianKM) 
+medkmcombined <- dplyr::bind_rows(observedmedianKM) %>%
+  mutate(Stratification = "None")
 
 # generate the risk table and remove entries < 5 patients
 risktableskm <- dplyr::bind_rows(observedrisktableKM)%>%
   mutate(across(everything(), ~replace(., . <=  5 , NA))) %>%
   replace(is.na(.), "<5") %>%
   relocate(Cancer) %>%
-  mutate(across(everything(), as.character))
+  mutate(across(everything(), as.character)) %>%
+  mutate(Stratification = "None")
 
 info(logger, 'KM analysis for whole population COMPLETE')
 
@@ -271,9 +273,11 @@ for(j in 1:nrow(outcome_cohorts)) {
 
 # take the results from a list (one element for each cancer) and put into dataframe for KM survival
 observedkmcombined_gender <- dplyr::bind_rows(observedkm_gender) %>%
-  rename(est = estimate ,ucl = conf.high, lcl = conf.low )
+  rename(est = estimate ,ucl = conf.high, lcl = conf.low ) %>%
+  mutate(Stratification = "Gender")
 
-medkmcombined_gender <- dplyr::bind_rows(observedmedianKM_gender) 
+medkmcombined_gender <- dplyr::bind_rows(observedmedianKM_gender) %>%
+  mutate(Stratification = "Gender")
 
 #generate the risk table and remove entries < 5 patients
 risktableskm_gender <- dplyr::bind_rows(observedrisktableKM_gender) 
@@ -282,7 +286,8 @@ risktableskm_gender <- risktableskm_gender %>%
   mutate_at(.vars = c(1:(ncol(risktableskm_gender)-4)), funs(ifelse(.<= 5, "<5", .))) %>%
   replace(is.na(.), 0) %>%
   relocate(Cancer) %>%
-  mutate(across(everything(), as.character))
+  mutate(across(everything(), as.character)) %>%
+  mutate(Stratification = "Gender")
 
 info(logger, 'KM analysis for gender stratification COMPLETE')
 
@@ -350,9 +355,11 @@ for(j in 1:nrow(outcome_cohorts)) {
 
 # take the results from a list (one element for each cancer) and put into dataframe ----
 observedkmcombined_age <- dplyr::bind_rows(observedkm_age) %>%
-  rename(est = estimate ,ucl = conf.high, lcl = conf.low )
+  rename(est = estimate ,ucl = conf.high, lcl = conf.low ) %>%
+  mutate(Stratification = "Age")
 
-medkmcombined_age <- dplyr::bind_rows(observedmedianKM_age) 
+medkmcombined_age <- dplyr::bind_rows(observedmedianKM_age) %>%
+  mutate(Stratification = "Age")
 
 #generate the risk table and obscure entries < 5 patients
 risktableskm_age <- dplyr::bind_rows(observedrisktableKM_age)
@@ -361,7 +368,8 @@ risktableskm_age <- risktableskm_age %>%
   mutate_at(.vars = c(1:(ncol(risktableskm_age)-4)), funs(ifelse(.<= 5, "<5", .))) %>%
   replace(is.na(.), 0) %>%
   relocate(Cancer) %>%
-  mutate(across(everything(), as.character))
+  mutate(across(everything(), as.character)) %>%
+  mutate(Stratification = "Age")
 
 info(logger, 'KM analysis for AGE stratification COMPLETE')
 
@@ -484,9 +492,11 @@ for(j in 1:nrow(outcome_cohorts)) {
 
 # take the results from a list (one element for each cancer) and put into dataframe ----
 observedkmcombined_age_gender <- dplyr::bind_rows(observedkm_age_gender) %>%
-  rename(est = estimate ,ucl = conf.high, lcl = conf.low )
+  rename(est = estimate ,ucl = conf.high, lcl = conf.low ) %>%
+  mutate(Stratification = "Age*Gender")
 
-medkmcombined_age_gender <- dplyr::bind_rows(observedmedianKM_age_gender) 
+medkmcombined_age_gender <- dplyr::bind_rows(observedmedianKM_age_gender)  %>%
+  mutate(Stratification = "Age*Gender")
 
 #generate the risk table and remove entries < 5 patients
 risktableskm_age_gender <- dplyr::bind_rows(observedrisktableKM_age_gender) 
@@ -495,7 +505,8 @@ risktableskm_age_gender <- risktableskm_age_gender %>%
   mutate_at(.vars = c(1:(ncol(risktableskm_age_gender)-5)), funs(ifelse(.<= 5, "<5", .))) %>%
   replace(is.na(.), 0) %>%
   relocate(Cancer) %>%
-  mutate(across(everything(), as.character))
+  mutate(across(everything(), as.character))  %>%
+  mutate(Stratification = "Age*Gender")
 
 info(logger, 'KM analysis for AGE*GENDER stratification COMPLETE')
 
