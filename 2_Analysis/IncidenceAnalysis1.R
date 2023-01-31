@@ -67,7 +67,7 @@ prev_period <- estimatePeriodPrevalence(
   outcomeTable = outcome_table_name,
   interval = c("years"),
   completeDatabaseIntervals = TRUE, # prev only estimate for intervals where db captures all of the interval
-  fullContribution = FALSE , # individuals only required to be present for one day in interval
+  fullContribution = c(TRUE, FALSE) , # individuals only required to be present for one day in interval
   minCellCount = 5
 )
 
