@@ -43,7 +43,7 @@ inc <- estimateIncidence(
   denominatorCohortId = NULL,
   outcomeCohortId = outcome_cohorts$cohortId,
   outcomeCohortName = outcome_cohorts$cohortName,
-  interval = c("years"), 
+  interval = c("years", "overall"), 
   outcomeWashout = NULL,
   repeatedEvents = FALSE,
   completeDatabaseIntervals = TRUE,

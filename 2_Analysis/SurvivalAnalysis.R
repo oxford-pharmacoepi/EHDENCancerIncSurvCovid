@@ -180,7 +180,7 @@ for(j in 1:nrow(outcome_cohorts)) {
   
   #grab survival probabilities 1,5,10 years
   sprob <- survfit(Surv(time_years, status) ~ 1, data=data) %>% 
-    summary(times = c(1,5,10))
+    summary(times = c(1,5,10), extend = TRUE)
   
   cols <- lapply(c(2:15) , function(x) sprob[x])
   observedsurprobsKM[[j]] <- do.call(data.frame, cols) %>%
@@ -282,7 +282,7 @@ for(j in 1:nrow(outcome_cohorts)) {
     
     #grab survival probabilities 1,5,10 years
     sprob <- survfit(Surv(time_years, status) ~ gender, data=data) %>%
-      summary(times = c(1,5,10))
+      summary(times = c(1,5,10), extend = TRUE)
 
     cols <- lapply(c(2:15) , function(x) sprob[x])
     observedsurprobsKM_gender[[j]] <- do.call(data.frame, cols) %>%
@@ -391,7 +391,7 @@ for(j in 1:nrow(outcome_cohorts)) {
   
   #grab survival probabilities 1,5,10 years
   sprob <- survfit(Surv(time_years, status) ~ age_gr, data=data) %>%
-    summary(times = c(1,5,10))
+    summary(times = c(1,5,10), extend = TRUE)
   
   cols <- lapply(c(2:15) , function(x) sprob[x])
   observedsurprobsKM_age[[j]] <- do.call(data.frame, cols) %>%
@@ -549,7 +549,7 @@ for(j in 1:nrow(outcome_cohorts)) {
     
     #grab survival probabilities 1,5,10 years
     sprob <- survfit(Surv(time_years, status) ~ genderAgegp, data=data) %>%
-      summary(times = c(1,5,10))
+      summary(times = c(1,5,10), extend = TRUE)
     
     cols <- lapply(c(2:15) , function(x) sprob[x])
     observedsurprobsKM_age_gender[[j]] <- do.call(data.frame, cols) %>%
