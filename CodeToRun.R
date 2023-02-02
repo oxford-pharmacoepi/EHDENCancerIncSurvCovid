@@ -21,6 +21,7 @@ library(broom)
 library(survival)
 library(bshazard)
 library(DatabaseConnector)
+library(gtsummary)
 
 
 # database metadata and connection details -----

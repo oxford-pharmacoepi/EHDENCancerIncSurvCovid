@@ -126,13 +126,14 @@ Pop<-Pop %>%
 # remove people with end of observation end date == cohort entry
 # Pop<-Pop %>%
 #   filter(time_days != 0)
-table(Pop$outcome_cohort_name)
+#table(Pop$outcome_cohort_name)
 
 ### KAPLAIN MEIER CODE ####
 
 # whole population
 observedkm <- list()
 observedmedianKM <- list()
+observedsurprobsKM <- list()
 observedrisktableKM <- list()
 
 # loop to carry out for each cancer
@@ -159,7 +160,6 @@ for(j in 1:nrow(outcome_cohorts)) {
   
   print(paste0("Extract risk table ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
   
-  
   # KM median survival---
   modelKM <- survfit(Surv(time_years, status) ~ 1, data=data) %>%
     summary()
@@ -177,6 +177,20 @@ for(j in 1:nrow(outcome_cohorts)) {
   
   
   print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+  
+  #grab survival probabilities 1,5,10 years
+  sprob <- survfit(Surv(time_years, status) ~ 1, data=data) %>% 
+    summary(times = c(1,5,10))
+  
+  cols <- lapply(c(2:15) , function(x) sprob[x])
+  observedsurprobsKM[[j]] <- do.call(data.frame, cols) %>%
+    mutate(Method = "Kaplan-Meier", 
+           Cancer = outcome_cohorts$cohortName[j],
+           Gender = "Both" ,
+           Age = "All" )
+
+  print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+  
   
 }
 
@@ -196,13 +210,17 @@ risktableskm <- dplyr::bind_rows(observedrisktableKM)%>%
   mutate(across(everything(), as.character)) %>%
   mutate(Stratification = "None")
 
-info(logger, 'KM analysis for whole population COMPLETE')
+#generate 1,5,10 probabilities
+sprobkmcombined <- dplyr::bind_rows(observedsurprobsKM) %>%
+  mutate(Stratification = "None")
 
+info(logger, 'KM analysis for whole population COMPLETE')
 
 # GENDER STRATIFICATION-----
 
 observedkm_gender <- list()
 observedmedianKM_gender <- list()
+observedsurprobsKM_gender <- list()
 observedrisktableKM_gender <- list()
 
 # loop to carry out for each cancer
@@ -262,6 +280,20 @@ for(j in 1:nrow(outcome_cohorts)) {
     
     print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
     
+    #grab survival probabilities 1,5,10 years
+    sprob <- survfit(Surv(time_years, status) ~ gender, data=data) %>%
+      summary(times = c(1,5,10))
+
+    cols <- lapply(c(2:15) , function(x) sprob[x])
+    observedsurprobsKM_gender[[j]] <- do.call(data.frame, cols) %>%
+      rename(Gender = strata) %>%
+      mutate(Method = "Kaplan-Meier", Cancer = outcome_cohorts$cohortName[j], Age = "All", Gender = str_replace(Gender, "gender=Male", "Male"), Gender = str_replace(Gender,"gender=Female", "Female"))
+      
+
+    
+    print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+    
+    
     
   } else{
     
@@ -289,6 +321,10 @@ risktableskm_gender <- risktableskm_gender %>%
   mutate(across(everything(), as.character)) %>%
   mutate(Stratification = "Gender")
 
+#generate 1,5,10 probabilities
+sprobkmcombined_gender <- dplyr::bind_rows(observedsurprobsKM_gender) %>%
+  mutate(Stratification = "Gender")
+
 info(logger, 'KM analysis for gender stratification COMPLETE')
 
 ###########################
@@ -297,6 +333,7 @@ info(logger, 'KM analysis for gender stratification COMPLETE')
 
 observedkm_age <- list()
 observedmedianKM_age <- list()
+observedsurprobsKM_age <- list()
 observedrisktableKM_age <- list()
 
 # loop to carry out for each cancer
@@ -326,7 +363,7 @@ for(j in 1:nrow(outcome_cohorts)) {
     tidy() %>%
     rename(Age = strata) %>%
     mutate(Method = "Kaplan-Meier", Cancer = outcome_cohorts$cohortName[j], 
-           Age = str_replace(Age, "age_gr=<30", "18-29"),
+           Age = str_replace(Age, "age_gr=18-29", "18-29"),
            Age = str_replace(Age, "age_gr=30-39", "30-39"),
            Age = str_replace(Age, "age_gr=40-49", "40-49"),
            Age = str_replace(Age, "age_gr=50-59", "50-59"),
@@ -351,6 +388,28 @@ for(j in 1:nrow(outcome_cohorts)) {
   
   print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
   
+  
+  #grab survival probabilities 1,5,10 years
+  sprob <- survfit(Surv(time_years, status) ~ age_gr, data=data) %>%
+    summary(times = c(1,5,10))
+  
+  cols <- lapply(c(2:15) , function(x) sprob[x])
+  observedsurprobsKM_age[[j]] <- do.call(data.frame, cols) %>%
+    rename(Age = strata) %>%
+    mutate(Method = "Kaplan-Meier", 
+           Cancer = outcome_cohorts$cohortName[j], 
+           Age = str_replace(Age, "age_gr=18-29", "18-29"),
+           Age = str_replace(Age, "age_gr=30-39", "30-39"),
+           Age = str_replace(Age, "age_gr=40-49", "40-49"),
+           Age = str_replace(Age, "age_gr=50-59", "50-59"),
+           Age = str_replace(Age, "age_gr=60-69", "60-69"),
+           Age = str_replace(Age, "age_gr=70-79", "70-79"),
+           Age = str_replace(Age, "age_gr=80-89", "80-89"),
+           Age = str_replace(Age, "age_gr=>=90", ">=90"),
+           Gender = "Both")
+  
+  print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+  
 }
 
 # take the results from a list (one element for each cancer) and put into dataframe ----
@@ -371,6 +430,10 @@ risktableskm_age <- risktableskm_age %>%
   mutate(across(everything(), as.character)) %>%
   mutate(Stratification = "Age")
 
+#generate 1,5,10 probabilities
+sprobkmcombined_age <- dplyr::bind_rows(observedsurprobsKM_age) %>%
+  mutate(Stratification = "Age")
+
 info(logger, 'KM analysis for AGE stratification COMPLETE')
 
 ##################################################################
@@ -382,6 +445,7 @@ info(logger, 'KM analysis for age*gender stratification START')
 # KM observed
 observedkm_age_gender <- list()
 observedmedianKM_age_gender <- list()
+observedsurprobsKM_age_gender <- list()
 observedrisktableKM_age_gender <- list()
 
 # loop to carry out for each cancer
@@ -483,6 +547,53 @@ for(j in 1:nrow(outcome_cohorts)) {
     
     print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
     
+    #grab survival probabilities 1,5,10 years
+    sprob <- survfit(Surv(time_years, status) ~ genderAgegp, data=data) %>%
+      summary(times = c(1,5,10))
+    
+    cols <- lapply(c(2:15) , function(x) sprob[x])
+    observedsurprobsKM_age_gender[[j]] <- do.call(data.frame, cols) %>%
+      mutate(Method = "Kaplan-Meier", 
+             Cancer = outcome_cohorts$cohortName[j], 
+             Age = strata ,
+             Age = str_replace(Age, "genderAgegp=Female_18-29", "18-29"),
+             Age = str_replace(Age, "genderAgegp=Female_30-39", "30-39"),
+             Age = str_replace(Age, "genderAgegp=Female_40-49", "40-49"),
+             Age = str_replace(Age, "genderAgegp=Female_50-59", "50-59"),
+             Age = str_replace(Age, "genderAgegp=Female_60-69", "60-69"),
+             Age = str_replace(Age, "genderAgegp=Female_70-79", "70-79"),
+             Age = str_replace(Age, "genderAgegp=Female_80-89", "80-89"),
+             Age = str_replace(Age, "genderAgegp=Female_>=90", ">=90"),
+             Age = str_replace(Age, "genderAgegp=Male_18-29", "18-29"),
+             Age = str_replace(Age, "genderAgegp=Male_30-39", "30-39"),
+             Age = str_replace(Age, "genderAgegp=Male_40-49", "40-49"),
+             Age = str_replace(Age, "genderAgegp=Male_50-59", "50-59"),
+             Age = str_replace(Age, "genderAgegp=Male_60-69", "60-69"),
+             Age = str_replace(Age, "genderAgegp=Male_70-79", "70-79"),
+             Age = str_replace(Age, "genderAgegp=Male_80-89", "80-89"),
+             Age = str_replace(Age, "genderAgegp=Male_>=90", ">=90"),       
+             Gender = strata,
+             Gender = str_replace(Gender, "genderAgegp=Female_18-29", "Female"),
+             Gender = str_replace(Gender, "genderAgegp=Female_30-39", "Female"),
+             Gender = str_replace(Gender, "genderAgegp=Female_40-49", "Female"),
+             Gender = str_replace(Gender, "genderAgegp=Female_50-59", "Female"),
+             Gender = str_replace(Gender, "genderAgegp=Female_60-69", "Female"),
+             Gender = str_replace(Gender, "genderAgegp=Female_70-79", "Female"),
+             Gender = str_replace(Gender, "genderAgegp=Female_80-89", "Female"),
+             Gender = str_replace(Gender, "genderAgegp=Female_>=90", "Female"),
+             Gender = str_replace(Gender, "genderAgegp=Male_18-29", "Male"),
+             Gender = str_replace(Gender, "genderAgegp=Male_30-39", "Male"),
+             Gender = str_replace(Gender, "genderAgegp=Male_40-49", "Male"),
+             Gender = str_replace(Gender, "genderAgegp=Male_50-59", "Male"),
+             Gender = str_replace(Gender, "genderAgegp=Male_60-69", "Male"),
+             Gender = str_replace(Gender, "genderAgegp=Male_70-79", "Male"),
+             Gender = str_replace(Gender, "genderAgegp=Male_80-89", "Male"),
+             Gender = str_replace(Gender, "genderAgegp=Male_>=90", "Male"),
+             strata = str_replace(strata, "genderAgegp=", "") ) %>%
+      rename("GenderAge" = "strata")
+    
+    print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+    
   } else {
     
     
@@ -507,6 +618,11 @@ risktableskm_age_gender <- risktableskm_age_gender %>%
   relocate(Cancer) %>%
   mutate(across(everything(), as.character))  %>%
   mutate(Stratification = "Age*Gender")
+
+#generate 1,5,10 probabilities
+sprobkmcombined_age_gender <- dplyr::bind_rows(observedsurprobsKM_age_gender) %>%
+  mutate(Stratification = "Age*Gender")
+
 
 info(logger, 'KM analysis for AGE*GENDER stratification COMPLETE')
 
@@ -537,15 +653,27 @@ medianKMResults <- bind_rows(
 ) %>%
   mutate(Database = db.name)
 
+#1,5,10 survival probabilites results
+SurvProb1510KMResults <- bind_rows( 
+  sprobkmcombined , # all
+  sprobkmcombined_gender , # gender
+  sprobkmcombined_age , # age strat
+  sprobkmcombined_age_gender # age*gender strat 
+) %>%
+  mutate(Database = db.name)
+
 
 # put results all together in a list
 survival_study_results <- list(survivalResults ,
                                riskTableResults,
-                               medianKMResults )
+                               medianKMResults,
+                               SurvProb1510KMResults)
 
 names(survival_study_results) <- c(paste0("survival_estimates_", db.name),
                                    paste0("risk_table_results_", db.name),
-                                   paste0("median_survival_results_", db.name) )
+                                   paste0("median_survival_results_", db.name),
+                                   paste0("one_five_ten_survival_rates_", db.name)
+                                   )
 
 
 # zip results
