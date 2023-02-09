@@ -1,0 +1,9 @@
+data/*.csv
+rsconnect/shinyapps.io/dpa-pde-oxford/*.dcf
+networkResults/*.csv
+shiny/data/*.rds
+*.dcf
+Results/*
+.Rhistory
+CancerIncidencePrevalanceShiny/networkResults*
+CancerIncidencePrevalanceShiny/data*
