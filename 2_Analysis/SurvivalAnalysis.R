@@ -1,22 +1,148 @@
 # KM survival analysis ---
 
-#extract settings for survival
-settings_surv <- settings(inc_overall) %>%
-  filter(analysis_interval == "overall" & denominator_cohort_id == 3)
 
-pops <- list()
+# until server works again extracting data not linked to incidence numbers
 
-for (i in 1:length(settings_surv$analysis_id)){
-#extract the participants for each cancer
-  pops[[i]] <-cdm$person %>% 
-  inner_join(participants(inc_overall, analysisId = settings_surv$analysis_id[i]) %>% filter(!is.na(outcome_start_date)),
+# #extract settings for survival
+# settings_surv <- settings(inc_overall) %>%
+#   filter(analysis_interval == "overall" & denominator_cohort_id == 3)
+# 
+# pops <- list()
+# 
+# for (i in 1:length(settings_surv$analysis_id)){
+# #extract the participants for each cancer
+#   pops[[i]] <-cdm$person %>% 
+#   inner_join(participants(inc_overall, analysisId = settings_surv$analysis_id[i]) %>% filter(!is.na(outcome_start_date)),
+#              by = c("person_id" = "subject_id" )) %>%
+#   select(person_id,gender_concept_id, 
+#          year_of_birth, month_of_birth, day_of_birth,
+#          cohort_start_date,
+#          cohort_end_date,
+#          outcome_start_date,
+#          analysis_id)  %>%
+#   left_join(cdm$observation_period %>% 
+#               select("person_id",  "observation_period_start_date", "observation_period_end_date") %>% 
+#               distinct(),
+#             by = "person_id") %>% 
+#   left_join(cdm$death %>% 
+#               select("person_id",  "death_date") %>% 
+#               distinct(),
+#             by = "person_id") %>% 
+#   collect()
+# 
+# pops[[i]] <- pops[[i]]  %>%
+# mutate(outcome_cohort_name = settings_surv$outcome_cohort_name[i]) %>%
+#   mutate(outcome_cohort_id = settings_surv$outcome_cohort_id[i]) 
+# 
+# }
+# 
+# Pop <- dplyr::bind_rows(pops)
+
+# format data -----
+# add age -----
+# Pop$age<- NA
+# if(sum(is.na(Pop$day_of_birth))==0 & sum(is.na(Pop$month_of_birth))==0){
+#   # if we have day and month 
+#   Pop<-Pop %>%
+#     mutate(age=floor(as.numeric((ymd(cohort_start_date)-
+#                                    ymd(paste(year_of_birth,
+#                                              month_of_birth,
+#                                              day_of_birth, sep="-"))))/365.25))
+# } else { 
+#   Pop<-Pop %>% 
+#     mutate(age= year(cohort_start_date)-year_of_birth)
+# }
+# 
+# 
+# # age age groups ----
+# Pop<-Pop %>% 
+#   mutate(age_gr=ifelse(age<30,  "18-29",
+#                        ifelse(age>=30 &  age<=39,  "30-39",
+#                               ifelse(age>=40 & age<=49,  "40-49",
+#                                      ifelse(age>=50 & age<=59,  "50-59",
+#                                             ifelse(age>=60 & age<=69, "60-69", 
+#                                                    ifelse(age>=70 & age<=79, "70-79", 
+#                                                           
+#                                                           ifelse(age>=80 & age<=89, "80-89",      
+#                                                                  ifelse(age>=90, ">=90",
+#                                                                         NA))))))))) %>% 
+#   mutate(age_gr= factor(age_gr, 
+#                         levels = c("18-29","30-39","40-49", "50-59",
+#                                    "60-69", "70-79","80-89",">=90"))) 
+# table(Pop$age_gr, useNA = "always")
+# 
+# 
+# # reformat gender
+# # add gender -----
+# #8507 male
+# #8532 female
+# Pop<-Pop %>% 
+#   mutate(gender= ifelse(gender_concept_id==8507, "Male",
+#                         ifelse(gender_concept_id==8532, "Female", NA ))) %>% 
+#   mutate(gender= factor(gender, 
+#                         levels = c("Male", "Female")))
+# table(Pop$gender, useNA = "always")
+# 
+# # if missing (or unreasonable) age or gender, drop ----
+# Pop<-Pop %>% 
+#   filter(!is.na(age)) %>% 
+#   filter(age>=18) %>% 
+#   filter(age<=110) %>%
+#   filter(!is.na(gender))
+# 
+# # create sex:agegp categorical variables
+# Pop <- Pop %>%
+#   unite('genderAgegp', c(gender,age_gr), remove = FALSE) %>%
+#   mutate(genderAgegp= factor(genderAgegp, 
+#                              levels = c("Female_18-29","Female_30-39","Female_40-49", "Female_50-59",
+#                                         "Female_60-69", "Female_70-79","Female_80-89","Female_>=90",
+#                                         "Male_18-29","Male_30-39","Male_40-49", "Male_50-59",
+#                                         "Male_60-69", "Male_70-79","Male_80-89","Male_>=90"))) 
+# 
+# # drop if missing observation period end date ----
+# Pop<-Pop %>% 
+#   filter(!is.na(observation_period_end_date))
+# 
+# # need to make new end of observation period to 31/12/2019 ----
+# Pop<-Pop %>% 
+#   mutate(observation_period_end_date_2019 = ifelse(observation_period_end_date >= '2019-12-31', '2019-12-31', NA)) %>%
+#   mutate(observation_period_end_date_2019 = as.Date(observation_period_end_date_2019) ) %>%
+#   mutate(observation_period_end_date_2019 = coalesce(observation_period_end_date_2019, observation_period_end_date))
+# 
+# 
+# # binary death outcome (for survival) ---
+# # need to take into account follow up
+# # if death date is > 1/1/2019 set death to 0
+# Pop<-Pop %>% 
+#   mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
+#   mutate(status= ifelse(death_date > observation_period_end_date_2019 , 1, status )) %>% 
+#   mutate(status= ifelse(is.na(status), 1, status ))
+# 
+# # calculate follow up in years
+# Pop<-Pop %>%  
+#   mutate(time_days=as.numeric(difftime(observation_period_end_date_2019,
+#                                        outcome_start_date,
+#                                        units="days"))) %>% 
+#   mutate(time_years=time_days/365) 
+
+
+# remove people with end of observation end date == cohort entry
+# Pop<-Pop %>%
+#   filter(time_days != 0)
+#table(Pop$outcome_cohort_name)
+
+cdm$cancerincprev %>% 
+  group_by(cohort_definition_id) %>%
+  tally()
+
+# get variables for analysis ---
+Pop<-cdm$person %>% 
+  inner_join(cdm$cancerincprev,
              by = c("person_id" = "subject_id" )) %>%
   select(person_id,gender_concept_id, 
          year_of_birth, month_of_birth, day_of_birth,
          cohort_start_date,
-         cohort_end_date,
-         outcome_start_date,
-         analysis_id)  %>%
+         cohort_definition_id)  %>% 
   left_join(cdm$observation_period %>% 
               select("person_id",  "observation_period_start_date", "observation_period_end_date") %>% 
               distinct(),
@@ -25,15 +151,18 @@ for (i in 1:length(settings_surv$analysis_id)){
               select("person_id",  "death_date") %>% 
               distinct(),
             by = "person_id") %>% 
+  
   collect()
 
-pops[[i]] <- pops[[i]]  %>%
-mutate(outcome_cohort_name = settings_surv$outcome_cohort_name[i]) %>%
-  mutate(outcome_cohort_id = settings_surv$outcome_cohort_id[i]) 
 
-}
+# only include people with a diagnosis that starts at or after 1st jan 2000 ---
+Pop<-Pop %>% 
+  filter(cohort_start_date >= '2000-01-01') 
 
-Pop <- dplyr::bind_rows(pops)
+# Only include people with a diagnosis at or before 31st dec 2019 ---
+Pop<-Pop %>% 
+  filter(cohort_start_date <= '2019-12-31') 
+
 
 # format data -----
 # add age -----
@@ -44,7 +173,7 @@ if(sum(is.na(Pop$day_of_birth))==0 & sum(is.na(Pop$month_of_birth))==0){
     mutate(age=floor(as.numeric((ymd(cohort_start_date)-
                                    ymd(paste(year_of_birth,
                                              month_of_birth,
-                                             day_of_birth, sep="-"))))/365.25))
+                                             day_of_birth, sep="-"))))/365))
 } else { 
   Pop<-Pop %>% 
     mutate(age= year(cohort_start_date)-year_of_birth)
@@ -53,7 +182,7 @@ if(sum(is.na(Pop$day_of_birth))==0 & sum(is.na(Pop$month_of_birth))==0){
 
 # age age groups ----
 Pop<-Pop %>% 
-  mutate(age_gr=ifelse(age<30,  "18-29",
+  mutate(age_gr=ifelse(age<30,  "<30",
                        ifelse(age>=30 &  age<=39,  "30-39",
                               ifelse(age>=40 & age<=49,  "40-49",
                                      ifelse(age>=50 & age<=59,  "50-59",
@@ -64,9 +193,18 @@ Pop<-Pop %>%
                                                                  ifelse(age>=90, ">=90",
                                                                         NA))))))))) %>% 
   mutate(age_gr= factor(age_gr, 
-                        levels = c("18-29","30-39","40-49", "50-59",
+                        levels = c("<30","30-39","40-49", "50-59",
                                    "60-69", "70-79","80-89",">=90"))) 
 table(Pop$age_gr, useNA = "always")
+
+# wider age groups
+Pop<-Pop %>% 
+  mutate(age_gr2=ifelse(age<=50,  "<=50",
+                        ifelse(age>50, ">50",
+                               NA))) %>% 
+  mutate(age_gr2= factor(age_gr2, 
+                         levels = c("<=50", ">50")))
+table(Pop$age_gr2, useNA = "always")
 
 
 # reformat gender
@@ -91,14 +229,25 @@ Pop<-Pop %>%
 Pop <- Pop %>%
   unite('genderAgegp', c(gender,age_gr), remove = FALSE) %>%
   mutate(genderAgegp= factor(genderAgegp, 
-                             levels = c("Female_18-29","Female_30-39","Female_40-49", "Female_50-59",
+                             levels = c("Female_<30","Female_30-39","Female_40-49", "Female_50-59",
                                         "Female_60-69", "Female_70-79","Female_80-89","Female_>=90",
-                                        "Male_18-29","Male_30-39","Male_40-49", "Male_50-59",
+                                        "Male_<30","Male_30-39","Male_40-49", "Male_50-59",
                                         "Male_60-69", "Male_70-79","Male_80-89","Male_>=90"))) 
 
 # drop if missing observation period end date ----
 Pop<-Pop %>% 
   filter(!is.na(observation_period_end_date))
+
+# add prior observation time -----
+Pop<-Pop %>%  
+  mutate(prior_obs_days=as.numeric(difftime(cohort_start_date,
+                                            observation_period_start_date,
+                                            units="days"))) %>% 
+  mutate(prior_obs_years=prior_obs_days/365)
+
+# make sure all have year of prior history ---
+Pop<-Pop %>%
+  filter(prior_obs_years>=1)
 
 # need to make new end of observation period to 31/12/2019 ----
 Pop<-Pop %>% 
@@ -109,7 +258,7 @@ Pop<-Pop %>%
 
 # binary death outcome (for survival) ---
 # need to take into account follow up
-# if death date is > 1/1/2019 set death to 0
+# if death date is > 31/12/2019 set death to 0
 Pop<-Pop %>% 
   mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
   mutate(status= ifelse(death_date > observation_period_end_date_2019 , 1, status )) %>% 
@@ -118,15 +267,58 @@ Pop<-Pop %>%
 # calculate follow up in years
 Pop<-Pop %>%  
   mutate(time_days=as.numeric(difftime(observation_period_end_date_2019,
-                                       outcome_start_date,
+                                       cohort_start_date,
                                        units="days"))) %>% 
   mutate(time_years=time_days/365) 
+
+# follow up for different calender splits
+Pop<-Pop %>% 
+mutate(time_days2004=as.numeric(difftime('2004-12-31',
+                                     cohort_start_date,
+                                     units="days"))) %>% 
+  mutate(time_years2004=time_days2004/365) 
 
 
 # remove people with end of observation end date == cohort entry
 # Pop<-Pop %>%
 #   filter(time_days != 0)
-#table(Pop$outcome_cohort_name)
+
+# split the data by date of diagnosis
+
+Pop<-Pop %>% 
+  mutate(calenderYearSplitGroup=ifelse(cohort_start_date <= '2004-12-31',  "2000-2004",
+                       ifelse(cohort_start_date>='2005-01-01' &  cohort_start_date<='2009-12-31',  "2005-2009",
+                              ifelse(cohort_start_date>='2010-01-01' & cohort_start_date<='2014-12-31',  "2010-2014",
+                                                                 ifelse(cohort_start_date>='2005-01-01', "2015-2020",
+                                                                        NA))))) %>% 
+  mutate(calenderYearSplitGroup= factor(calenderYearSplitGroup, 
+                        levels = c("2000-2004","2005-2009","2010-2014", "2015-2020"))) 
+
+#create updated date of death for each calender strata
+
+# if death date is > 31/12/2004 set death to 1
+Pop<-Pop %>% 
+  mutate(status2004= ifelse(!is.na(death_date), 2, 1 )) %>%
+  mutate(status2004= ifelse(death_date > '2004-12-31' , 1, status2004 )) %>% 
+  mutate(status2004= ifelse(is.na(status2004), 1, status2004 ))
+
+# if death date is > 31/12/2009 set death to 1
+Pop<-Pop %>% 
+  mutate(status2009= ifelse(!is.na(death_date), 2, 1 )) %>%
+  mutate(status2009= ifelse(death_date > '2009-12-31' , 1, status2009 )) %>% 
+  mutate(status2009= ifelse(is.na(status2009), 1, status2009 ))
+
+# if death date is > 31/12/2014 set death to 1
+Pop<-Pop %>% 
+  mutate(status2014= ifelse(!is.na(death_date), 2, 1 )) %>%
+  mutate(status2014= ifelse(death_date > '2014-12-31' , 1, status2014 )) %>% 
+  mutate(status2014= ifelse(is.na(status2014), 1, status2014 ))
+
+# if death date is > 31/12/2020 set death to 1
+Pop<-Pop %>% 
+  mutate(status2020= ifelse(!is.na(death_date), 2, 1 )) %>%
+  mutate(status2020= ifelse(death_date > '2020-12-31' , 1, status2020 )) %>% 
+  mutate(status2020= ifelse(is.na(status2020), 1, status2020 ))
 
 ### KAPLAIN MEIER CODE ####
 
@@ -662,7 +854,6 @@ SurvProb1510KMResults <- bind_rows(
 ) %>%
   mutate(Database = db.name)
 
-
 # put results all together in a list
 survival_study_results <- list(survivalResults ,
                                riskTableResults,
@@ -674,6 +865,11 @@ names(survival_study_results) <- c(paste0("survival_estimates_", db.name),
                                    paste0("median_survival_results_", db.name),
                                    paste0("one_five_ten_survival_rates_", db.name)
                                    )
+
+
+
+#run analysis in calender year subsets
+source(here("SurvivalAnalysisCalenderYear.R"))
 
 
 # zip results
