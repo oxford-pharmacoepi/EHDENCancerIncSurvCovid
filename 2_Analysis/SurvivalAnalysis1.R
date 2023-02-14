@@ -51,25 +51,24 @@ Pop <- dplyr::bind_rows(pops)
 Pop$age<- NA
 if(sum(is.na(Pop$day_of_birth))==0 & sum(is.na(Pop$month_of_birth))==0){
   # if we have day and month
-  Pop<-Pop %>%
+  Pop <-Pop %>%
     mutate(age=floor(as.numeric((ymd(cohort_start_date)-
                                    ymd(paste(year_of_birth,
                                              month_of_birth,
                                              day_of_birth, sep="-"))))/365.25))
 } else {
-  Pop<-Pop %>%
+  Pop <- Pop %>%
     mutate(age= year(cohort_start_date)-year_of_birth)
 }
 
 # # age age groups ----
-Pop<-Pop %>%
+Pop <- Pop %>%
   mutate(age_gr=ifelse(age<30,  "18-29",
                        ifelse(age>=30 &  age<=39,  "30-39",
                               ifelse(age>=40 & age<=49,  "40-49",
                                      ifelse(age>=50 & age<=59,  "50-59",
                                             ifelse(age>=60 & age<=69, "60-69",
                                                    ifelse(age>=70 & age<=79, "70-79",
-
                                                           ifelse(age>=80 & age<=89, "80-89",
                                                                  ifelse(age>=90, ">=90",
                                                                         NA))))))))) %>%
@@ -82,7 +81,7 @@ table(Pop$age_gr, useNA = "always")
 # # add gender -----
 # #8507 male
 # #8532 female
-Pop<-Pop %>%
+Pop <-Pop %>%
   mutate(gender= ifelse(gender_concept_id==8507, "Male",
                         ifelse(gender_concept_id==8532, "Female", NA ))) %>%
   mutate(gender= factor(gender,
@@ -90,7 +89,7 @@ Pop<-Pop %>%
 table(Pop$gender, useNA = "always")
 
 # # if missing (or unreasonable) age or gender, drop ----
-Pop<-Pop %>%
+Pop <-Pop %>%
   filter(!is.na(age)) %>%
   filter(age>=18) %>%
   filter(age<=110) %>%
@@ -106,230 +105,95 @@ Pop <- Pop %>%
                                         "Male_60-69", "Male_70-79","Male_80-89","Male_>=90")))
 
 # # drop if missing observation period end date ----
-Pop<-Pop %>%
+Pop <-Pop %>%
   filter(!is.na(observation_period_end_date))
 
-# # need to make new end of observation period to 31/12/2019 ----
-Pop<-Pop %>%
-  mutate(observation_period_end_date_2019 = ifelse(observation_period_end_date >= '2019-12-31', '2019-12-31', NA)) %>%
-  mutate(observation_period_end_date_2019 = as.Date(observation_period_end_date_2019) ) %>%
-  mutate(observation_period_end_date_2019 = coalesce(observation_period_end_date_2019, observation_period_end_date))
 
+#FUNCTION to extract the data and calculate the correct observation time and event (death) for different calender strata
+DataExtraction <- function(dataset){
+  
+  #for whole dataset
+  #make new end of observation period to studyEndDate parameter ----
+  data <-dataset %>%
+    mutate(endOfObservation = ifelse(observation_period_end_date >= studyEndDate, studyEndDate, NA)) %>%
+    mutate(endOfObservation = as.Date(endOfObservation) ) %>%
+    mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
+  
+  # binary death outcome (for survival) ---
+  # need to take into account follow up
+  # if death date is > database end data set death to 0
+  data <-data %>%
+    mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
+    mutate(status= ifelse(death_date > endOfObservation , 1, status )) %>%
+    mutate(status= ifelse(is.na(status), 1, status ))
+  
+  # calculate follow up in years
+  data <-data %>%
+    mutate(time_days=as.numeric(difftime(endOfObservation,
+                                         outcome_start_date,
+                                         units="days"))) %>%
+    mutate(time_years=time_days/365)
+  
+  # take "dataset" and do the code for each calender year
+  # carry out for calender year
+  # take year and split into groups based on the data available
+  grid <- seq(min(year(ymd(dataset$cohort_start_date))), max(year(ymd(dataset$cohort_start_date))),by=5)
+  
+  # now need to create the start and end dates for each one
+  startYear <- paste0(grid,"-01-01") # first days
+  endYear <- paste0(grid+4,"-12-31") # end days (plus 4 to create 5 year bands)
+  
+  # split data into groups of calender year and put it into a list. This will create 4 groups split by calender year
+  calenderSplitData <- list()
+  
+  for(w in 1:length(grid)){
+    
+    calenderdata <- dataset %>%
+      filter( outcome_start_date >= startYear[w] &  
+                outcome_start_date <= endYear[w] )
+    
+      calenderdata <- calenderdata %>%
+      mutate(endOfObservation = ifelse(observation_period_end_date >= endYear[w], endYear[w], NA)) %>%
+      mutate(endOfObservation = as.Date(endOfObservation) ) %>%
+      mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
+    
+    # binary death outcome (for survival) ---
+    # need to take into account follow up
+    # if death date is > database end data set death to 0
+    calenderdata <- calenderdata %>%
+      mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
+      mutate(status= ifelse(death_date > endOfObservation , 1, status )) %>%
+      mutate(status= ifelse(is.na(status), 1, status ))
+    
+    # calculate follow up in years
+    calenderdata <- calenderdata %>%
+      mutate(time_days=as.numeric(difftime(endOfObservation,
+                                           outcome_start_date,
+                                           units="days"))) %>%
+      mutate(time_years=time_days/365)
+    
+    calenderSplitData[[w]] <- calenderdata
+    
+  }
+  
 
-# binary death outcome (for survival) ---
-# need to take into account follow up
-# if death date is > 1/1/2019 set death to 0
-Pop<-Pop %>%
-  mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
-  mutate(status= ifelse(death_date > observation_period_end_date_2019 , 1, status )) %>%
-  mutate(status= ifelse(is.na(status), 1, status ))
+  return(c(list(data),calenderSplitData))
 
-# calculate follow up in years
-Pop<-Pop %>%
-  mutate(time_days=as.numeric(difftime(observation_period_end_date_2019,
-                                       outcome_start_date,
-                                       units="days"))) %>%
-  mutate(time_years=time_days/365)
+  
+}
 
+#OUTPUT data for whole dataset and strata based on calender year
+PopAll <- DataExtraction(dataset = Pop)
 
-# remove people with end of observation end date == cohort entry
-# Pop<-Pop %>%
-#   filter(time_days != 0)
-#table(Pop$outcome_cohort_name)
-
-# cdm$cancerincprev %>% 
-#   group_by(cohort_definition_id) %>%
-#   tally()
-# 
-# # get variables for analysis ---
-# Pop<-cdm$person %>% 
-#   inner_join(cdm$cancerincprev,
-#              by = c("person_id" = "subject_id" )) %>%
-#   select(person_id,gender_concept_id, 
-#          year_of_birth, month_of_birth, day_of_birth,
-#          cohort_start_date,
-#          cohort_definition_id)  %>% 
-#   left_join(cdm$observation_period %>% 
-#               select("person_id",  "observation_period_start_date", "observation_period_end_date") %>% 
-#               distinct(),
-#             by = "person_id") %>% 
-#   left_join(cdm$death %>% 
-#               select("person_id",  "death_date") %>% 
-#               distinct(),
-#             by = "person_id") %>% 
-#   
-#   collect()
-# 
-# 
-# # only include people with a diagnosis that starts at or after 1st jan 2000 ---
-# Pop<-Pop %>% 
-#   filter(cohort_start_date >= '2000-01-01') 
-# 
-# # Only include people with a diagnosis at or before 31st dec 2019 ---
-# Pop<-Pop %>% 
-#   filter(cohort_start_date <= '2019-12-31') 
-# 
-# 
-# # format data -----
-# # add age -----
-# Pop$age<- NA
-# if(sum(is.na(Pop$day_of_birth))==0 & sum(is.na(Pop$month_of_birth))==0){
-#   # if we have day and month 
-#   Pop<-Pop %>%
-#     mutate(age=floor(as.numeric((ymd(cohort_start_date)-
-#                                    ymd(paste(year_of_birth,
-#                                              month_of_birth,
-#                                              day_of_birth, sep="-"))))/365))
-# } else { 
-#   Pop<-Pop %>% 
-#     mutate(age= year(cohort_start_date)-year_of_birth)
-# }
-# 
-# 
-# # age age groups ----
-# Pop<-Pop %>% 
-#   mutate(age_gr=ifelse(age<30,  "<30",
-#                        ifelse(age>=30 &  age<=39,  "30-39",
-#                               ifelse(age>=40 & age<=49,  "40-49",
-#                                      ifelse(age>=50 & age<=59,  "50-59",
-#                                             ifelse(age>=60 & age<=69, "60-69", 
-#                                                    ifelse(age>=70 & age<=79, "70-79", 
-#                                                           
-#                                                           ifelse(age>=80 & age<=89, "80-89",      
-#                                                                  ifelse(age>=90, ">=90",
-#                                                                         NA))))))))) %>% 
-#   mutate(age_gr= factor(age_gr, 
-#                         levels = c("<30","30-39","40-49", "50-59",
-#                                    "60-69", "70-79","80-89",">=90"))) 
-# table(Pop$age_gr, useNA = "always")
-# 
-# # wider age groups
-# Pop<-Pop %>% 
-#   mutate(age_gr2=ifelse(age<=50,  "<=50",
-#                         ifelse(age>50, ">50",
-#                                NA))) %>% 
-#   mutate(age_gr2= factor(age_gr2, 
-#                          levels = c("<=50", ">50")))
-# table(Pop$age_gr2, useNA = "always")
-# 
-# 
-# # reformat gender
-# # add gender -----
-# #8507 male
-# #8532 female
-# Pop<-Pop %>% 
-#   mutate(gender= ifelse(gender_concept_id==8507, "Male",
-#                         ifelse(gender_concept_id==8532, "Female", NA ))) %>% 
-#   mutate(gender= factor(gender, 
-#                         levels = c("Male", "Female")))
-# table(Pop$gender, useNA = "always")
-# 
-# # if missing (or unreasonable) age or gender, drop ----
-# Pop<-Pop %>% 
-#   filter(!is.na(age)) %>% 
-#   filter(age>=18) %>% 
-#   filter(age<=110) %>%
-#   filter(!is.na(gender))
-# 
-# # create sex:agegp categorical variables
-# Pop <- Pop %>%
-#   unite('genderAgegp', c(gender,age_gr), remove = FALSE) %>%
-#   mutate(genderAgegp= factor(genderAgegp, 
-#                              levels = c("Female_<30","Female_30-39","Female_40-49", "Female_50-59",
-#                                         "Female_60-69", "Female_70-79","Female_80-89","Female_>=90",
-#                                         "Male_<30","Male_30-39","Male_40-49", "Male_50-59",
-#                                         "Male_60-69", "Male_70-79","Male_80-89","Male_>=90"))) 
-# 
-# # drop if missing observation period end date ----
-# Pop<-Pop %>% 
-#   filter(!is.na(observation_period_end_date))
-# 
-# # add prior observation time -----
-# Pop<-Pop %>%  
-#   mutate(prior_obs_days=as.numeric(difftime(cohort_start_date,
-#                                             observation_period_start_date,
-#                                             units="days"))) %>% 
-#   mutate(prior_obs_years=prior_obs_days/365)
-# 
-# # make sure all have year of prior history ---
-# Pop<-Pop %>%
-#   filter(prior_obs_years>=1)
-# 
-# # need to make new end of observation period to 31/12/2019 ----
-# Pop<-Pop %>% 
-#   mutate(observation_period_end_date_2019 = ifelse(observation_period_end_date >= '2019-12-31', '2019-12-31', NA)) %>%
-#   mutate(observation_period_end_date_2019 = as.Date(observation_period_end_date_2019) ) %>%
-#   mutate(observation_period_end_date_2019 = coalesce(observation_period_end_date_2019, observation_period_end_date))
-# 
-# 
-# # binary death outcome (for survival) ---
-# # need to take into account follow up
-# # if death date is > 31/12/2019 set death to 0
-# Pop<-Pop %>% 
-#   mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
-#   mutate(status= ifelse(death_date > observation_period_end_date_2019 , 1, status )) %>% 
-#   mutate(status= ifelse(is.na(status), 1, status ))
-# 
-# # calculate follow up in years
-# Pop<-Pop %>%  
-#   mutate(time_days=as.numeric(difftime(observation_period_end_date_2019,
-#                                        cohort_start_date,
-#                                        units="days"))) %>% 
-#   mutate(time_years=time_days/365) 
-# 
-# # follow up for different calender splits
-# Pop<-Pop %>% 
-# mutate(time_days2004=as.numeric(difftime('2004-12-31',
-#                                      cohort_start_date,
-#                                      units="days"))) %>% 
-#   mutate(time_years2004=time_days2004/365) 
-# 
-# 
-# # remove people with end of observation end date == cohort entry
-# # Pop<-Pop %>%
-# #   filter(time_days != 0)
-# 
-# # split the data by date of diagnosis
-# 
-# Pop<-Pop %>% 
-#   mutate(calenderYearSplitGroup=ifelse(cohort_start_date <= '2004-12-31',  "2000-2004",
-#                        ifelse(cohort_start_date>='2005-01-01' &  cohort_start_date<='2009-12-31',  "2005-2009",
-#                               ifelse(cohort_start_date>='2010-01-01' & cohort_start_date<='2014-12-31',  "2010-2014",
-#                                                                  ifelse(cohort_start_date>='2005-01-01', "2015-2020",
-#                                                                         NA))))) %>% 
-#   mutate(calenderYearSplitGroup= factor(calenderYearSplitGroup, 
-#                         levels = c("2000-2004","2005-2009","2010-2014", "2015-2020"))) 
-# 
-# #create updated date of death for each calender strata
-# 
-# # if death date is > 31/12/2004 set death to 1
-# Pop<-Pop %>% 
-#   mutate(status2004= ifelse(!is.na(death_date), 2, 1 )) %>%
-#   mutate(status2004= ifelse(death_date > '2004-12-31' , 1, status2004 )) %>% 
-#   mutate(status2004= ifelse(is.na(status2004), 1, status2004 ))
-# 
-# # if death date is > 31/12/2009 set death to 1
-# Pop<-Pop %>% 
-#   mutate(status2009= ifelse(!is.na(death_date), 2, 1 )) %>%
-#   mutate(status2009= ifelse(death_date > '2009-12-31' , 1, status2009 )) %>% 
-#   mutate(status2009= ifelse(is.na(status2009), 1, status2009 ))
-# 
-# # if death date is > 31/12/2014 set death to 1
-# Pop<-Pop %>% 
-#   mutate(status2014= ifelse(!is.na(death_date), 2, 1 )) %>%
-#   mutate(status2014= ifelse(death_date > '2014-12-31' , 1, status2014 )) %>% 
-#   mutate(status2014= ifelse(is.na(status2014), 1, status2014 ))
-# 
-# # if death date is > 31/12/2020 set death to 1
-# Pop<-Pop %>% 
-#   mutate(status2020= ifelse(!is.na(death_date), 2, 1 )) %>%
-#   mutate(status2020= ifelse(death_date > '2020-12-31' , 1, status2020 )) %>% 
-#   mutate(status2020= ifelse(is.na(status2020), 1, status2020 ))
 
 ### KAPLAIN MEIER CODE ####
-SurAnalysis <- function(dataset, 
-                        outcomeCohort
-                        ) {
+# INPUT
+# dataset is a dataframe containing the data as processed above
+# outcome cohort is a dataframe containing information about cancers
+# OUTPUT
+# list containing 4 data frames 1) survival estimates 2) risktables 3) median survival 4) survival probabilities
+
+SurAnalysis <- function(dataset, outcomeCohort) {
 
 # whole population
 observedkm <- list()
@@ -338,7 +202,7 @@ observedsurprobsKM <- list()
 observedrisktableKM <- list()
 
 # loop to carry out for each cancer
-for(j in 1:nrow(outcome_cohorts)) { 
+for(j in 1:nrow(outcomeCohort)) { 
   
   #subset the data by cancer type
   data <- dataset %>%
@@ -347,19 +211,19 @@ for(j in 1:nrow(outcome_cohorts)) {
   #carry out km estimate
   observedkm[[j]] <- survfit (Surv(time_years, status) ~ 1, data=data) %>%
     tidy() %>%
-    mutate(Method = "Kaplan-Meier", Cancer = outcome_cohorts$cohortName[j], Age = "All", Gender = "Both") 
+    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All", Gender = "Both") 
   
-  print(paste0("KM for observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+  print(paste0("KM for observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
   
   # get the risk table ---
   grid <- seq(0,ceiling(time_length(difftime(as.Date(studyEndDate), as.Date(studyStartDate)), "years")),by=2) 
   observedrisktableKM[[j]] <- RiskSetCount(grid,data$time_years) %>%
     rbind(grid) %>% as.data.frame() %>%
     `colnames<-`(grid) %>%
-    mutate(Method = "Kaplan-Meier", Cancer = outcome_cohorts$cohortName[j], Age = "All", Gender = "Both" ) %>%
+    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All", Gender = "Both" ) %>%
     slice(1)
   
-  print(paste0("Extract risk table ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+  print(paste0("Extract risk table ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
   
   # KM median survival---
   modelKM <- survfit(Surv(time_years, status) ~ 1, data=data) %>%
@@ -371,13 +235,13 @@ for(j in 1:nrow(outcome_cohorts)) {
     pivot_longer(-rowname) %>% 
     pivot_wider(names_from=rowname, values_from=value) %>%
     mutate(Method = "Kaplan-Meier", 
-           Cancer = outcome_cohorts$cohortName[j],
+           Cancer = outcomeCohort$cohortName[j],
            Gender = "Both" ,
            Age = "All" ) %>%
     select(-name)
   
   
-  print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+  print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
   
   #grab survival probabilities 1,5,10 years
   sprob <- survfit(Surv(time_years, status) ~ 1, data=data) %>% 
@@ -386,11 +250,11 @@ for(j in 1:nrow(outcome_cohorts)) {
   cols <- lapply(c(2:15) , function(x) sprob[x])
   observedsurprobsKM[[j]] <- do.call(data.frame, cols) %>%
     mutate(Method = "Kaplan-Meier", 
-           Cancer = outcome_cohorts$cohortName[j],
+           Cancer = outcomeCohort$cohortName[j],
            Gender = "Both" ,
            Age = "All" )
 
-  print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+  print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
   
   
 }
@@ -426,7 +290,7 @@ observedsurprobsKM_gender <- list()
 observedrisktableKM_gender <- list()
 
 # loop to carry out for each cancer
-for(j in 1:nrow(outcome_cohorts)) { 
+for(j in 1:nrow(outcomeCohort)) { 
   
   #subset the data by cancer type
   data <- dataset %>%
@@ -436,10 +300,10 @@ for(j in 1:nrow(outcome_cohorts)) {
   filter4gender <- RiskSetCount(grid,data$time_years[data$gender == "Male"])%>%
     rbind(grid) %>% as.data.frame() %>%
     `colnames<-`(grid) %>%
-    mutate(Method = "Kaplan-Meier", Cancer = outcome_cohorts$cohortName[j], Age = "All") %>%
+    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All") %>%
     slice(1) %>%
     rbind(RiskSetCount(grid,data$time_years[data$gender == "Female"]))%>%
-    mutate(Method = "Kaplan-Meier", Cancer = outcome_cohorts$cohortName[j], Age = "All", Gender = c("Male", "Female"))
+    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All", Gender = c("Male", "Female"))
   
   #creates a test that determines if both genders in the data
   genderlevels <- data %>%
@@ -452,21 +316,21 @@ for(j in 1:nrow(outcome_cohorts)) {
     observedrisktableKM_gender[[j]] <- RiskSetCount(grid,data$time_years[data$gender == "Male"])%>%
       rbind(grid) %>% as.data.frame() %>%
       `colnames<-`(grid) %>%
-      mutate(Method = "Kaplan-Meier", Cancer = outcome_cohorts$cohortName[j], Age = "All") %>%
+      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All") %>%
       slice(1) %>%
       rbind(RiskSetCount(grid,data$time_years[data$gender == "Female"]))%>%
-      mutate(Method = "Kaplan-Meier", Cancer = outcome_cohorts$cohortName[j], Age = "All", Gender = c("Male", "Female")) 
+      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All", Gender = c("Male", "Female")) 
     
-    print(paste0("Extract risk table ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+    print(paste0("Extract risk table ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
     
     #carry out km estimate
     observedkm_gender[[j]] <- survfit (Surv(time_years, status) ~ gender, data=data) %>%
       tidy() %>%
       rename(Gender = strata) %>%
-      mutate(Method = "Kaplan-Meier", Cancer = outcome_cohorts$cohortName[j], Age = "All", Gender = str_replace(Gender, "gender=Male", "Male"), Gender = str_replace(Gender,"gender=Female", "Female")) %>%
+      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All", Gender = str_replace(Gender, "gender=Male", "Male"), Gender = str_replace(Gender,"gender=Female", "Female")) %>%
       filter(n.risk >= 5) #remove entries with less than 5 patients
     
-    print(paste0("KM for observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+    print(paste0("KM for observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
     
     # KM median survival ---
     modelKM <- survfit(Surv(time_years, status) ~ gender, data=data) %>%
@@ -476,11 +340,11 @@ for(j in 1:nrow(outcome_cohorts)) {
     observedmedianKM_gender[[j]] <- modelKM$table %>%
       as.data.frame() %>%
       mutate(Method = "Kaplan-Meier", 
-             Cancer = outcome_cohorts$cohortName[j], 
+             Cancer = outcomeCohort$cohortName[j], 
              Age = "All" ,
              Gender = c("Male", "Female"))
     
-    print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+    print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
     
     #grab survival probabilities 1,5,10 years
     sprob <- survfit(Surv(time_years, status) ~ gender, data=data) %>%
@@ -489,17 +353,17 @@ for(j in 1:nrow(outcome_cohorts)) {
     cols <- lapply(c(2:15) , function(x) sprob[x])
     observedsurprobsKM_gender[[j]] <- do.call(data.frame, cols) %>%
       rename(Gender = strata) %>%
-      mutate(Method = "Kaplan-Meier", Cancer = outcome_cohorts$cohortName[j], Age = "All", Gender = str_replace(Gender, "gender=Male", "Male"), Gender = str_replace(Gender,"gender=Female", "Female"))
+      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All", Gender = str_replace(Gender, "gender=Male", "Male"), Gender = str_replace(Gender,"gender=Female", "Female"))
       
 
     
-    print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+    print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
     
     
     
   } else{
     
-    print(paste0("Gender stratification KM analysis not carried out for ", outcome_cohorts$cohortName[j], " due to only 1 gender present " , Sys.time()))
+    print(paste0("Gender stratification KM analysis not carried out for ", outcomeCohort$cohortName[j], " due to only 1 gender present " , Sys.time()))
     
   }
   
@@ -539,7 +403,7 @@ observedsurprobsKM_age <- list()
 observedrisktableKM_age <- list()
 
 # loop to carry out for each cancer
-for(j in 1:nrow(outcome_cohorts)) { 
+for(j in 1:nrow(outcomeCohort)) { 
   
   #subset the data by cancer type
   data <- dataset %>%
@@ -558,13 +422,13 @@ for(j in 1:nrow(outcome_cohorts)) {
     rbind(RiskSetCount(grid,data$time_years[data$age_gr == "70-79"]))%>%
     rbind(RiskSetCount(grid,data$time_years[data$age_gr == "80-89"]))%>%
     rbind(RiskSetCount(grid,data$time_years[data$age_gr == ">=90"]))%>%
-    mutate(Method = "Kaplan-Meier", Cancer = outcome_cohorts$cohortName[j], Gender = "Both", Age = c("<30" ,"30-39", "40-49" ,"50-59" ,"60-69", "70-79", "80-89" ,">=90")) 
+    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Gender = "Both", Age = c("<30" ,"30-39", "40-49" ,"50-59" ,"60-69", "70-79", "80-89" ,">=90")) 
   
   #carry out km estimate
   observedkm_age[[j]] <- survfit (Surv(time_years, status) ~ age_gr, data=data) %>%
     tidy() %>%
     rename(Age = strata) %>%
-    mutate(Method = "Kaplan-Meier", Cancer = outcome_cohorts$cohortName[j], 
+    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], 
            Age = str_replace(Age, "age_gr=18-29", "18-29"),
            Age = str_replace(Age, "age_gr=30-39", "30-39"),
            Age = str_replace(Age, "age_gr=40-49", "40-49"),
@@ -575,7 +439,7 @@ for(j in 1:nrow(outcome_cohorts)) {
            Age = str_replace(Age, "age_gr=>=90", ">=90"),
            Gender = "Both")
   
-  print(paste0("KM for observed data age strat ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+  print(paste0("KM for observed data age strat ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
   
   
   # KM median survival---
@@ -585,10 +449,10 @@ for(j in 1:nrow(outcome_cohorts)) {
   observedmedianKM_age[[j]] <- modelKM$table %>%
     as.data.frame() %>%
     mutate(Method = "Kaplan-Meier", 
-           Cancer = outcome_cohorts$cohortName[j], 
+           Cancer = outcomeCohort$cohortName[j], 
            Gender = "Both" )
   
-  print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+  print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
   
   
   #grab survival probabilities 1,5,10 years
@@ -599,7 +463,7 @@ for(j in 1:nrow(outcome_cohorts)) {
   observedsurprobsKM_age[[j]] <- do.call(data.frame, cols) %>%
     rename(Age = strata) %>%
     mutate(Method = "Kaplan-Meier", 
-           Cancer = outcome_cohorts$cohortName[j], 
+           Cancer = outcomeCohort$cohortName[j], 
            Age = str_replace(Age, "age_gr=18-29", "18-29"),
            Age = str_replace(Age, "age_gr=30-39", "30-39"),
            Age = str_replace(Age, "age_gr=40-49", "40-49"),
@@ -610,7 +474,7 @@ for(j in 1:nrow(outcome_cohorts)) {
            Age = str_replace(Age, "age_gr=>=90", ">=90"),
            Gender = "Both")
   
-  print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+  print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
   
 }
 
@@ -651,7 +515,7 @@ observedsurprobsKM_age_gender <- list()
 observedrisktableKM_age_gender <- list()
 
 # loop to carry out for each cancer
-for(j in 1:nrow(outcome_cohorts)) { 
+for(j in 1:nrow(outcomeCohort)) { 
   
   #subset the data by cancer type
   data <- dataset %>%
@@ -684,17 +548,17 @@ for(j in 1:nrow(outcome_cohorts)) {
       rbind(RiskSetCount(grid,data$time_years[data$genderAgegp == "Male_70-79"]))%>%
       rbind(RiskSetCount(grid,data$time_years[data$genderAgegp == "Male_80-89"]))%>%
       rbind(RiskSetCount(grid,data$time_years[data$genderAgegp == "Male_>=90"]))%>%
-      mutate(Method = "Kaplan-Meier", Cancer = outcome_cohorts$cohortName[j],
+      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j],
              Gender = rep(c("Female", "Male"), each = nlevels(data$age_gr)),
              Age = rep(c("18-29" ,"30-39", "40-49" ,"50-59" ,"60-69", "70-79", "80-89" ,">=90"), 2) ) %>%
       unite("GenderAge", c(Gender, Age), remove = FALSE) 
     
-    print(paste0("Extract risk table ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+    print(paste0("Extract risk table ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
     
     #carry out km estimate ---
     observedkm_age_gender[[j]] <- survfit (Surv(time_years, status) ~ genderAgegp, data=data) %>%
       tidy() %>%
-      mutate(Method = "Kaplan-Meier", Cancer = outcome_cohorts$cohortName[j], 
+      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], 
              Age = strata ,
              Age = str_replace(Age, "genderAgegp=Female_18-29", "18-29"),
              Age = str_replace(Age, "genderAgegp=Female_30-39", "30-39"),
@@ -732,7 +596,7 @@ for(j in 1:nrow(outcome_cohorts)) {
              strata = str_replace(strata, "genderAgegp=", "") ) %>%
       rename("GenderAge" = "strata")
     
-    print(paste0("KM for observed data age strat ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+    print(paste0("KM for observed data age strat ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
     
     
     # KM median survival---
@@ -742,12 +606,12 @@ for(j in 1:nrow(outcome_cohorts)) {
     observedmedianKM_age_gender[[j]] <- modelKM$table %>%
       as.data.frame() %>%
       mutate(Method = "Kaplan-Meier", 
-             Cancer = outcome_cohorts$cohortName[j],
+             Cancer = outcomeCohort$cohortName[j],
              GenderAge = rownames(modelKM$table), 
              GenderAge = str_replace(GenderAge, "genderAgegp=", "")) %>%
       separate(col = "GenderAge", into = c("Gender", "Age"), sep = "_", remove = FALSE)
     
-    print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+    print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
     
     #grab survival probabilities 1,5,10 years
     sprob <- survfit(Surv(time_years, status) ~ genderAgegp, data=data) %>%
@@ -756,7 +620,7 @@ for(j in 1:nrow(outcome_cohorts)) {
     cols <- lapply(c(2:15) , function(x) sprob[x])
     observedsurprobsKM_age_gender[[j]] <- do.call(data.frame, cols) %>%
       mutate(Method = "Kaplan-Meier", 
-             Cancer = outcome_cohorts$cohortName[j], 
+             Cancer = outcomeCohort$cohortName[j], 
              Age = strata ,
              Age = str_replace(Age, "genderAgegp=Female_18-29", "18-29"),
              Age = str_replace(Age, "genderAgegp=Female_30-39", "30-39"),
@@ -794,12 +658,12 @@ for(j in 1:nrow(outcome_cohorts)) {
              strata = str_replace(strata, "genderAgegp=", "") ) %>%
       rename("GenderAge" = "strata")
     
-    print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcome_cohorts$cohortName[j], " completed"))
+    print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
     
   } else {
     
     
-    print(paste0("Gender*Age stratification KM analysis not carried out for ", outcome_cohorts$cohortName[j], " due to only 1 gender present age stratification will have results " , Sys.time()))
+    print(paste0("Gender*Age stratification KM analysis not carried out for ", outcomeCohort$cohortName[j], " due to only 1 gender present age stratification will have results " , Sys.time()))
   }
 }
 
@@ -836,7 +700,8 @@ survivalResults <- bind_rows(
   observedkmcombined_age , # age strat
   observedkmcombined_age_gender # age gender strat
 ) %>%
-  mutate(Database = db.name)
+  mutate(Database = db.name, CalenderYearGp = paste0(min(year(ymd(data$cohort_end_date))),"-",
+                                                     max(year(ymd(data$cohort_end_date)))))
 
 #risk table # error with characters and double formats
 riskTableResults <- bind_rows(
@@ -845,7 +710,8 @@ riskTableResults <- bind_rows(
   risktableskm_age , # age strat
   risktableskm_age_gender # age*gender strat 
 ) %>%
-  mutate(Database = db.name)
+  mutate(Database = db.name, CalenderYearGp = paste0(min(year(ymd(data$cohort_end_date))),"-",
+                                                     max(year(ymd(data$cohort_end_date)))))
 
 #median results
 medianKMResults <- bind_rows( 
@@ -854,7 +720,8 @@ medianKMResults <- bind_rows(
   medkmcombined_age , # age strat
   medkmcombined_age_gender # age*gender strat 
 ) %>%
-  mutate(Database = db.name)
+  mutate(Database = db.name, CalenderYearGp = paste0(min(year(ymd(data$cohort_end_date))),"-",
+                                                     max(year(ymd(data$cohort_end_date)))))
 
 #1,5,10 survival probabilites results
 SurvProb1510KMResults <- bind_rows( 
@@ -863,7 +730,8 @@ SurvProb1510KMResults <- bind_rows(
   sprobkmcombined_age , # age strat
   sprobkmcombined_age_gender # age*gender strat 
 ) %>%
-  mutate(Database = db.name)
+  mutate(Database = db.name, CalenderYearGp = paste0(min(year(ymd(data$cohort_end_date))),"-",
+                                                     max(year(ymd(data$cohort_end_date)))))
 
 # put results all together in a list
 survival_study_results <- list(survivalResults ,
@@ -878,16 +746,32 @@ names(survival_study_results) <- c(paste0("survival_estimates_", db.name),
 )
 
 
+print(paste0("Survival Analysis completed"))
+
+return(survival_study_results)
+
+}
 
 
+#whole data
+test1 <- SurAnalysis(dataset = PopAll[[1]],
+                    outcomeCohort = outcome_cohorts)
 
+# calender strata 1
+test2 <- SurAnalysis(dataset = PopAll[[2]],
+                     outcomeCohort = outcome_cohorts)
+# calender strata 2
+test3 <- SurAnalysis(dataset = PopAll[[3]],
+                     outcomeCohort = outcome_cohorts)
+# calender strata 3
+test4 <- SurAnalysis(dataset = PopAll[[4]],
+                     outcomeCohort = outcome_cohorts)
+# calender strata 4
+test5 <- SurAnalysis(dataset = PopAll[[5]],
+                     outcomeCohort = outcome_cohorts)
 
+# need to put into a loop then merge ALL results into 1 and zip 
 
-
-
-
-#run analysis in calender year subsets
-#source(here("SurvivalAnalysisCalenderYear.R"))
 
 
 # zip results

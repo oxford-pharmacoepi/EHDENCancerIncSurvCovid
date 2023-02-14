@@ -7,8 +7,8 @@ info(logger, "- Getting denominator: cancer populations")
 #get denominator
 cdm$denominator <- generateDenominatorCohortSet(
   cdm = cdm,
-  startDate = as.Date("2000-01-01"),
-  endDate = as.Date("2019-12-31"),
+  startDate = as.Date(studyStartDate),
+  endDate = as.Date(studyEndDate),
   ageGroup =list(
     c(18, 150),
     c(18, 29),
@@ -123,6 +123,7 @@ inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit 
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "esophagealCancer", "Esophagus")) %>%  
   mutate(time = format(incidence_start_date, format="%Y")) %>%
   as.data.frame()
 
@@ -133,8 +134,8 @@ plotAll <- inc_yrs_plot %>%
   geom_point(size = 2.5) +
   xlab("Calender year") +
   ylab("Incidence rate per 100000 person-years") +
-  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
-  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) +
   labs(colour = "Cancer") +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
         panel.background = element_blank() ,
@@ -165,6 +166,7 @@ pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit 
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "esophagealCancer", "Esophagus")) %>% 
   mutate(time = format(prevalence_start_date, format="%Y")) %>%
   as.data.frame()
 
@@ -175,8 +177,8 @@ plotAll <- pp_yrs_plot %>%
   geom_point(size = 2.5) +
   xlab("Calender year") +
   ylab("Prevalence") +
-  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
-  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) +
   labs(colour = "Cancer") +
   scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
@@ -208,6 +210,7 @@ inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit 
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "esophagealCancer", "Esophagus")) %>% 
   mutate(time = format(incidence_start_date, format="%Y")) %>%
   as.data.frame()
 
@@ -218,8 +221,8 @@ plotGender <- inc_yrs_plot %>%
   geom_point(size = 2.5) +
   xlab("Calender year") +
   ylab("Incidence rate per 100000 person-years") +
-  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
-  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) +
   labs(colour = "Cancer") +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
         panel.background = element_blank() ,
@@ -251,6 +254,7 @@ pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit 
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "esophagealCancer", "Esophagus")) %>% 
   mutate(time = format(prevalence_start_date, format="%Y")) %>%
   as.data.frame()
 
@@ -261,8 +265,8 @@ plotGender <- pp_yrs_plot %>%
   geom_point(size = 2.5) +
   xlab("Calender year") +
   ylab("Prevalence") +
-  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
-  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) +
   labs(colour = "Cancer") +
   scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
@@ -299,6 +303,7 @@ inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit 
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "esophagealCancer", "Esophagus")) %>% 
   mutate(time = format(incidence_start_date, format="%Y")) %>%
   mutate(time = as.numeric(time)) %>%
   as.data.frame()
@@ -321,8 +326,8 @@ plotAge <- inc_yrs_plot %>%
   geom_point(size = 1.5) +
   xlab("Calender year") +
   ylab("Incidence rate per 100000 person-years") +
-  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
-  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) +
   labs(colour = "Cancer") +
   scale_x_continuous(breaks=seq(min(inc_yrs_plot$time), max(inc_yrs_plot$time), 2)) +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
@@ -357,6 +362,7 @@ pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit 
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "esophagealCancer", "Esophagus")) %>% 
   mutate(time = format(prevalence_start_date, format="%Y")) %>%
   mutate(time = as.numeric(time)) %>%
   as.data.frame()
@@ -368,8 +374,8 @@ plotAge <- pp_yrs_plot %>%
   geom_point(size = 1.5) +
   xlab("Calender year") +
   ylab("Prevalence") +
-  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
-  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) +
   labs(colour = "Cancer") +
   scale_x_continuous(breaks=seq(min(inc_yrs_plot$time), max(inc_yrs_plot$time), 2)) +
   scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
@@ -406,6 +412,7 @@ inc_yrs_plot <- study_results$incidence_estimates %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "esophagealCancer", "Esophagus")) %>% 
   mutate(time = format(incidence_start_date, format="%Y")) %>%
   mutate(time = as.numeric(time)) %>%
   as.data.frame()
@@ -427,8 +434,8 @@ plotAgeGender <- inc_yrs_plot %>%
   geom_point(size = 1.5) +
   xlab("Calender year") +
   ylab("Incidence rate per 100000 person-years") +
-  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
-  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) +
   labs(colour = "Cancer") +
   scale_x_continuous(breaks=seq(min(inc_yrs_plot$time), max(inc_yrs_plot$time), 2)) +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
@@ -463,6 +470,7 @@ pp_yrs_plot <- study_results$prevalence_estimates %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
   mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
+  mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "esophagealCancer", "Esophagus")) %>% 
   mutate(time = format(prevalence_start_date, format="%Y")) %>%
   mutate(time = as.numeric(time)) %>%
   as.data.frame()
@@ -484,8 +492,8 @@ plotAgeGender <- pp_yrs_plot %>%
   geom_point(size = 1.5) +
   xlab("Calender year") +
   ylab("Prevalence") +
-  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
-  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) +
   labs(colour = "Cancer") +
   scale_x_continuous(breaks=seq(min(inc_yrs_plot$time), max(inc_yrs_plot$time), 2)) +
   scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +

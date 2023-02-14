@@ -1,7 +1,7 @@
 # Load packages ------
 
 # to install latest version of IncidencePrevalence
-#remotes::install_github("darwin-eu-dev/IncidencePrevalence",force = TRUE)
+remotes::install_github("darwin-eu-dev/IncidencePrevalence",force = TRUE)
 
 # load r packages
 library(CirceR)
@@ -26,8 +26,8 @@ library(DatabaseConnector)
 # database metadata and connection details -----
 # The name/ acronym for the database
 #db.name<-"CPRDAurum"
-#db.name<-"CPRDGold"
-db.name<-"CPRDAurumCovid"
+db.name<-"CPRDGold"
+#db.name<-"CPRDAurumCovid"
 
 # Set output folder location -----
 # the path to a folder where the results from this analysis will be saved
@@ -43,8 +43,8 @@ password<- Sys.getenv("DB_PASSWORD")
 port<-Sys.getenv("DB_PORT") 
 host<-Sys.getenv("DB_HOST") 
 #server_dbi<-Sys.getenv("DB_SERVER_cdm_aurum_202106_dbi") #aurum
-#server_dbi<-Sys.getenv("DB_SERVER_cdmgold202007_dbi") #gold
-server_dbi<-Sys.getenv("DB_SERVER_p20_059_cdm_aurum_dbi") #aurum covid
+server_dbi<-Sys.getenv("DB_SERVER_cdmgold202007_dbi") #gold
+#server_dbi<-Sys.getenv("DB_SERVER_p20_059_cdm_aurum_dbi") #aurum covid
 
 
 # Specify cdm_reference via DBI connection details -----
@@ -74,6 +74,7 @@ results_database_schema<-"results"
 # it will be overwritten 
 outcome_table_stem<-"cancerincprev"
 
+
 # create cdm reference ----
 cdm <- CDMConnector::cdm_from_con(con = db, 
                                   cdm_schema = cdm_database_schema,
@@ -83,6 +84,15 @@ cdm <- CDMConnector::cdm_from_con(con = db,
 # running the next line should give you a count of your person table
 cdm$person %>% 
   tally()
+
+# Set study details -----
+# must be start of year so 1st jan 2007, 1st jan 2013 CANNOT BE MID YEAR
+studyStartDate <- "2000-01-01" 
+# study end data
+studyEndDate <- "2019-12-31"  
+
+# Does a user want to run survival analysis? if a database does not have mortality data change this FALSE
+runSurvial <- FALSE
 
 # Run the study ------
 source(here("RunStudy.R"))
