@@ -27,8 +27,8 @@ library(DatabaseConnector)
 # database metadata and connection details -----
 # The name/ acronym for the database
 #db.name<-"CPRDAurum"
-#db.name<-"CPRDGold"
-db.name<-"CPRDAurumCovid"
+db.name<-"CPRDGold"
+#db.name<-"CPRDAurumCovid"
 
 # Set output folder location -----
 # the path to a folder where the results from this analysis will be saved
@@ -44,8 +44,8 @@ password<- Sys.getenv("DB_PASSWORD")
 port<-Sys.getenv("DB_PORT") 
 host<-Sys.getenv("DB_HOST") 
 #server_dbi<-Sys.getenv("DB_SERVER_cdm_aurum_202106_dbi") #aurum
-#server_dbi<-Sys.getenv("DB_SERVER_cdmgold202007_dbi") #gold
-server_dbi<-Sys.getenv("DB_SERVER_p20_059_cdm_aurum_dbi") #aurum covid
+server_dbi<-Sys.getenv("DB_SERVER_cdmgold202007_dbi") #gold
+#server_dbi<-Sys.getenv("DB_SERVER_p20_059_cdm_aurum_dbi") #aurum covid
 
 
 # Specify cdm_reference via DBI connection details -----
@@ -73,7 +73,7 @@ results_database_schema<-"results"
 # Name of outcome table in the result table where the outcome cohorts will be stored
 # Note, if there is an existing table in your results schema with the same names
 # it will be overwritten 
-outcome_table_stem<-"cancerincprev"
+outcome_table_stem<-"cancerincprev2"
 
 
 # create cdm reference ----
