@@ -699,13 +699,12 @@
     "CriteriaList": [
       {
         "ConditionOccurrence": {
-          "CodesetId": 0,
-          "First": true
+          "CodesetId": 0
         }
       }
     ],
     "ObservationWindow": {
-      "PriorDays": 365,
+      "PriorDays": 0,
       "PostDays": 0
     },
     "PrimaryCriteriaLimit": {
