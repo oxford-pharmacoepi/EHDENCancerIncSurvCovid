@@ -132,16 +132,16 @@ DataExtraction <- function(dataset){
     mutate(time_days=as.numeric(difftime(endOfObservation,
                                          outcome_start_date,
                                          units="days"))) %>%
-    mutate(time_years=time_days/365)
+    mutate(time_years=time_days/365.25)
   
   # take "dataset" and do the code for each calender year
   # carry out for calender year
   # take year and split into groups based on the data available
-  grid <- seq(min(year(ymd(dataset$cohort_start_date))), max(year(ymd(dataset$cohort_start_date))),by=5)
-  
+  grid <- rev(seq(max(year(ymd(dataset$cohort_start_date))), min(year(ymd(dataset$cohort_start_date))),by=-5))
+
   # now need to create the start and end dates for each one
-  startYear <- paste0(grid,"-01-01") # first days
-  endYear <- paste0(grid+4,"-12-31") # end days (plus 4 to create 5 year bands)
+  startYear <- paste0(grid-4,"-01-01") # first days
+  endYear <- paste0(grid,"-12-31") # end days (plus 4 to create 5 year bands)
   
   # split data into groups of calender year and put it into a list. This will create 4 groups split by calender year
   calenderSplitData <- list()
@@ -170,7 +170,7 @@ DataExtraction <- function(dataset){
       mutate(time_days=as.numeric(difftime(endOfObservation,
                                            outcome_start_date,
                                            units="days"))) %>%
-      mutate(time_years=time_days/365)
+      mutate(time_years=time_days/365.25)
     
     calenderSplitData[[w]] <- calenderdata
     
@@ -216,7 +216,12 @@ for(j in 1:nrow(outcomeCohort)) {
   print(paste0("KM for observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
   
   # get the risk table ---
-  grid <- seq(0,ceiling(time_length(difftime(as.Date(studyEndDate), as.Date(studyStartDate)), "years")),by=2) 
+    if(ceiling(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")) <=5) {   
+    grid <- seq(0,floor(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=1) 
+    } else {
+  grid <- seq(0,floor(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=2) 
+    }
+  
   observedrisktableKM[[j]] <- RiskSetCount(grid,data$time_years) %>%
     rbind(grid) %>% as.data.frame() %>%
     `colnames<-`(grid) %>%
@@ -296,7 +301,13 @@ for(j in 1:nrow(outcomeCohort)) {
   data <- dataset %>%
     filter(outcome_cohort_id == j) 
   
-  grid <- seq(0,ceiling(time_length(difftime(as.Date(studyEndDate), as.Date(studyStartDate)), "years")),by=2) 
+  # get the risk table ---
+  if(ceiling(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")) <=5) {   
+    grid <- seq(0,floor(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=1) 
+  } else {
+    grid <- seq(0,floor(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=2) 
+  }
+  
   filter4gender <- RiskSetCount(grid,data$time_years[data$gender == "Male"])%>%
     rbind(grid) %>% as.data.frame() %>%
     `colnames<-`(grid) %>%
@@ -355,12 +366,8 @@ for(j in 1:nrow(outcomeCohort)) {
       rename(Gender = strata) %>%
       mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All", Gender = str_replace(Gender, "gender=Male", "Male"), Gender = str_replace(Gender,"gender=Female", "Female"))
       
-
-    
     print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
-    
-    
-    
+
   } else{
     
     print(paste0("Gender stratification KM analysis not carried out for ", outcomeCohort$cohortName[j], " due to only 1 gender present " , Sys.time()))
@@ -410,7 +417,11 @@ for(j in 1:nrow(outcomeCohort)) {
     filter(outcome_cohort_id == j) 
   
   # get the risk table ---
-  grid <- seq(0,ceiling(time_length(difftime(as.Date(studyEndDate), as.Date(studyStartDate)), "years")),by=2) 
+  if(ceiling(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")) <=5) {   
+    grid <- seq(0,floor(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=1) 
+  } else {
+    grid <- seq(0,floor(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=2) 
+  }
   observedrisktableKM_age[[j]] <- RiskSetCount(grid,data$time_years[data$age_gr == "18-29"]) %>%
     rbind(grid) %>% as.data.frame() %>%
     `colnames<-`(grid) %>%
@@ -527,8 +538,14 @@ for(j in 1:nrow(outcomeCohort)) {
   
   if(genderlevels == 2){
     
-    # get the risk table for data after filtering for missingness ---
-    grid <- seq(0,ceiling(time_length(difftime(as.Date(studyEndDate), as.Date(studyStartDate)), "years")),by=2) 
+    # get the risk table for data ---
+    
+    if(ceiling(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")) <=5) {   
+      grid <- seq(0,floor(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=1) 
+    } else {
+      grid <- seq(0,floor(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=2) 
+    }
+    
     observedrisktableKM_age_gender[[j]] <- RiskSetCount(grid,data$time_years[data$genderAgegp == "Female_18-29"]) %>%
       rbind(grid) %>% as.data.frame() %>%
       `colnames<-`(grid) %>%
@@ -752,11 +769,9 @@ return(survival_study_results)
 
 }
 
-
 #whole data
 test1 <- SurAnalysis(dataset = PopAll[[1]],
                     outcomeCohort = outcome_cohorts)
-
 # calender strata 1
 test2 <- SurAnalysis(dataset = PopAll[[2]],
                      outcomeCohort = outcome_cohorts)
@@ -770,12 +785,54 @@ test4 <- SurAnalysis(dataset = PopAll[[4]],
 test5 <- SurAnalysis(dataset = PopAll[[5]],
                      outcomeCohort = outcome_cohorts)
 
-# need to put into a loop then merge ALL results into 1 and zip 
 
+#combine the results
+
+# KM results
+survival_results <- bind_rows(test2[[1]],
+          test3[[1]],
+          test4[[1]],
+          test5[[1]] )
+
+
+risk_table <- bind_rows(test2[[2]],
+                              test3[[2]],
+                              test4[[2]],
+                              test5[[2]] )
+
+med_surv_results <- bind_rows(test2[[3]],
+                              test3[[3]],
+                              test4[[3]],
+                              test5[[3]] )
+
+survival_prob <- bind_rows(test2[[4]],
+                              test3[[4]],
+                              test4[[4]],
+                              test5[[4]] )
+
+calenderyr_results <- list(
+  survival_results,
+  risk_table,
+  med_surv_results,
+  survival_prob)
+
+names(calenderyr_results) <- c(paste0("survival_estimates_", db.name),
+                                   paste0("risk_table_results_", db.name),
+                                   paste0("median_survival_results_", db.name),
+                                   paste0("one_five_ten_survival_rates_", db.name))
+
+# need to put into a loop then merge ALL results into 1 and zip 
 
 
 # zip results
 print("Zipping results to output folder")
-exportSurvivalResults(result=survival_study_results,
-                      zipName= paste0(db.name, "SurvivalResults"),
+
+#whole database
+exportSurvivalResults(result=test1,
+                      zipName= paste0(db.name, "WholeSurvivalResults"),
+                      outputFolder=here::here("Results", db.name))
+
+#calender year stratification
+exportSurvivalResults(result=calenderyr_results,
+                      zipName= paste0(db.name, "CalenderYrSurvivalResults"),
                       outputFolder=here::here("Results", db.name))
