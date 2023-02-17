@@ -73,7 +73,7 @@ results_database_schema<-"results"
 # Name of outcome table in the result table where the outcome cohorts will be stored
 # Note, if there is an existing table in your results schema with the same names
 # it will be overwritten 
-outcome_table_stem<-"cancerincprev2"
+outcome_table_stem<-"cancerincprev3"
 
 
 # create cdm reference ----
