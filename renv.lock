@@ -89,23 +89,6 @@
         "promises"
       ]
     },
-    "DatabaseConnector": {
-      "Package": "DatabaseConnector",
-      "Version": "5.1.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "7efe1532a5256de9dd7f2f8d90b4e6da",
-      "Requirements": [
-        "DBI",
-        "SqlRender",
-        "bit64",
-        "rJava",
-        "readr",
-        "rlang",
-        "stringr",
-        "urltools"
-      ]
-    },
     "Epi": {
       "Package": "Epi",
       "Version": "2.47",
@@ -258,8 +241,8 @@
       "RemoteRepo": "SqlRender",
       "RemoteUsername": "OHDSI",
       "RemoteRef": "HEAD",
-      "RemoteSha": "1fe3abc926de4d40f1bb60bbe055e0e4e3b0fbb4",
-      "Hash": "0ca1e8d3a3f4c07b2bffb63472822da5",
+      "RemoteSha": "5aaca3c77e366dcd8cb670809a5e44bc8eb17fd9",
+      "Hash": "bb8195189918e88daef5e816df9785fe",
       "Requirements": [
         "checkmate",
         "rJava",
@@ -1526,16 +1509,6 @@
         "xfun"
       ]
     },
-    "triebeard": {
-      "Package": "triebeard",
-      "Version": "0.3.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "847a9d113b78baca4a9a8639609ea228",
-      "Requirements": [
-        "Rcpp"
-      ]
-    },
     "tzdb": {
       "Package": "tzdb",
       "Version": "0.3.0",
@@ -1544,17 +1517,6 @@
       "Hash": "b2e1cbce7c903eaf23ec05c58e59fb5e",
       "Requirements": [
         "cpp11"
-      ]
-    },
-    "urltools": {
-      "Package": "urltools",
-      "Version": "1.7.3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "e86a704261a105f4703f653e05defa3e",
-      "Requirements": [
-        "Rcpp",
-        "triebeard"
       ]
     },
     "utf8": {

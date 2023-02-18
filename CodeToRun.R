@@ -2,10 +2,11 @@
 renv::activate()
 renv::restore()
 # to install latest version of IncidencePrevalence
-#remotes::install_github("darwin-eu-dev/IncidencePrevalence",force = TRUE)
+remotes::install_github("darwin-eu-dev/IncidencePrevalence",force = TRUE)
 
 # load r packages
 library(CirceR)
+library(CDMConnector)
 library(IncidencePrevalence)
 library(here)
 library(DBI)
@@ -15,7 +16,7 @@ library(readr)
 library(log4r)
 library(tidyr)
 library(stringr)
-library(CDMConnector)
+library(SqlRender)
 library(ggplot2)
 library(lubridate)
 library(RPostgres)
