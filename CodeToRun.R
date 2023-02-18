@@ -13,16 +13,15 @@ library(dbplyr)
 library(dplyr)
 library(readr)
 library(log4r)
+library(tidyr)
 library(stringr)
 library(CDMConnector)
 library(ggplot2)
 library(lubridate)
-library(tidyr)
+library(RPostgres)
 library(broom)
 library(survival)
 library(bshazard)
-library(DatabaseConnector)
-
 
 # database metadata and connection details -----
 # The name/ acronym for the database
