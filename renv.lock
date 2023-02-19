@@ -241,8 +241,8 @@
       "RemoteRepo": "SqlRender",
       "RemoteUsername": "OHDSI",
       "RemoteRef": "HEAD",
-      "RemoteSha": "5aaca3c77e366dcd8cb670809a5e44bc8eb17fd9",
-      "Hash": "bb8195189918e88daef5e816df9785fe",
+      "RemoteSha": "1fe3abc926de4d40f1bb60bbe055e0e4e3b0fbb4",
+      "Hash": "0ca1e8d3a3f4c07b2bffb63472822da5",
       "Requirements": [
         "checkmate",
         "rJava",
