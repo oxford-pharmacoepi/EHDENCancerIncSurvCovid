@@ -1,6 +1,6 @@
 # Load packages ------
-renv::activate()
-renv::restore()
+#renv::activate()
+#renv::restore()
 # to install latest version of IncidencePrevalence
 #remotes::install_github("darwin-eu-dev/IncidencePrevalence",force = TRUE)
 
