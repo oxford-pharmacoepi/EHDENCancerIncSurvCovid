@@ -2,15 +2,15 @@
   "ConceptSets": [
     {
       "id": 0,
-      "name": "esophagealCancer",
+      "name": "CRC",
       "expression": {
         "items": [
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "276803003",
-              "CONCEPT_ID": 4081043,
-              "CONCEPT_NAME": "Adenocarcinoma of esophagus",
+              "CONCEPT_CODE": "413446001",
+              "CONCEPT_ID": 4184850,
+              "CONCEPT_NAME": "Adenocarcinoma of cecum",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -22,9 +22,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "449153001",
-              "CONCEPT_ID": 40493492,
-              "CONCEPT_NAME": "Adenocarcinoma of lower esophagus",
+              "CONCEPT_CODE": "408645001",
+              "CONCEPT_ID": 4256776,
+              "CONCEPT_NAME": "Adenocarcinoma of large intestine",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -36,9 +36,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "254543002",
-              "CONCEPT_ID": 4110569,
-              "CONCEPT_NAME": "Carcinoma of abdominal part of esophagus",
+              "CONCEPT_CODE": "425178004",
+              "CONCEPT_ID": 4322376,
+              "CONCEPT_NAME": "Adenocarcinoma of rectosigmoid junction",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -50,9 +50,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "254535007",
-              "CONCEPT_ID": 4111799,
-              "CONCEPT_NAME": "Carcinoma of cervical part of esophagus",
+              "CONCEPT_CODE": "254582000",
+              "CONCEPT_ID": 4110575,
+              "CONCEPT_NAME": "Adenocarcinoma of rectum",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -64,9 +64,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "372138000",
-              "CONCEPT_ID": 4162997,
-              "CONCEPT_NAME": "Carcinoma of esophagus",
+              "CONCEPT_CODE": "301756000",
+              "CONCEPT_ID": 4200514,
+              "CONCEPT_NAME": "Adenocarcinoma of sigmoid colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -78,9 +78,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "254551004",
-              "CONCEPT_ID": 4112606,
-              "CONCEPT_NAME": "Carcinoma of lower third of esophagus",
+              "CONCEPT_CODE": "312111009",
+              "CONCEPT_ID": 4207182,
+              "CONCEPT_NAME": "Carcinoma of ascending colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -92,9 +92,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "254549003",
-              "CONCEPT_ID": 4115265,
-              "CONCEPT_NAME": "Carcinoma of middle third of esophagus",
+              "CONCEPT_CODE": "255081007",
+              "CONCEPT_ID": 4116240,
+              "CONCEPT_NAME": "Carcinoma of cecum",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -106,9 +106,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "254539001",
-              "CONCEPT_ID": 4110568,
-              "CONCEPT_NAME": "Carcinoma of thoracic part of esophagus",
+              "CONCEPT_CODE": "269533000",
+              "CONCEPT_ID": 4149847,
+              "CONCEPT_NAME": "Carcinoma of colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -120,9 +120,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "254547001",
-              "CONCEPT_ID": 4112605,
-              "CONCEPT_NAME": "Carcinoma of upper third of esophagus",
+              "CONCEPT_CODE": "425213009",
+              "CONCEPT_ID": 4312240,
+              "CONCEPT_NAME": "Carcinoma of colon, stage I",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -134,9 +134,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "449055006",
-              "CONCEPT_ID": 40493008,
-              "CONCEPT_NAME": "Leiomyosarcoma of cardioesophageal junction",
+              "CONCEPT_CODE": "422581008",
+              "CONCEPT_ID": 4307687,
+              "CONCEPT_NAME": "Carcinoma of colon, stage II",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -148,9 +148,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "448229007",
-              "CONCEPT_ID": 40488914,
-              "CONCEPT_NAME": "Leiomyosarcoma of lower esophagus",
+              "CONCEPT_CODE": "422375001",
+              "CONCEPT_ID": 4310858,
+              "CONCEPT_NAME": "Carcinoma of colon, stage III",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -162,9 +162,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "314960002",
-              "CONCEPT_ID": 4201480,
-              "CONCEPT_NAME": "Local recurrence of malignant tumor of esophagus",
+              "CONCEPT_CODE": "422985007",
+              "CONCEPT_ID": 4312001,
+              "CONCEPT_NAME": "Carcinoma of colon, stage IV",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -176,9 +176,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "187734007",
-              "CONCEPT_ID": 4089658,
-              "CONCEPT_NAME": "Malignant neoplasm of cardio-esophageal junction of stomach",
+              "CONCEPT_CODE": "312113007",
+              "CONCEPT_ID": 4193165,
+              "CONCEPT_NAME": "Carcinoma of descending colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -190,9 +190,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "187724003",
-              "CONCEPT_ID": 4095316,
-              "CONCEPT_NAME": "Malignant tumor of abdominal part of esophagus",
+              "CONCEPT_CODE": "312114001",
+              "CONCEPT_ID": 4207183,
+              "CONCEPT_NAME": "Carcinoma of hepatic flexure",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -204,9 +204,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "187722004",
-              "CONCEPT_ID": 4094854,
-              "CONCEPT_NAME": "Malignant tumor of cervical part of esophagus",
+              "CONCEPT_CODE": "285312008",
+              "CONCEPT_ID": 4115028,
+              "CONCEPT_NAME": "Carcinoma of sigmoid colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -218,9 +218,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "363402007",
-              "CONCEPT_ID": 4181343,
-              "CONCEPT_NAME": "Malignant tumor of esophagus",
+              "CONCEPT_CODE": "312115000",
+              "CONCEPT_ID": 4193872,
+              "CONCEPT_NAME": "Carcinoma of splenic flexure",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -232,9 +232,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "255078002",
-              "CONCEPT_ID": 4116239,
-              "CONCEPT_NAME": "Malignant tumor of esophagus, stomach and duodenum",
+              "CONCEPT_CODE": "269544008",
+              "CONCEPT_ID": 4151260,
+              "CONCEPT_NAME": "Carcinoma of the rectosigmoid junction",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -246,9 +246,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "187727005",
-              "CONCEPT_ID": 4089656,
-              "CONCEPT_NAME": "Malignant tumor of lower third of esophagus",
+              "CONCEPT_CODE": "312112002",
+              "CONCEPT_ID": 4193871,
+              "CONCEPT_NAME": "Carcinoma of transverse colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -260,9 +260,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "187726001",
-              "CONCEPT_ID": 4092060,
-              "CONCEPT_NAME": "Malignant tumor of middle third of esophagus",
+              "CONCEPT_CODE": "448994001",
+              "CONCEPT_ID": 40492939,
+              "CONCEPT_NAME": "Carcinoma of upper rectum",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -274,9 +274,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "187723009",
-              "CONCEPT_ID": 4092059,
-              "CONCEPT_NAME": "Malignant tumor of thoracic part of esophagus",
+              "CONCEPT_CODE": "315058005",
+              "CONCEPT_ID": 4198567,
+              "CONCEPT_NAME": "HNPCC - hereditary nonpolyposis colon cancer",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -288,9 +288,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "187725002",
-              "CONCEPT_ID": 4094855,
-              "CONCEPT_NAME": "Malignant tumor of upper third of esophagus",
+              "CONCEPT_CODE": "781382000",
+              "CONCEPT_ID": 36683531,
+              "CONCEPT_NAME": "Malignant neoplasm of colon and/or rectum",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -302,9 +302,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "315003007",
-              "CONCEPT_ID": 4198445,
-              "CONCEPT_NAME": "Metastasis from malignant tumor of esophagus",
+              "CONCEPT_CODE": "187757001",
+              "CONCEPT_ID": 4089661,
+              "CONCEPT_NAME": "Malignant neoplasm, overlapping lesion of colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -316,9 +316,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "458581000124106",
-              "CONCEPT_ID": 36674609,
-              "CONCEPT_NAME": "Metastatic HER2 positive gastroesophageal junction cancer",
+              "CONCEPT_CODE": "363412000",
+              "CONCEPT_ID": 435754,
+              "CONCEPT_NAME": "Malignant tumor of ascending colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -330,9 +330,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "109835005",
-              "CONCEPT_ID": 25748,
-              "CONCEPT_NAME": "Overlapping malignant neoplasm of esophagus",
+              "CONCEPT_CODE": "363350007",
+              "CONCEPT_ID": 443391,
+              "CONCEPT_NAME": "Malignant tumor of cecum",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -344,9 +344,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "307216009",
-              "CONCEPT_ID": 4145865,
-              "CONCEPT_NAME": "Perforated carcinoma of esophagus",
+              "CONCEPT_CODE": "363406005",
+              "CONCEPT_ID": 4180790,
+              "CONCEPT_NAME": "Malignant tumor of colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -358,9 +358,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "128041000119107",
-              "CONCEPT_ID": 37016162,
-              "CONCEPT_NAME": "Primary adenocarcinoma of distal third of esophagus",
+              "CONCEPT_CODE": "363409003",
+              "CONCEPT_ID": 443382,
+              "CONCEPT_NAME": "Malignant tumor of descending colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -372,9 +372,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "721628002",
-              "CONCEPT_ID": 36717176,
-              "CONCEPT_NAME": "Primary adenocarcinoma of esophagogastric junction",
+              "CONCEPT_CODE": "363407001",
+              "CONCEPT_ID": 4180791,
+              "CONCEPT_NAME": "Malignant tumor of hepatic flexure",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -386,9 +386,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "721617001",
-              "CONCEPT_ID": 36715844,
-              "CONCEPT_NAME": "Primary adenocarcinoma of lower third of esophagus due to Barrett esophagus",
+              "CONCEPT_CODE": "363510005",
+              "CONCEPT_ID": 443396,
+              "CONCEPT_NAME": "Malignant tumor of large intestine",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -400,9 +400,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "721623006",
-              "CONCEPT_ID": 36715849,
-              "CONCEPT_NAME": "Primary adenocarcinoma of middle third of esophagus",
+              "CONCEPT_CODE": "363414004",
+              "CONCEPT_ID": 4180792,
+              "CONCEPT_NAME": "Malignant tumor of rectosigmoid junction",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -414,9 +414,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "721624000",
-              "CONCEPT_ID": 36715850,
-              "CONCEPT_NAME": "Primary adenocarcinoma of overlapping lesion of esophagus",
+              "CONCEPT_CODE": "363351006",
+              "CONCEPT_ID": 443390,
+              "CONCEPT_NAME": "Malignant tumor of rectum",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -428,9 +428,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "721622001",
-              "CONCEPT_ID": 36715848,
-              "CONCEPT_NAME": "Primary adenocarcinoma of upper third of esophagus",
+              "CONCEPT_CODE": "363410008",
+              "CONCEPT_ID": 443381,
+              "CONCEPT_NAME": "Malignant tumor of sigmoid colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -442,9 +442,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "371962007",
-              "CONCEPT_ID": 193971,
-              "CONCEPT_NAME": "Primary malignant neoplasm of abdominal esophagus",
+              "CONCEPT_CODE": "363413005",
+              "CONCEPT_ID": 4181344,
+              "CONCEPT_NAME": "Malignant tumor of splenic flexure",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -456,9 +456,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "371978009",
-              "CONCEPT_ID": 441224,
-              "CONCEPT_NAME": "Primary malignant neoplasm of cervical esophagus",
+              "CONCEPT_CODE": "363408006",
+              "CONCEPT_ID": 443384,
+              "CONCEPT_NAME": "Malignant tumor of transverse colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -470,9 +470,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "722533007",
-              "CONCEPT_ID": 36716505,
-              "CONCEPT_NAME": "Primary malignant neoplasm of esophagogastric junction",
+              "CONCEPT_CODE": "737058005",
+              "CONCEPT_ID": 42537577,
+              "CONCEPT_NAME": "Microsatellite instability-high colorectal cancer",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -484,9 +484,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "371984007",
-              "CONCEPT_ID": 26638,
-              "CONCEPT_NAME": "Primary malignant neoplasm of esophagus",
+              "CONCEPT_CODE": "109838007",
+              "CONCEPT_ID": 79740,
+              "CONCEPT_NAME": "Overlapping malignant neoplasm of colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -498,9 +498,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "371998004",
-              "CONCEPT_ID": 193138,
-              "CONCEPT_NAME": "Primary malignant neoplasm of lower third of esophagus",
+              "CONCEPT_CODE": "96281000119107",
+              "CONCEPT_ID": 37018659,
+              "CONCEPT_NAME": "Overlapping malignant neoplasm of colon and rectum",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -512,9 +512,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "371999007",
-              "CONCEPT_ID": 437805,
-              "CONCEPT_NAME": "Primary malignant neoplasm of middle third of esophagus",
+              "CONCEPT_CODE": "109839004",
+              "CONCEPT_ID": 438090,
+              "CONCEPT_NAME": "Overlapping malignant neoplasm of rectum, anus and anal canal",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -526,9 +526,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "372017008",
-              "CONCEPT_ID": 135476,
-              "CONCEPT_NAME": "Primary malignant neoplasm of thoracic esophagus",
+              "CONCEPT_CODE": "681601000119101",
+              "CONCEPT_ID": 36713361,
+              "CONCEPT_NAME": "Primary adenocarcinoma of ascending colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -540,9 +540,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "372023003",
-              "CONCEPT_ID": 432260,
-              "CONCEPT_NAME": "Primary malignant neoplasm of upper third of esophagus",
+              "CONCEPT_CODE": "721695008",
+              "CONCEPT_ID": 36715911,
+              "CONCEPT_NAME": "Primary adenocarcinoma of ascending colon and right flexure",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -554,9 +554,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "721620009",
-              "CONCEPT_ID": 36715846,
-              "CONCEPT_NAME": "Primary squamous cell carcinoma of lower third of esophagus",
+              "CONCEPT_CODE": "1701000119104",
+              "CONCEPT_ID": 42872396,
+              "CONCEPT_NAME": "Primary adenocarcinoma of colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -568,9 +568,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "721619003",
-              "CONCEPT_ID": 36717489,
-              "CONCEPT_NAME": "Primary squamous cell carcinoma of middle third of esophagus",
+              "CONCEPT_CODE": "681651000119102",
+              "CONCEPT_ID": 37208245,
+              "CONCEPT_NAME": "Primary adenocarcinoma of descending colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -582,9 +582,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "721621008",
-              "CONCEPT_ID": 36715847,
-              "CONCEPT_NAME": "Primary squamous cell carcinoma of overlapping lesion of esophagus",
+              "CONCEPT_CODE": "721699002",
+              "CONCEPT_ID": 36717495,
+              "CONCEPT_NAME": "Primary adenocarcinoma of descending colon and splenic flexure",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -596,9 +596,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "721618006",
-              "CONCEPT_ID": 36715845,
-              "CONCEPT_NAME": "Primary squamous cell carcinoma of upper third of esophagus",
+              "CONCEPT_CODE": "184881000119106",
+              "CONCEPT_ID": 37016239,
+              "CONCEPT_NAME": "Primary adenocarcinoma of rectosigmoid junction",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -610,9 +610,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "783183009",
-              "CONCEPT_ID": 37204513,
-              "CONCEPT_NAME": "Salivary gland type carcinoma of esophagus",
+              "CONCEPT_CODE": "721696009",
+              "CONCEPT_ID": 36715912,
+              "CONCEPT_NAME": "Primary adenocarcinoma of transverse colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -624,9 +624,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "438946002",
-              "CONCEPT_ID": 4208017,
-              "CONCEPT_NAME": "Siewert type I adenocarcinoma of esophagogastric junction",
+              "CONCEPT_CODE": "93683002",
+              "CONCEPT_ID": 4247719,
+              "CONCEPT_NAME": "Primary malignant neoplasm of ascending colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -638,9 +638,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "440501006",
-              "CONCEPT_ID": 4207131,
-              "CONCEPT_NAME": "Siewert type II adenocarcinoma of esophagogastric junction",
+              "CONCEPT_CODE": "371977004",
+              "CONCEPT_ID": 432837,
+              "CONCEPT_NAME": "Primary malignant neoplasm of cecum",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -652,9 +652,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "439478008",
-              "CONCEPT_ID": 4258546,
-              "CONCEPT_NAME": "Siewert type III adenocarcinoma of esophagogastric junction",
+              "CONCEPT_CODE": "93761005",
+              "CONCEPT_ID": 197500,
+              "CONCEPT_NAME": "Primary malignant neoplasm of colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -666,9 +666,9 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "276804009",
-              "CONCEPT_ID": 4081044,
-              "CONCEPT_NAME": "Squamous cell carcinoma of esophagus",
+              "CONCEPT_CODE": "93771007",
+              "CONCEPT_ID": 441800,
+              "CONCEPT_NAME": "Primary malignant neoplasm of descending colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -680,9 +680,107 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "783704005",
-              "CONCEPT_ID": 37204806,
-              "CONCEPT_NAME": "Undifferentiated carcinoma of esophagus",
+              "CONCEPT_CODE": "93826009",
+              "CONCEPT_ID": 438979,
+              "CONCEPT_NAME": "Primary malignant neoplasm of hepatic flexure of colon",
+              "DOMAIN_ID": "Condition",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "SNOMED"
+            }
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Clinical Finding",
+              "CONCEPT_CODE": "98981000119103",
+              "CONCEPT_ID": 764981,
+              "CONCEPT_NAME": "Primary malignant neoplasm of ileocecal valve",
+              "DOMAIN_ID": "Condition",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "SNOMED"
+            }
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Clinical Finding",
+              "CONCEPT_CODE": "93854002",
+              "CONCEPT_ID": 4246125,
+              "CONCEPT_NAME": "Primary malignant neoplasm of large intestine",
+              "DOMAIN_ID": "Condition",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "SNOMED"
+            }
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Clinical Finding",
+              "CONCEPT_CODE": "93980002",
+              "CONCEPT_ID": 438699,
+              "CONCEPT_NAME": "Primary malignant neoplasm of rectosigmoid junction",
+              "DOMAIN_ID": "Condition",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "SNOMED"
+            }
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Clinical Finding",
+              "CONCEPT_CODE": "93984006",
+              "CONCEPT_ID": 74582,
+              "CONCEPT_NAME": "Primary malignant neoplasm of rectum",
+              "DOMAIN_ID": "Condition",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "SNOMED"
+            }
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Clinical Finding",
+              "CONCEPT_CODE": "94006002",
+              "CONCEPT_ID": 436635,
+              "CONCEPT_NAME": "Primary malignant neoplasm of sigmoid colon",
+              "DOMAIN_ID": "Condition",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "SNOMED"
+            }
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Clinical Finding",
+              "CONCEPT_CODE": "94072004",
+              "CONCEPT_ID": 437798,
+              "CONCEPT_NAME": "Primary malignant neoplasm of splenic flexure of colon",
+              "DOMAIN_ID": "Condition",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "SNOMED"
+            }
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Clinical Finding",
+              "CONCEPT_CODE": "94105000",
+              "CONCEPT_ID": 432257,
+              "CONCEPT_NAME": "Primary malignant neoplasm of transverse colon",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",

@@ -2,7 +2,7 @@
   "ConceptSets": [
     {
       "id": 0,
-      "name": "esophagealCancer",
+      "name": "esophagealcancer",
       "expression": {
         "items": [
           {
@@ -134,48 +134,6 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "449055006",
-              "CONCEPT_ID": 40493008,
-              "CONCEPT_NAME": "Leiomyosarcoma of cardioesophageal junction",
-              "DOMAIN_ID": "Condition",
-              "INVALID_REASON": "V",
-              "INVALID_REASON_CAPTION": "Valid",
-              "STANDARD_CONCEPT": "S",
-              "STANDARD_CONCEPT_CAPTION": "Standard",
-              "VOCABULARY_ID": "SNOMED"
-            }
-          },
-          {
-            "concept": {
-              "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "448229007",
-              "CONCEPT_ID": 40488914,
-              "CONCEPT_NAME": "Leiomyosarcoma of lower esophagus",
-              "DOMAIN_ID": "Condition",
-              "INVALID_REASON": "V",
-              "INVALID_REASON_CAPTION": "Valid",
-              "STANDARD_CONCEPT": "S",
-              "STANDARD_CONCEPT_CAPTION": "Standard",
-              "VOCABULARY_ID": "SNOMED"
-            }
-          },
-          {
-            "concept": {
-              "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "314960002",
-              "CONCEPT_ID": 4201480,
-              "CONCEPT_NAME": "Local recurrence of malignant tumor of esophagus",
-              "DOMAIN_ID": "Condition",
-              "INVALID_REASON": "V",
-              "INVALID_REASON_CAPTION": "Valid",
-              "STANDARD_CONCEPT": "S",
-              "STANDARD_CONCEPT_CAPTION": "Standard",
-              "VOCABULARY_ID": "SNOMED"
-            }
-          },
-          {
-            "concept": {
-              "CONCEPT_CLASS_ID": "Clinical Finding",
               "CONCEPT_CODE": "187734007",
               "CONCEPT_ID": 4089658,
               "CONCEPT_NAME": "Malignant neoplasm of cardio-esophageal junction of stomach",
@@ -232,20 +190,6 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "255078002",
-              "CONCEPT_ID": 4116239,
-              "CONCEPT_NAME": "Malignant tumor of esophagus, stomach and duodenum",
-              "DOMAIN_ID": "Condition",
-              "INVALID_REASON": "V",
-              "INVALID_REASON_CAPTION": "Valid",
-              "STANDARD_CONCEPT": "S",
-              "STANDARD_CONCEPT_CAPTION": "Standard",
-              "VOCABULARY_ID": "SNOMED"
-            }
-          },
-          {
-            "concept": {
-              "CONCEPT_CLASS_ID": "Clinical Finding",
               "CONCEPT_CODE": "187727005",
               "CONCEPT_ID": 4089656,
               "CONCEPT_NAME": "Malignant tumor of lower third of esophagus",
@@ -291,20 +235,6 @@
               "CONCEPT_CODE": "187725002",
               "CONCEPT_ID": 4094855,
               "CONCEPT_NAME": "Malignant tumor of upper third of esophagus",
-              "DOMAIN_ID": "Condition",
-              "INVALID_REASON": "V",
-              "INVALID_REASON_CAPTION": "Valid",
-              "STANDARD_CONCEPT": "S",
-              "STANDARD_CONCEPT_CAPTION": "Standard",
-              "VOCABULARY_ID": "SNOMED"
-            }
-          },
-          {
-            "concept": {
-              "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "315003007",
-              "CONCEPT_ID": 4198445,
-              "CONCEPT_NAME": "Metastasis from malignant tumor of esophagus",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
