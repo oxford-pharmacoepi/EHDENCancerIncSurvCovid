@@ -58,7 +58,7 @@ if(sum(is.na(Pop$day_of_birth))==0 & sum(is.na(Pop$month_of_birth))==0){
                                              day_of_birth, sep="-"))))/365.25))
 } else {
   Pop <- Pop %>%
-    mutate(age= year(cohort_start_date)-year_of_birth)
+    mutate(age= lubridate::year(cohort_start_date)-year_of_birth)
 }
 
 # # age age groups ----
@@ -137,7 +137,7 @@ DataExtraction <- function(dataset){
   # take "dataset" and do the code for each calender year
   # carry out for calender year
   # take year and split into groups based on the data available
-  grid <- rev(seq(max(year(ymd(dataset$cohort_start_date))), min(year(ymd(dataset$cohort_start_date))),by=-5))
+  grid <- rev(seq(max(lubridate::year(lubridate::ymd(dataset$cohort_start_date))), min(lubridate::year(lubridate::ymd(dataset$cohort_start_date))),by=-5))
 
   # now need to create the start and end dates for each one
   startYear <- paste0(grid-4,"-01-01") # first days
@@ -216,10 +216,10 @@ for(j in 1:nrow(outcomeCohort)) {
   print(paste0("KM for observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
   
   # get the risk table ---
-    if(ceiling(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")) <=5) {   
-    grid <- seq(0,floor(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=1) 
+    if(ceiling(lubridate::time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")) <=5) {   
+    grid <- seq(0,floor(lubridate::time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=1) 
     } else {
-  grid <- seq(0,floor(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=2) 
+  grid <- seq(0,floor(lubridate::time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=2) 
     }
   
   observedrisktableKM[[j]] <- RiskSetCount(grid,data$time_years) %>%
@@ -302,10 +302,10 @@ for(j in 1:nrow(outcomeCohort)) {
     filter(outcome_cohort_id == j) 
   
   # get the risk table ---
-  if(ceiling(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")) <=5) {   
-    grid <- seq(0,floor(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=1) 
+  if(ceiling(lubridate::time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")) <=5) {   
+    grid <- seq(0,floor(lubridate::time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=1) 
   } else {
-    grid <- seq(0,floor(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=2) 
+    grid <- seq(0,floor(lubridate::time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=2) 
   }
   
   filter4gender <- RiskSetCount(grid,data$time_years[data$gender == "Male"])%>%
@@ -417,10 +417,10 @@ for(j in 1:nrow(outcomeCohort)) {
     filter(outcome_cohort_id == j) 
   
   # get the risk table ---
-  if(ceiling(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")) <=5) {   
-    grid <- seq(0,floor(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=1) 
+  if(ceiling(lubridate::time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")) <=5) {   
+    grid <- seq(0,floor(lubridate::time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=1) 
   } else {
-    grid <- seq(0,floor(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=2) 
+    grid <- seq(0,floor(lubridate::time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=2) 
   }
   observedrisktableKM_age[[j]] <- RiskSetCount(grid,data$time_years[data$age_gr == "18-29"]) %>%
     rbind(grid) %>% as.data.frame() %>%
@@ -540,10 +540,10 @@ for(j in 1:nrow(outcomeCohort)) {
     
     # get the risk table for data ---
     
-    if(ceiling(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")) <=5) {   
-      grid <- seq(0,floor(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=1) 
+    if(ceiling(lubridate::time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")) <=5) {   
+      grid <- seq(0,floor(lubridate::time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=1) 
     } else {
-      grid <- seq(0,floor(time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=2) 
+      grid <- seq(0,floor(lubridate::time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")),by=2) 
     }
     
     observedrisktableKM_age_gender[[j]] <- RiskSetCount(grid,data$time_years[data$genderAgegp == "Female_18-29"]) %>%
@@ -717,8 +717,8 @@ survivalResults <- bind_rows(
   observedkmcombined_age , # age strat
   observedkmcombined_age_gender # age gender strat
 ) %>%
-  mutate(Database = db.name, CalenderYearGp = paste0(min(year(ymd(data$cohort_end_date))),"-",
-                                                     max(year(ymd(data$cohort_end_date)))))
+  mutate(Database = db.name, CalenderYearGp = paste0(min(lubridate::year(lubridate::ymd(data$cohort_end_date))),"-",
+                                                     max(lubridate::year(lubridate::ymd(data$cohort_end_date)))))
 
 #risk table # error with characters and double formats
 riskTableResults <- bind_rows(
@@ -727,8 +727,8 @@ riskTableResults <- bind_rows(
   risktableskm_age , # age strat
   risktableskm_age_gender # age*gender strat 
 ) %>%
-  mutate(Database = db.name, CalenderYearGp = paste0(min(year(ymd(data$cohort_end_date))),"-",
-                                                     max(year(ymd(data$cohort_end_date)))))
+  mutate(Database = db.name, CalenderYearGp = paste0(min(lubridate::year(lubridate::ymd(data$cohort_end_date))),"-",
+                                                     max(lubridate::year(lubridate::ymd(data$cohort_end_date)))))
 
 #median results
 medianKMResults <- bind_rows( 
@@ -737,8 +737,8 @@ medianKMResults <- bind_rows(
   medkmcombined_age , # age strat
   medkmcombined_age_gender # age*gender strat 
 ) %>%
-  mutate(Database = db.name, CalenderYearGp = paste0(min(year(ymd(data$cohort_end_date))),"-",
-                                                     max(year(ymd(data$cohort_end_date)))))
+  mutate(Database = db.name, CalenderYearGp = paste0(min(lubridate::year(lubridate::ymd(data$cohort_end_date))),"-",
+                                                     max(lubridate::year(lubridate::ymd(data$cohort_end_date)))))
 
 #1,5,10 survival probabilites results
 SurvProb1510KMResults <- bind_rows( 
@@ -747,8 +747,8 @@ SurvProb1510KMResults <- bind_rows(
   sprobkmcombined_age , # age strat
   sprobkmcombined_age_gender # age*gender strat 
 ) %>%
-  mutate(Database = db.name, CalenderYearGp = paste0(min(year(ymd(data$cohort_end_date))),"-",
-                                                     max(year(ymd(data$cohort_end_date)))))
+  mutate(Database = db.name, CalenderYearGp = paste0(min(lubridate::year(lubridate::ymd(data$cohort_end_date))),"-",
+                                                     max(lubridate::year(lubridate::ymd(data$cohort_end_date)))))
 
 # put results all together in a list
 survival_study_results <- list(survivalResults ,

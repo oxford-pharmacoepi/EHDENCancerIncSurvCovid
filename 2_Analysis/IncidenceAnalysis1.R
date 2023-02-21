@@ -61,10 +61,10 @@ info(logger, "- Getting period prevalence: cancer populations")
 prev_period <- estimatePeriodPrevalence(
   cdm = cdm,
   denominatorTable = "denominator",
-  outcomeCohortId = outcome_cohorts$cohortId,
-  outcomeCohortName = outcome_cohorts$cohortName,
+  outcomeCohortId = prevalent_cohorts$cohortId,
+  outcomeCohortName = prevalent_cohorts$cohortName,
   outcomeLookbackDays = 0, 
-  outcomeTable = outcome_table_name,
+  outcomeTable = prevalent_table_name,
   interval = c("years"),
   completeDatabaseIntervals = TRUE, # prev only estimate for intervals where db captures all of the interval
   fullContribution = c(TRUE, FALSE) , # individuals only required to be present for one day in interval

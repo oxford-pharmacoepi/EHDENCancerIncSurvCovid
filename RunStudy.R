@@ -1,5 +1,6 @@
 # table names----
-outcome_table_name<-paste0(outcome_table_stem,"_o")
+outcome_table_name<-paste0(outcome_table_stem,"_o") # for incidence
+prevalent_table_name<-paste0(outcome_table_stem,"_p") # for prevalence
 
 # QC plot folders ----
 qcfolder <- here::here("3_QC",db.name)
@@ -76,7 +77,7 @@ info(logger, 'SURVIVAL ANALYSIS RAN')
 }
 
 print("Done!")
-print("-- If all has worked, there should now be two zip folders with the incidence/prevalence and survival results in the output folder to share")
+print("-- If all has worked, there should now be three zip folders with the incidence/prevalence and survival results for whole datasets and calender years in the output folder to share")
 print("-- Thank you for running the study! :)")
 Sys.time()-start
 readLines(log_file)
