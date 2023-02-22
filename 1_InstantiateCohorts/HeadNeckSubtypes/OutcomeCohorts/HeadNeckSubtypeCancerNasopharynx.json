@@ -148,20 +148,6 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "187697007",
-              "CONCEPT_ID": 4092057,
-              "CONCEPT_NAME": "Malignant tumor of pharyngeal recess",
-              "DOMAIN_ID": "Condition",
-              "INVALID_REASON": "V",
-              "INVALID_REASON_CAPTION": "Valid",
-              "STANDARD_CONCEPT": "S",
-              "STANDARD_CONCEPT_CAPTION": "Standard",
-              "VOCABULARY_ID": "SNOMED"
-            }
-          },
-          {
-            "concept": {
-              "CONCEPT_CLASS_ID": "Clinical Finding",
               "CONCEPT_CODE": "187693006",
               "CONCEPT_ID": 4094722,
               "CONCEPT_NAME": "Malignant tumor of posterior wall of nasopharynx",
@@ -274,20 +260,6 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "93662008",
-              "CONCEPT_ID": 4246793,
-              "CONCEPT_NAME": "Primary malignant neoplasm of adenoid",
-              "DOMAIN_ID": "Condition",
-              "INVALID_REASON": "V",
-              "INVALID_REASON_CAPTION": "Valid",
-              "STANDARD_CONCEPT": "S",
-              "STANDARD_CONCEPT_CAPTION": "Standard",
-              "VOCABULARY_ID": "SNOMED"
-            }
-          },
-          {
-            "concept": {
-              "CONCEPT_CLASS_ID": "Clinical Finding",
               "CONCEPT_CODE": "93674007",
               "CONCEPT_ID": 438080,
               "CONCEPT_NAME": "Primary malignant neoplasm of anterior wall of nasopharynx",
@@ -361,20 +333,6 @@
               "CONCEPT_CODE": "707528007",
               "CONCEPT_ID": 45768977,
               "CONCEPT_NAME": "Primary squamous cell carcinoma of nasopharynx",
-              "DOMAIN_ID": "Condition",
-              "INVALID_REASON": "V",
-              "INVALID_REASON_CAPTION": "Valid",
-              "STANDARD_CONCEPT": "S",
-              "STANDARD_CONCEPT_CAPTION": "Standard",
-              "VOCABULARY_ID": "SNOMED"
-            }
-          },
-          {
-            "concept": {
-              "CONCEPT_CLASS_ID": "Clinical Finding",
-              "CONCEPT_CODE": "722530005",
-              "CONCEPT_ID": 36716502,
-              "CONCEPT_NAME": "Primary squamous cell carcinoma of pharyngeal tonsil",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",

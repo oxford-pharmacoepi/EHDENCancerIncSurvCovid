@@ -2,7 +2,7 @@
   "ConceptSets": [
     {
       "id": 0,
-      "name": "tongue",
+      "name": "tongueInc",
       "expression": {
         "items": [
           {

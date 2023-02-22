@@ -2,7 +2,7 @@
   "ConceptSets": [
     {
       "id": 0,
-      "name": "HaNHypop",
+      "name": "hypopharynx",
       "expression": {
         "items": [
           {
@@ -11,6 +11,20 @@
               "CONCEPT_CODE": "448665005",
               "CONCEPT_ID": 40490990,
               "CONCEPT_NAME": "Malignant epithelial neoplasm of hypopharynx",
+              "DOMAIN_ID": "Condition",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "SNOMED"
+            }
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Clinical Finding",
+              "CONCEPT_CODE": "187681002",
+              "CONCEPT_ID": 4091931,
+              "CONCEPT_NAME": "Malignant neoplasm of anterior epiglottis",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -39,6 +53,20 @@
               "CONCEPT_CODE": "363399006",
               "CONCEPT_ID": 4181342,
               "CONCEPT_NAME": "Malignant tumor of hypopharynx",
+              "DOMAIN_ID": "Condition",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "SNOMED"
+            }
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Clinical Finding",
+              "CONCEPT_CODE": "187697007",
+              "CONCEPT_ID": 4092057,
+              "CONCEPT_NAME": "Malignant tumor of pharyngeal recess",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -81,6 +109,20 @@
               "CONCEPT_CODE": "363401000",
               "CONCEPT_ID": 4180789,
               "CONCEPT_NAME": "Malignant tumor of pyriform fossa",
+              "DOMAIN_ID": "Condition",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "SNOMED"
+            }
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Clinical Finding",
+              "CONCEPT_CODE": "363395000",
+              "CONCEPT_ID": 4177102,
+              "CONCEPT_NAME": "Malignant tumor of vallecula",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
@@ -218,6 +260,20 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
+              "CONCEPT_CODE": "93670003",
+              "CONCEPT_ID": 436643,
+              "CONCEPT_NAME": "Primary malignant neoplasm of anterior aspect of epiglottis",
+              "DOMAIN_ID": "Condition",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "SNOMED"
+            }
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Clinical Finding",
               "CONCEPT_CODE": "93829002",
               "CONCEPT_ID": 434577,
               "CONCEPT_NAME": "Primary malignant neoplasm of hypopharyngeal aspect of aryepiglottic fold",
@@ -288,6 +344,20 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
+              "CONCEPT_CODE": "94132005",
+              "CONCEPT_ID": 438360,
+              "CONCEPT_NAME": "Primary malignant neoplasm of vallecula",
+              "DOMAIN_ID": "Condition",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "SNOMED"
+            }
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Clinical Finding",
               "CONCEPT_CODE": "707406005",
               "CONCEPT_ID": 45768882,
               "CONCEPT_NAME": "Primary mucoepidermoid carcinoma of hypopharynx",
@@ -344,6 +414,20 @@
           {
             "concept": {
               "CONCEPT_CLASS_ID": "Clinical Finding",
+              "CONCEPT_CODE": "707537007",
+              "CONCEPT_ID": 45768984,
+              "CONCEPT_NAME": "Primary squamous cell carcinoma of anterior surface of epiglottis",
+              "DOMAIN_ID": "Condition",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "SNOMED"
+            }
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Clinical Finding",
               "CONCEPT_CODE": "707697002",
               "CONCEPT_ID": 45771033,
               "CONCEPT_NAME": "Primary squamous cell carcinoma of hypopharyngeal aspect of aryepiglottic fold",
@@ -389,6 +473,20 @@
               "CONCEPT_CODE": "707686002",
               "CONCEPT_ID": 45769108,
               "CONCEPT_NAME": "Primary squamous cell carcinoma of posterior wall of hypopharynx",
+              "DOMAIN_ID": "Condition",
+              "INVALID_REASON": "V",
+              "INVALID_REASON_CAPTION": "Valid",
+              "STANDARD_CONCEPT": "S",
+              "STANDARD_CONCEPT_CAPTION": "Standard",
+              "VOCABULARY_ID": "SNOMED"
+            }
+          },
+          {
+            "concept": {
+              "CONCEPT_CLASS_ID": "Clinical Finding",
+              "CONCEPT_CODE": "707538002",
+              "CONCEPT_ID": 45773564,
+              "CONCEPT_NAME": "Primary squamous cell carcinoma of vallecula",
               "DOMAIN_ID": "Condition",
               "INVALID_REASON": "V",
               "INVALID_REASON_CAPTION": "Valid",
