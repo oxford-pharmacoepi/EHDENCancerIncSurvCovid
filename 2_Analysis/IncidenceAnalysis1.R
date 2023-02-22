@@ -653,6 +653,88 @@ inc_han <- estimateIncidence(
   info(logger, "- Plotting incidence and period prevalence results: head neck subtypes")
   
 
+  # Plots
+  inc_yrs_plot <- study_results_han$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
+    filter(denominator_cohort_id == 3 &
+             denominator_age_group == "18;150" &
+             analysis_interval == "years") %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerHypopharynx", "Hypopharynx")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerLarynx", "Larynx")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerNasalCavitySinus", "Nasal Cavity & Sinus")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerNasopharynx", "Nasopharynx")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerOralCavityIncidence", "Oral Cavity")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerOropharynx", "Oropharynx")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerSalivaryGland", "Salivary Gland")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerTongueIncidence", "Tongue")) %>%
+    mutate(time = format(incidence_start_date, format="%Y")) %>%
+    as.data.frame()
+  
+  plotAll <- inc_yrs_plot %>%
+    ggplot( aes(x = time, y = incidence_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
+    geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
+    geom_line(color = "black", size = 0.25) +
+    geom_point(size = 2.5) +
+    xlab("Calender year") +
+    ylab("Incidence rate per 100000 person-years") +
+    scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+    scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) +
+    labs(colour = "Head and Neck Cancers") +
+    theme(axis.text.x = element_text(angle = 45, hjust=1),
+          panel.background = element_blank() ,
+          axis.line = element_line(colour = "black", size = 0.6) ,
+          panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+          legend.key = element_rect(fill = "transparent", colour = "transparent"))
+  
+  plotname <- paste0("IncidenceRatesWholePopHeadNeckCancerSubtypes", db.name,".pdf")
+  
+  pdf(here(qcfolder, plotname),
+      width = 7, height = 5)
+  print(plotAll, newpage = FALSE)
+  dev.off()
+  
+  
+  
+  # plot the results stratified by gender
+  inc_yrs_plot <- study_results_han$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
+    filter((denominator_cohort_id == 1 | denominator_cohort_id == 2 &
+              denominator_age_group == "18;150") &
+             analysis_interval == "years") %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerHypopharynx", "Hypopharynx")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerLarynx", "Larynx")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerNasalCavitySinus", "Nasal Cavity & Sinus")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerNasopharynx", "Nasopharynx")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerOralCavityIncidence", "Oral Cavity")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerOropharynx", "Oropharynx")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerSalivaryGland", "Salivary Gland")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerTongueIncidence", "Tongue")) %>% 
+    mutate(time = format(incidence_start_date, format="%Y")) %>%
+    as.data.frame()
+  
+  plotGender <- inc_yrs_plot %>%
+    ggplot( aes(x = time, y = incidence_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
+    geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
+    geom_line(color = "black", size = 0.25) +
+    geom_point(size = 2.5) +
+    xlab("Calender year") +
+    ylab("Incidence rate per 100000 person-years") +
+    scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+    scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) +
+    labs(colour = "Head and Neck Cancers") +
+    theme(axis.text.x = element_text(angle = 45, hjust=1),
+          panel.background = element_blank() ,
+          panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+          legend.key = element_rect(fill = "transparent", colour = "transparent"))
+  
+  plotGender <- plotGender + facet_wrap(~denominator_sex, scales="free_y") +
+    theme(strip.background = element_rect(colour="black", fill=NA),
+          panel.border = element_rect(fill = NA, color = "black"))
+  
+  plotname <- paste0("IncidenceRatesGenderHeadNeckCancerSubtypes", db.name,".pdf")
+  
+  pdf(here(qcfolder, plotname),
+      width = 11, height = 5)
+  print(plotGender, newpage = FALSE)
+  dev.off()
 
 }
 
