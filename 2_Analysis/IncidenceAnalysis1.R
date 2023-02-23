@@ -67,7 +67,7 @@ prev_period <- estimatePeriodPrevalence(
   outcomeTable = prevalent_table_name,
   interval = c("years"),
   completeDatabaseIntervals = TRUE, # prev only estimate for intervals where db captures all of the interval
-  fullContribution = c(TRUE, FALSE) , # individuals only required to be present for one day in interval
+  fullContribution = FALSE , # individuals only required to be present for one day in interval
   minCellCount = 5
 )
 
@@ -596,7 +596,8 @@ inc_han <- estimateIncidence(
     minCellCount = 5,
     returnParticipants = FALSE
   )
-  
+
+
   print(paste0("- Got incidence: head neck subtypes"))
   info(logger, "- Got incidence: head neck subtypes")
   
@@ -613,7 +614,7 @@ inc_han <- estimateIncidence(
     outcomeTable = prevalent_table_name_han,
     interval = c("years"),
     completeDatabaseIntervals = TRUE, # prev only estimate for intervals where db captures all of the interval
-    fullContribution = c(TRUE, FALSE) , # individuals only required to be present for one day in interval
+    fullContribution = FALSE , # individuals only required to be present for one day in interval
     minCellCount = 5
   )
   
@@ -631,9 +632,12 @@ inc_han <- estimateIncidence(
   
   
   study_results_han <- gatherIncidencePrevalenceResults(cdm = cdm, 
-                                                        resultList=list(inc_han, prev_period_han ),
+                                                        resultList=list(inc_han, 
+                                                                        prev_period_han ),
                                                         databaseName = db.name)
   
+  
+
   print(paste0("- Got incidence and period prevalence results: head neck subtypes"))
   info(logger, "- Got incidence and period prevalence results: head neck subtypes")
   
@@ -648,6 +652,38 @@ inc_han <- estimateIncidence(
   
   print(paste0("- Exported incidence and period prevalence results: head neck subtypes"))
   info(logger, "- Exported incidence and period prevalence results: cancer populations")
+  
+  print(paste0("- Getting overall incidence: head neck subtypes"))
+  info(logger, "- Getting overall incidence: head neck subtypes")
+  
+  # Estimate overall incidence -------
+  inc_han_overall <- estimateIncidence(
+    cdm = cdm,
+    denominatorTable = "denominator",
+    outcomeTable = outcome_table_name_han,
+    denominatorCohortId = NULL,
+    outcomeCohortId = outcome_cohorts_han$cohortId,
+    outcomeCohortName = outcome_cohorts_han$cohortName,
+    interval = c("overall"), 
+    outcomeWashout = NULL,
+    repeatedEvents = FALSE,
+    completeDatabaseIntervals = TRUE,
+    minCellCount = 5,
+    returnParticipants = FALSE
+  )
+  
+  study_results_han_overall <- gatherIncidencePrevalenceResults(cdm = cdm, 
+                                                                resultList=list(inc_han_overall ),
+                                                                databaseName = db.name)
+  
+  exportIncidencePrevalenceResults(result=study_results_han_overall,
+                                   zipName= paste0(db.name, "IPResultsHeadNeckSubtypesOverall"),
+                                   outputFolder=here::here("Results", db.name))
+  
+  
+  print(paste0("- Got overall incidence: head neck subtypes"))
+  info(logger, "- Got overall incidence: head neck subtypes")
+
   
   print(paste0("- Plotting incidence and period prevalence results: head neck subtypes"))
   info(logger, "- Plotting incidence and period prevalence results: head neck subtypes")
