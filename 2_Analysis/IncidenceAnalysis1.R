@@ -43,7 +43,7 @@ inc <- estimateIncidence(
   denominatorCohortId = NULL,
   outcomeCohortId = outcome_cohorts$cohortId,
   outcomeCohortName = outcome_cohorts$cohortName,
-  interval = c("years"), 
+  interval = "years", 
   outcomeWashout = NULL,
   repeatedEvents = FALSE,
   completeDatabaseIntervals = TRUE,
@@ -65,7 +65,7 @@ prev_period <- estimatePeriodPrevalence(
   outcomeCohortName = prevalent_cohorts$cohortName,
   outcomeLookbackDays = 0, 
   outcomeTable = prevalent_table_name,
-  interval = c("years"),
+  interval = "years" ,
   completeDatabaseIntervals = TRUE, # prev only estimate for intervals where db captures all of the interval
   fullContribution = FALSE , # individuals only required to be present for one day in interval
   minCellCount = 5
