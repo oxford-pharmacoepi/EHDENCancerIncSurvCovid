@@ -52,13 +52,13 @@ Pop$age<- NA
 if(sum(is.na(Pop$day_of_birth))==0 & sum(is.na(Pop$month_of_birth))==0){
   # if we have day and month
   Pop <-Pop %>%
-    mutate(age=floor(as.numeric((ymd(cohort_start_date)-
+    mutate(age=floor(as.numeric((ymd(outcome_start_date)-
                                    ymd(paste(year_of_birth,
                                              month_of_birth,
                                              day_of_birth, sep="-"))))/365.25))
 } else {
   Pop <- Pop %>%
-    mutate(age= lubridate::year(cohort_start_date)-year_of_birth)
+    mutate(age= lubridate::year(outcome_start_date)-year_of_birth)
 }
 
 # # age age groups ----

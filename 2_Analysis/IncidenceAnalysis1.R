@@ -312,7 +312,6 @@ inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit 
   mutate(time = format(incidence_start_date, format="%Y")) %>%
   as.data.frame()
 
-
 agelabels <- c(
   `18;29` = "18-29 Years",
   `30;39` = "30-39 Years",
@@ -333,7 +332,6 @@ plotAge <- inc_yrs_plot %>%
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) +
   labs(colour = "Cancer") +
-  scale_x_continuous(breaks=seq(min(inc_yrs_plot$time), max(inc_yrs_plot$time), 2)) +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
         panel.background = element_blank() ,
         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
@@ -381,7 +379,7 @@ plotAge <- pp_yrs_plot %>%
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) +
   labs(colour = "Cancer") +
-  scale_x_continuous(breaks=seq(min(inc_yrs_plot$time), max(inc_yrs_plot$time), 2)) +
+  #scale_x_continuous(breaks=seq(min(inc_yrs_plot$time), max(inc_yrs_plot$time), 2)) +
   scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
         panel.background = element_blank() ,
@@ -441,7 +439,7 @@ plotAgeGender <- inc_yrs_plot %>%
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) +
   labs(colour = "Cancer") +
-  scale_x_continuous(breaks=seq(min(inc_yrs_plot$time), max(inc_yrs_plot$time), 2)) +
+  #scale_x_continuous(breaks=seq(min(inc_yrs_plot$time), max(inc_yrs_plot$time), 2)) +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
         panel.background = element_blank() ,
         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
@@ -499,7 +497,7 @@ plotAgeGender <- pp_yrs_plot %>%
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey", "hotpink")) +
   labs(colour = "Cancer") +
-  scale_x_continuous(breaks=seq(min(inc_yrs_plot$time), max(inc_yrs_plot$time), 2)) +
+  #scale_x_continuous(breaks=seq(min(inc_yrs_plot$time), max(inc_yrs_plot$time), 2)) +
   scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
   theme(axis.text.x = element_text(angle = 45, hjust=1),
         panel.background = element_blank() ,

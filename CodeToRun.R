@@ -20,6 +20,7 @@ library(ggplot2)
 library(broom)
 library(survival)
 library(bshazard)
+library(scales)
 
 # database metadata and connection details -----
 # The name/ acronym for the database
