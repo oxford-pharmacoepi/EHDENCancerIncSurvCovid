@@ -108,6 +108,7 @@ Pop <- Pop %>%
 Pop <-Pop %>%
   filter(!is.na(observation_period_end_date))
 
+#source(here("2_Analysis","CohortCharacteristics.R"))
 
 #FUNCTION to extract the data and calculate the correct observation time and event (death) for different calender strata
 DataExtraction <- function(dataset){
