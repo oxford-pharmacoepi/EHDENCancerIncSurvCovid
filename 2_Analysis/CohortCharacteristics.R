@@ -114,6 +114,8 @@ Pop <-Pop %>%
 
 
 # co morbidities
+
+# this works
 Dementia.codes<-tbl(db, sql("SELECT * FROM concept_ancestor")) %>% 
   filter(ancestor_concept_id ==4182210) %>% 
   collect()
@@ -126,7 +128,7 @@ Pop <-
       inner_join(cdm$condition_occurrence %>% 
                    filter(condition_concept_id %in% !!Dementia.codes$descendant_concept_id), 
                  by=c("person_id"), copy = TRUE) %>% 
-      filter(condition_start_date < outcome_start_date) %>% 
+      filter(condition_start_date <= outcome_start_date) %>% 
       select(person_id) %>% 
       distinct() %>% 
       mutate(Dementia=1),
