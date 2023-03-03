@@ -647,10 +647,10 @@ survival_study_results <- list(survivalResults ,
                                medianKMResults,
                                SurvProb1510KMResults)
 
-names(survival_study_results) <- c(paste0("survival_estimates_", db.name),
-                                   paste0("risk_table_results_", db.name),
-                                   paste0("median_survival_results_", db.name),
-                                   paste0("one_five_ten_survival_rates_", db.name)
+names(survival_study_results) <- c(paste0("survival_estimates"),
+                                   paste0("risk_table_results"),
+                                   paste0("median_survival_results"),
+                                   paste0("one_five_ten_survival_rates")
 )
 
 
@@ -660,66 +660,65 @@ return(survival_study_results)
 
 }
 
-#whole data
-test1 <- SurAnalysis(dataset = PopAll[[1]],
-                    outcomeCohort = outcome_cohorts)
-# calender strata 1
-test2 <- SurAnalysis(dataset = PopAll[[2]],
-                     outcomeCohort = outcome_cohorts)
-# calender strata 2
-test3 <- SurAnalysis(dataset = PopAll[[3]],
-                     outcomeCohort = outcome_cohorts)
-# calender strata 3
-test4 <- SurAnalysis(dataset = PopAll[[4]],
-                     outcomeCohort = outcome_cohorts)
-# calender strata 4
-test5 <- SurAnalysis(dataset = PopAll[[5]],
-                     outcomeCohort = outcome_cohorts)
+# create a loop which carries the analysis out on the number of calender year groups (all data plus the calender time splits)
+SurResults <- list()
 
+for(l in 1:length(PopAll)) {
+  SurResults[[l]] <- SurAnalysis(dataset = PopAll[[l]],
+                       outcomeCohort = outcome_cohorts)
+}
 
-#combine the results
+# extract results for the whole population
+whole_pop_results <- list(
+  SurResults[[1]]$survival_estimates ,
+  SurResults[[1]]$risk_table_results ,
+  SurResults[[1]]$median_survival_results,
+  SurResults[[1]]$one_five_ten_survival_rates
+  )
 
-# KM results
-survival_results <- bind_rows(test2[[1]],
-          test3[[1]],
-          test4[[1]],
-          test5[[1]] )
+names(whole_pop_results) <- c(paste0("survival_estimates", db.name),
+                               paste0("risk_table_results", db.name),
+                               paste0("median_survival_results", db.name),
+                               paste0("one_five_ten_survival_rates", db.name))
 
+# extract calender year results
+surres <- list()
+rtres <- list()
+msres <- list()
+oftsrres <- list()
 
-risk_table <- bind_rows(test2[[2]],
-                              test3[[2]],
-                              test4[[2]],
-                              test5[[2]] )
+# extract information for calender year (element 1 is whole population so start from 2:n)
+for(q in 2:length(PopAll)) {
+  
+  surres[[q]]<-SurResults[[q]]$survival_estimates
+  rtres[[q]]<-SurResults[[q]]$risk_table_results
+  msres[[q]]<-SurResults[[q]]$median_survival_results
+  oftsrres[[q]]<-SurResults[[q]]$one_five_ten_survival_rates
+  
+}
 
-med_surv_results <- bind_rows(test2[[3]],
-                              test3[[3]],
-                              test4[[3]],
-                              test5[[3]] )
-
-survival_prob <- bind_rows(test2[[4]],
-                              test3[[4]],
-                              test4[[4]],
-                              test5[[4]] )
+# bind the results for calender years
+survival_results_cy <- bind_rows(surres)
+risk_table_cy <- bind_row(rtres)
+med_surv_results_cy <- bind_rows(msres)
+survival_prob_cy <- bind_rows(oftsrres)
 
 calenderyr_results <- list(
-  survival_results,
-  risk_table,
-  med_surv_results,
-  survival_prob)
+  survival_results_cy,
+  risk_table_cy,
+  med_surv_results_cy,
+  survival_prob_cy)
 
-names(calenderyr_results) <- c(paste0("survival_estimates_", db.name),
-                                   paste0("risk_table_results_", db.name),
-                                   paste0("median_survival_results_", db.name),
-                                   paste0("one_five_ten_survival_rates_", db.name))
-
-# need to put into a loop then merge ALL results into 1 and zip 
-
+names(calenderyr_results) <- c(paste0("survival_estimates_cy", db.name),
+                                   paste0("risk_table_results_cy", db.name),
+                                   paste0("median_survival_results_cy", db.name),
+                                   paste0("one_five_ten_survival_rates_cy", db.name))
 
 # zip results
 print("Zipping results to output folder")
 
 #whole database
-exportSurvivalResults(result=test1,
+exportSurvivalResults(result=whole_pop_results,
                       zipName= paste0(db.name, "WholeSurvivalResults"),
                       outputFolder=here::here("Results", db.name))
 
@@ -727,3 +726,85 @@ exportSurvivalResults(result=test1,
 exportSurvivalResults(result=calenderyr_results,
                       zipName= paste0(db.name, "CalenderYrSurvivalResults"),
                       outputFolder=here::here("Results", db.name))
+
+
+
+
+# for head and neck cancer substypes
+if (grepl("CPRD", db.name) == TRUE){
+  
+  #OUTPUT data for whole dataset and strata based on calender year for head and neck
+  PopAll <- DataExtraction(dataset = Pophan)
+  
+  # create a loop which carries the analysis out on the number of calender year groups (all data plus the calender time splits)
+  SurResults <- list()
+  
+  for(l in 1:length(PopAll)) {
+    SurResults[[l]] <- SurAnalysis(dataset = PopAll[[l]],
+                                   outcomeCohort = outcome_cohorts_han)
+  }
+  
+  # extract results for the whole population
+  whole_pop_results <- list(
+    SurResults[[1]]$survival_estimates ,
+    SurResults[[1]]$risk_table_results ,
+    SurResults[[1]]$median_survival_results,
+    SurResults[[1]]$one_five_ten_survival_rates
+  )
+  
+  names(whole_pop_results) <- c(paste0("survival_estimates", db.name),
+                                paste0("risk_table_results", db.name),
+                                paste0("median_survival_results", db.name),
+                                paste0("one_five_ten_survival_rates", db.name))
+  
+  # extract calender year results
+  surres <- list()
+  rtres <- list()
+  msres <- list()
+  oftsrres <- list()
+  
+  # extract information for calender year (element 1 is whole population so start from 2:n)
+  for(q in 2:length(PopAll)) {
+    
+    surres[[q]]<-SurResults[[q]]$survival_estimates
+    rtres[[q]]<-SurResults[[q]]$risk_table_results
+    msres[[q]]<-SurResults[[q]]$median_survival_results
+    oftsrres[[q]]<-SurResults[[q]]$one_five_ten_survival_rates
+    
+  }
+  
+  # bind the results for calender years
+  survival_results_cy <- bind_rows(surres)
+  risk_table_cy <- bind_row(rtres)
+  med_surv_results_cy <- bind_rows(msres)
+  survival_prob_cy <- bind_rows(oftsrres)
+  
+  calenderyr_results <- list(
+    survival_results_cy,
+    risk_table_cy,
+    med_surv_results_cy,
+    survival_prob_cy)
+  
+  names(calenderyr_results) <- c(paste0("survival_estimates_cy_han", db.name),
+                                 paste0("risk_table_results_cy_han", db.name),
+                                 paste0("median_survival_results_cy_han", db.name),
+                                 paste0("one_five_ten_survival_rates_cy_han", db.name))
+  
+  # zip results
+  print("Zipping results to output folder")
+  
+  #whole database
+  exportSurvivalResults(result=whole_pop_results,
+                        zipName= paste0(db.name, "WholeSurvivalResultsHan"),
+                        outputFolder=here::here("Results", db.name))
+  
+  #calender year stratification
+  exportSurvivalResults(result=calenderyr_results,
+                        zipName= paste0(db.name, "CalenderYrSurvivalResultsHan"),
+                        outputFolder=here::here("Results", db.name))
+
+}
+  
+
+
+
