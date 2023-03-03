@@ -62,7 +62,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                 pickerInput(inputId = "prevalence_outcome_cohort_name_selector",
                                             label = "Outcome",
                                             choices = sort(unique(prevalence_estimates$outcome_cohort_name)),
-                                            selected = c("test"),
+                                            selected = c("Breast"),
                                             options = list(
                                               `actions-box` = TRUE,
                                               size = 10,
@@ -199,7 +199,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                 pickerInput(inputId = "incidence_outcome_cohort_name_selector",
                                             label = "Outcome",
                                             choices = sort(unique(incidence_estimates$outcome_cohort_name)),
-                                            selected = c("test"),
+                                            selected = c("Breast"),
                                             options = list(
                                               `actions-box` = TRUE,
                                               size = 10,
@@ -240,6 +240,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                               size = 10,
                                               `selected-text-format` = "count > 3"),
                                             multiple = TRUE)
+                         
                             ),
                             tags$hr(),
                             tags$h5("Analysis settings"),
@@ -248,6 +249,19 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                             label = "incidence start date",
                                             choices = as.character(unique(incidence_estimates$incidence_start_date)),
                                             selected = as.character(unique(incidence_estimates$incidence_start_date)),
+                                            options = list(
+                                              `actions-box` = TRUE,
+                                              size = 10,
+                                              `selected-text-format` = "count > 3"),
+                                            multiple = TRUE)
+                                
+                                
+                            ),
+                            div(style="display: inline-block;vertical-align:top; width: 150px;",
+                                pickerInput(inputId = "incidence_denominator_analysis_interval_selector",
+                                            label = "Analysis Interval",
+                                            choices = unique(incidence_estimates$analysis_interval),
+                                            selected = "years",
                                             options = list(
                                               `actions-box` = TRUE,
                                               size = 10,

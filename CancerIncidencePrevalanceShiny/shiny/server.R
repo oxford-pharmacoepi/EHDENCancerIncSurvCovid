@@ -192,7 +192,7 @@ server <-	function(input, output, session) {
     table<-incidence_estimates %>% 
       # first deselect settings which did not vary for this study
       select(!c(analysis_id, 
-                analysis_interval,
+                #analysis_interval,
                 analysis_complete_database_intervals,
                 denominator_start_date,
                 denominator_end_date)) %>% 
@@ -201,7 +201,8 @@ server <-	function(input, output, session) {
       filter(denominator_age_group %in% input$incidence_denominator_age_group_selector)     %>% 
       filter(denominator_sex %in% input$incidence_denominator_sex_selector)     %>% 
       filter(denominator_days_prior_history %in% input$incidence_denominator_days_prior_history_selector)   %>% 
-      filter(outcome_cohort_name %in% input$incidence_outcome_cohort_name_selector)  
+      filter(outcome_cohort_name %in% input$incidence_outcome_cohort_name_selector)  %>%
+      filter(analysis_interval %in% input$incidence_denominator_analysis_interval_selector) 
 
     table
   }) 
@@ -333,7 +334,7 @@ server <-	function(input, output, session) {
     table<-incidence_attrition %>% 
       # first deselect settings which did not vary for this study
       select(!c(analysis_id, 
-                analysis_interval,
+                #analysis_interval,
                 analysis_repeated_events,analysis_outcome_washout,
                 analysis_complete_database_intervals,
                 denominator_start_date,
@@ -342,8 +343,8 @@ server <-	function(input, output, session) {
       filter(denominator_age_group %in% input$incidence_denominator_age_group_selector)     %>% 
       filter(denominator_sex %in% input$incidence_denominator_sex_selector)     %>% 
       filter(denominator_days_prior_history %in% input$incidence_denominator_days_prior_history_selector)     %>% 
-      filter(outcome_cohort_name %in% input$incidence_outcome_cohort_name_selector)  
-    
+      filter(outcome_cohort_name %in% input$incidence_outcome_cohort_name_selector) %>%
+    filter(analysis_interval %in% input$incidence_denominator_analysis_interval_selector) 
     table
   }) 
   
