@@ -1,115 +1,5 @@
 # KM survival analysis ---
 
-# This code carries out
-# just in case the server crashes saving the participants and settings info so can 
-#get participants for table 1
-# participants_incoverall <- participants(result = inc_overall)
-# saveRDS(participants_incoverall, here(output.folder, "ParticipantsInc.rds"))
-# 
-# #save the settings for incidence
-# settings_inc <- settings(inc_overall)
-# save(settings_inc, file = here::here(output.folder, "SettingsInc.RData")) 
-
-
-# #extract settings for survival
-settings_surv <- settings(inc_overall) %>%
-  filter(analysis_interval == "overall" & denominator_cohort_id == 3)
-
-pops <- list()
-
-for (i in 1:length(settings_surv$analysis_id)){
-#extract the participants for each cancer
-  pops[[i]] <-cdm$person %>%
-  inner_join(participants(inc_overall, analysisId = settings_surv$analysis_id[i]) %>% filter(!is.na(outcome_start_date)),
-             by = c("person_id" = "subject_id" ), copy = TRUE) %>%
-  select(person_id,gender_concept_id,
-         year_of_birth, month_of_birth, day_of_birth,
-         cohort_start_date,
-         cohort_end_date,
-         outcome_start_date,
-         analysis_id)  %>%
-  left_join(cdm$observation_period %>%
-              select("person_id",  "observation_period_start_date", "observation_period_end_date") %>%
-              distinct(),
-            by = "person_id") %>%
-  left_join(cdm$death %>%
-              select("person_id",  "death_date") %>%
-              distinct(),
-            by = "person_id") %>%
-  collect()
-
-pops[[i]] <- pops[[i]]  %>%
-mutate(outcome_cohort_name = settings_surv$outcome_cohort_name[i]) %>%
-  mutate(outcome_cohort_id = settings_surv$outcome_cohort_id[i])
-
-}
-
-Pop <- dplyr::bind_rows(pops)
-
-# format data -----
-#add age -----
-Pop$age<- NA
-if(sum(is.na(Pop$day_of_birth))==0 & sum(is.na(Pop$month_of_birth))==0){
-  # if we have day and month
-  Pop <-Pop %>%
-    mutate(age=floor(as.numeric((ymd(outcome_start_date)-
-                                   ymd(paste(year_of_birth,
-                                             month_of_birth,
-                                             day_of_birth, sep="-"))))/365.25))
-} else {
-  Pop <- Pop %>%
-    mutate(age= lubridate::year(outcome_start_date)-year_of_birth)
-}
-
-# # age age groups ----
-Pop <- Pop %>%
-  mutate(age_gr=ifelse(age<30,  "18-29",
-                       ifelse(age>=30 &  age<=39,  "30-39",
-                              ifelse(age>=40 & age<=49,  "40-49",
-                                     ifelse(age>=50 & age<=59,  "50-59",
-                                            ifelse(age>=60 & age<=69, "60-69",
-                                                   ifelse(age>=70 & age<=79, "70-79",
-                                                          ifelse(age>=80 & age<=89, "80-89",
-                                                                 ifelse(age>=90, ">=90",
-                                                                        NA))))))))) %>%
-  mutate(age_gr= factor(age_gr,
-                        levels = c("18-29","30-39","40-49", "50-59",
-                                   "60-69", "70-79","80-89",">=90")))
-table(Pop$age_gr, useNA = "always")
-
-# # reformat gender
-# # add gender -----
-# #8507 male
-# #8532 female
-Pop <-Pop %>%
-  mutate(gender= ifelse(gender_concept_id==8507, "Male",
-                        ifelse(gender_concept_id==8532, "Female", NA ))) %>%
-  mutate(gender= factor(gender,
-                        levels = c("Male", "Female")))
-table(Pop$gender, useNA = "always")
-
-# # if missing (or unreasonable) age or gender, drop ----
-Pop <-Pop %>%
-  filter(!is.na(age)) %>%
-  filter(age>=18) %>%
-  filter(age<=110) %>%
-  filter(!is.na(gender))
-#
-# # create sex:agegp categorical variables
-Pop <- Pop %>%
-  unite('genderAgegp', c(gender,age_gr), remove = FALSE) %>%
-  mutate(genderAgegp= factor(genderAgegp,
-                             levels = c("Female_18-29","Female_30-39","Female_40-49", "Female_50-59",
-                                        "Female_60-69", "Female_70-79","Female_80-89","Female_>=90",
-                                        "Male_18-29","Male_30-39","Male_40-49", "Male_50-59",
-                                        "Male_60-69", "Male_70-79","Male_80-89","Male_>=90")))
-
-# # drop if missing observation period end date ----
-Pop <-Pop %>%
-  filter(!is.na(observation_period_end_date))
-
-#source(here("2_Analysis","CohortCharacteristics.R"))
-
 #FUNCTION to extract the data and calculate the correct observation time and event (death) for different calender strata
 DataExtraction <- function(dataset){
   
@@ -138,7 +28,7 @@ DataExtraction <- function(dataset){
   # take "dataset" and do the code for each calender year
   # carry out for calender year
   # take year and split into groups based on the data available
-  grid <- rev(seq(max(lubridate::year(lubridate::ymd(dataset$cohort_start_date))), min(lubridate::year(lubridate::ymd(dataset$cohort_start_date))),by=-5))
+  grid <- rev(seq(max(lubridate::year(lubridate::ymd(dataset$outcome_start_date))), min(lubridate::year(lubridate::ymd(dataset$cohort_start_date))),by=-5))
 
   # now need to create the start and end dates for each one
   startYear <- paste0(grid-4,"-01-01") # first days

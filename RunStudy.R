@@ -74,6 +74,11 @@ info(logger, 'RUNNING INCIDENCE RATE ANALYSIS')
 source(here("2_Analysis","IncidenceAnalysis1.R"))
 info(logger, 'INCIDENCE RATE ANALYSIS RAN')
 
+# Run cohort characterisation analysis ----
+info(logger, 'RUNNING COHORT CHARACTERISATION ANALYSIS')
+#source(here("2_Analysis","CohortCharacteristics.R"))
+info(logger, 'COHORT CHARACTERISATION ANALYSIS RAN')
+
 if(runSurvial == TRUE){
 # Run survival analysis -----
 info(logger, 'RUNNING SURVIVAL ANALYSIS')
