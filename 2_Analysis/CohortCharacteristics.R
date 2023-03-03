@@ -9,12 +9,16 @@
 settings_surv <- settings(inc_han_overall) %>%
   filter(analysis_interval == "overall" & denominator_cohort_id == 3)
 
+# # save the participants for now but remove when code is finished
+# participants_han <- participants(inc_han_overall, analysisId = 100) %>% 
+#   filter(!is.na(outcome_start_date)) %>% collect()
+
 pops <- list()
 
 for (i in 1:length(settings_surv$analysis_id)){
   #extract the participants for each cancer
   pops[[i]] <-cdm$person %>%
-    inner_join(participants(inc_overall, analysisId = settings_surv$analysis_id[i]) %>% filter(!is.na(outcome_start_date)),
+    inner_join(participants(inc_han_overall, analysisId = settings_surv$analysis_id[i]) %>% filter(!is.na(outcome_start_date)),
                by = c("person_id" = "subject_id" ), copy = TRUE) %>%
     select(person_id,gender_concept_id,
            year_of_birth, month_of_birth, day_of_birth,
@@ -38,14 +42,7 @@ for (i in 1:length(settings_surv$analysis_id)){
   
 }
 
-Pop <- dplyr::bind_rows(pops) %>%
-  mutate(Outcome = !is.na(outcome_start_date))
-
-# subset denominator to those who do not have an outcome (i.e. no drug) but have dementia
-PopDenom <- Pop %>% filter(Outcome == FALSE)
-
-# subset the population to those who have an outcome
-Pop <- Pop %>% filter(Outcome == TRUE)
+Pop <- dplyr::bind_rows(pops)
 
 # format data -----
 #add age -----
@@ -110,55 +107,46 @@ Pop <-Pop %>%
   filter(!is.na(observation_period_end_date))
 
 
-### OUTCOME COHORTS ####
-# format data -----
-#add age -----
-Pop$age<- NA
-if(sum(is.na(Pop$day_of_birth))==0 & sum(is.na(Pop$month_of_birth))==0){
-  # if we have day and month
-  Pop <-Pop %>%
-    mutate(age=floor(as.numeric((ymd(outcome_start_date)-
-                                   ymd(paste(year_of_birth,
-                                             month_of_birth,
-                                             day_of_birth, sep="-"))))/365.25))
-} else {
-  Pop <- Pop %>%
-    mutate(age= lubridate::year(outcome_start_date)-year_of_birth)
-}
 
-# # age age groups ----
-Pop <- Pop %>%
-  mutate(age_gr=ifelse(age<30,  "18-29",
-                       ifelse(age>=30 &  age<=39,  "30-39",
-                              ifelse(age>=40 & age<=49,  "40-49",
-                                     ifelse(age>=50 & age<=59,  "50-59",
-                                            ifelse(age>=60 & age<=69, "60-69",
-                                                   ifelse(age>=70 & age<=79, "70-79",
-                                                          ifelse(age>=80 & age<=89, "80-89",
-                                                                 ifelse(age>=90, ">=90",
-                                                                        NA))))))))) %>%
-  mutate(age_gr= factor(age_gr,
-                        levels = c("18-29","30-39","40-49", "50-59",
-                                   "60-69", "70-79","80-89",">=90")))
-table(Pop$age_gr, useNA = "always")
 
-# # reformat gender
-# # add gender -----
-# #8507 male
-# #8532 female
-Pop <-Pop %>%
-  mutate(gender= ifelse(gender_concept_id==8507, "Male",
-                        ifelse(gender_concept_id==8532, "Female", NA ))) %>%
-  mutate(gender= factor(gender,
-                        levels = c("Male", "Female")))
-table(Pop$gender, useNA = "always")
 
-# # if missing (or unreasonable) age or gender, drop ----
-Pop <-Pop %>%
-  filter(!is.na(age)) %>%
-  filter(age>=18) %>%
-  filter(age<=110) %>%
-  filter(!is.na(gender))
+
+
+
+# co morbidities
+Dementia.codes<-tbl(db, sql("SELECT * FROM concept_ancestor")) %>% 
+  filter(ancestor_concept_id ==4182210) %>% 
+  collect()
+
+Pop <- 
+  Pop %>% 
+  left_join(
+    Pop %>% 
+      select("person_id", "outcome_start_date") %>% 
+      inner_join(cdm$condition_occurrence %>% 
+                   filter(condition_concept_id %in% !!Dementia.codes$descendant_concept_id), 
+                 by=c("person_id"), copy = TRUE) %>% 
+      filter(condition_start_date < outcome_start_date) %>% 
+      select(person_id) %>% 
+      distinct() %>% 
+      mutate(Dementia=1),
+    by="person_id")  %>% 
+  compute()
+
+
+
+
+
+
+
+
+# medications
+
+
+
+
+
+
 
 
 # medications
