@@ -699,7 +699,7 @@ for(q in 2:length(PopAll)) {
 
 # bind the results for calender years
 survival_results_cy <- bind_rows(surres)
-risk_table_cy <- bind_row(rtres)
+risk_table_cy <- bind_rows(rtres)
 med_surv_results_cy <- bind_rows(msres)
 survival_prob_cy <- bind_rows(oftsrres)
 

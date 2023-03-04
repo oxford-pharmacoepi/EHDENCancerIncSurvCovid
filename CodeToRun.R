@@ -70,7 +70,7 @@ results_database_schema<-"results"
 # Name of outcome table in the result table where the outcome cohorts will be stored
 # Note, if there is an existing table in your results schema with the same names
 # it will be overwritten 
-outcome_table_stem<-"cancerincprev6"
+outcome_table_stem<-"cancerincprev7"
 
 
 # create cdm reference ----
@@ -95,3 +95,6 @@ runSurvial <- TRUE
 # Run the study ------
 source(here("RunStudy.R"))
 # after the study is run you should have a zip folder in your output folder to share
+
+# disconnect from the database
+dbDisconnect(db)
