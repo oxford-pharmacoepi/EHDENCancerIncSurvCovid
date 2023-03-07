@@ -606,8 +606,8 @@ survivalResults <- bind_rows(
   observedkmcombined , # all 
   observedkmcombined_gender , # gender strat 
   observedkmcombined_age , # age strat
-  observedkmcombined_age_gender # age gender strat
-) %>%
+  observedkmcombined_age_gender # age gender strat 
+  ) %>%
   mutate(Database = db.name, CalenderYearGp = paste0(min(lubridate::year(lubridate::ymd(data$cohort_end_date))),"-",
                                                      max(lubridate::year(lubridate::ymd(data$cohort_end_date)))))
 
@@ -668,6 +668,9 @@ for(l in 1:length(PopAll)) {
                        outcomeCohort = outcome_cohorts)
 }
 
+# test2 <- SurAnalysis(dataset = PopAll[[2]],
+#                                outcomeCohort = outcome_cohorts)
+
 # extract results for the whole population
 whole_pop_results <- list(
   SurResults[[1]]$survival_estimates ,
@@ -726,8 +729,6 @@ exportSurvivalResults(result=whole_pop_results,
 exportSurvivalResults(result=calenderyr_results,
                       zipName= paste0(db.name, "CalenderYrSurvivalResults"),
                       outputFolder=here::here("Results", db.name))
-
-
 
 
 # for head and neck cancer substypes

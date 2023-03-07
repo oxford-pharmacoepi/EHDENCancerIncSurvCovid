@@ -9,8 +9,9 @@ settings_surv <- settings(inc_overall) %>%
 pops <- list()
 
 for (i in 1:length(settings_surv$analysis_id)){
-  #extract the participants for each cancer
-  pops[[i]] <-cdm$person %>%
+#extract the participants for each cancer
+  
+pops[[i]] <-cdm$person %>%
     inner_join(participants(inc_overall, analysisId = settings_surv$analysis_id[i]) %>% filter(!is.na(outcome_start_date)),
                by = c("person_id" = "subject_id" ), copy = TRUE) %>%
     select(person_id,gender_concept_id,
@@ -18,7 +19,7 @@ for (i in 1:length(settings_surv$analysis_id)){
            cohort_start_date,
            cohort_end_date,
            outcome_start_date,
-           analysis_id)  %>%
+           analysis_id) %>%
     left_join(cdm$observation_period %>%
                 select("person_id",  "observation_period_start_date", "observation_period_end_date") %>%
                 distinct(),

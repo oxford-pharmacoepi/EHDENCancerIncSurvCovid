@@ -30,7 +30,6 @@ cdm <- generateCohortSet(cdm = cdm,
 info(logger, "- got prevalent outcomes")
 
 
-
 # if running CPRD data also run the subsets of head and neck cancers for inc/prev
 if (grepl("CPRD", db.name) == TRUE) {
   

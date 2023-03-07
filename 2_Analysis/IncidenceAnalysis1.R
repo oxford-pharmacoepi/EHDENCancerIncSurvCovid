@@ -4,7 +4,7 @@
 print(paste0("- Getting denominator: cancer populations"))
 info(logger, "- Getting denominator: cancer populations")
 
-#get denominator
+#get denominator ------
 cdm$denominator <- generateDenominatorCohortSet(
   cdm = cdm,
   startDate = as.Date(studyStartDate),
@@ -27,7 +27,6 @@ cdm$denominator <- generateDenominatorCohortSet(
 
 print(paste0("- Got denominator: cancer populations"))
 info(logger, "- Got denominator: cancer populations")
-
 
 # Estimate yearly incidence -------
 print(paste0("- Getting incidence and period prevalence: cancer populations"))
@@ -74,7 +73,6 @@ prev_period <- estimatePeriodPrevalence(
 print(paste0("- Got period prevalence: cancer populations"))
 info(logger, "- Got period prevalence: cancer populations")
 
-
 print(paste0("- Got incidence and period prevalence: cancer population"))
 info(logger, "- Got incidence and period prevalence: cancer population")
 
@@ -82,7 +80,6 @@ info(logger, "- Got incidence and period prevalence: cancer population")
 # Get the results ----------------
 print(paste0("- Gathering incidence and period prevalence results: cancer populations"))
 info(logger, "- Gathering incidence and period prevalence results: cancer populations")
-
 
 study_results<- gatherIncidencePrevalenceResults(cdm =cdm, 
                                                  resultList=list(inc,prev_period ),
@@ -99,7 +96,6 @@ exportIncidencePrevalenceResults(result=study_results,
                                  zipName= paste0(db.name, "IPResults"),
                                  outputFolder=here::here("Results", db.name))
 
-
 print(paste0("- Exported incidence and period prevalence results: cancer populations"))
 info(logger, "- Exported incidence and period prevalence results: cancer populations")
 
@@ -109,8 +105,7 @@ info(logger, "- Plotting incidence and period prevalence results: cancer populat
 ###########################################
 # run plots for checking QC checking -----
 
-# whole population
-# incidence
+# incidence: whole population
 inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
   filter(denominator_cohort_id == 3 &
            denominator_age_group == "18;150" &
@@ -151,9 +146,7 @@ pdf(here(qcfolder, plotname),
 print(plotAll, newpage = FALSE)
 dev.off()
 
-
-
-# period prevalence
+# period prevalence: whole population
 pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
   filter((denominator_cohort_id == 3 &
            denominator_age_group == "18;150" ) & 
@@ -198,8 +191,9 @@ dev.off()
 
 
 # ###########################################
-# # plot the results stratified by gender
+# plot the results stratified by gender
 
+# incidence: gender
 inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
     filter((denominator_cohort_id == 1 | denominator_cohort_id == 2 &
            denominator_age_group == "18;150") &
@@ -243,7 +237,7 @@ pdf(here(qcfolder, plotname),
 print(plotGender, newpage = FALSE)
 dev.off()
 
-# period prevalence
+# period prevalence: gender
 pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
   filter((denominator_cohort_id == 1 | denominator_cohort_id == 2 &
            denominator_age_group == "18;150" ) &
@@ -282,7 +276,6 @@ plotGender <- plotGender + facet_wrap(~denominator_sex , scales="free_y") +
   theme(strip.background = element_rect(colour="black", fill=NA),
         panel.border = element_rect(fill = NA, color = "black"))
 
-
 plotname <- paste0("PeriodPrevRatesGender", db.name,".pdf")
 
 pdf(here(qcfolder, plotname),
@@ -290,11 +283,10 @@ pdf(here(qcfolder, plotname),
 print(plotGender, newpage = FALSE)
 dev.off()
 
-
 # ###########################################
 # # plot the results stratified by age ----
 
-# incidence
+# incidence: age
 inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
   filter((denominator_age_group != "18;150" &
            denominator_sex == "Both" ) &
@@ -348,9 +340,7 @@ pdf(here(qcfolder, plotname),
 print(plotAge, newpage = FALSE)
 dev.off()
 
-
-
-# period prevalence
+# period prevalence: age
 pp_yrs_plot <- study_results$prevalence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
   filter((denominator_age_group != "18;150" &
            denominator_sex == "Both" ) &
@@ -401,7 +391,7 @@ dev.off()
 # ###########################################
 # # plot the results stratified by age AND gender ----
 
-# incidence
+# incidence: age*gender
 inc_yrs_plot <- study_results$incidence_estimates %>% 
   filter((denominator_age_group != "18;150" &
            denominator_sex != "Both" ) &
@@ -450,7 +440,6 @@ plotAgeGender <- plotAgeGender + facet_grid(denominator_sex ~ denominator_age_gr
   theme(strip.background = element_rect(colour="black", fill=NA),
         panel.border = element_rect(fill = NA, color = "black"))
 
-
 plotname <- paste0("IncidenceRatesAgeGender", db.name,".pdf")
 
 pdf(here(qcfolder, plotname),
@@ -458,7 +447,7 @@ pdf(here(qcfolder, plotname),
 print(plotAgeGender, newpage = FALSE)
 dev.off()
 
-# period prevalence
+# period prevalence: age*gender
 pp_yrs_plot <- study_results$prevalence_estimates %>% 
   filter((denominator_age_group != "18;150" &
            denominator_sex != "Both") &
@@ -535,7 +524,8 @@ inc_overall <- estimateIncidence(
   repeatedEvents = FALSE,
   completeDatabaseIntervals = TRUE,
   minCellCount = 5,
-  returnParticipants = TRUE
+  returnParticipants = TRUE,
+  tablePrefix = outcome_table_stem
 )
 
 print(paste0("- Got incidence: cancer populations"))
@@ -545,11 +535,9 @@ info(logger, "- Got incidence: cancer populations")
 print(paste0("- Gathering overall incidence results: cancer populations"))
 info(logger, "- Gathering overall incidence results: cancer populations")
 
-
 study_results_overall<- gatherIncidencePrevalenceResults(cdm =cdm,
                                                  resultList=list(inc_overall),
                                                  databaseName = db.name)
-
 
 print(paste0("- Got overall incidence results: cancer populations"))
 info(logger, "- Got overall incidence results: cancer populations")
@@ -602,8 +590,8 @@ inc_han <- estimateIncidence(
   print(paste0("- Getting period prevalence: head neck subtypes"))
   info(logger, "- Getting period prevalence: head neck subtypes")
   
-  # Estimate period prevalence ---------
-  prev_period_han <- estimatePeriodPrevalence(
+# Estimate period prevalence ---------
+prev_period_han <- estimatePeriodPrevalence(
     cdm = cdm,
     denominatorTable = "denominator",
     outcomeCohortId = prevalent_cohorts_han$cohortId,
@@ -616,46 +604,44 @@ inc_han <- estimateIncidence(
     minCellCount = 5
   )
   
-  print(paste0("- Got period prevalence: head neck subtypes"))
-  info(logger, "- Got period prevalence: head neck subtypes")
+print(paste0("- Got period prevalence: head neck subtypes"))
+info(logger, "- Got period prevalence: head neck subtypes")
   
   
-  print(paste0("- Got incidence and period prevalence: head neck subtypes"))
-  info(logger, "- Got incidence and period prevalence: head neck subtypes")
+print(paste0("- Got incidence and period prevalence: head neck subtypes"))
+info(logger, "- Got incidence and period prevalence: head neck subtypes")
   
   
-  # Get the results ----------------
-  print(paste0("- Gathering incidence and period prevalence results: head neck subtypes"))
-  info(logger, "- Gathering incidence and period prevalence results: head neck subtypes")
+# Get the results ----------------
+print(paste0("- Gathering incidence and period prevalence results: head neck subtypes"))
+info(logger, "- Gathering incidence and period prevalence results: head neck subtypes")
   
   
-  study_results_han <- gatherIncidencePrevalenceResults(cdm = cdm, 
-                                                        resultList=list(inc_han, 
-                                                                        prev_period_han ),
+study_results_han <- gatherIncidencePrevalenceResults(cdm = cdm, 
+                                                        resultList=list(inc_han, prev_period_han),
                                                         databaseName = db.name)
   
   
-
-  print(paste0("- Got incidence and period prevalence results: head neck subtypes"))
-  info(logger, "- Got incidence and period prevalence results: head neck subtypes")
+print(paste0("- Got incidence and period prevalence results: head neck subtypes"))
+info(logger, "- Got incidence and period prevalence results: head neck subtypes")
   
-  # Export the results -----
-  print(paste0("- Exporting incidence and period prevalence results: head neck subtypes"))
-  info(logger, "- Exporting incidence and period prevalence results: head neck subtypes")
+# Export the results -----
+print(paste0("- Exporting incidence and period prevalence results: head neck subtypes"))
+info(logger, "- Exporting incidence and period prevalence results: head neck subtypes")
   
-  exportIncidencePrevalenceResults(result=study_results_han,
+exportIncidencePrevalenceResults(result=study_results_han,
                                    zipName= paste0(db.name, "IPResultsHeadNeckSubtypes"),
                                    outputFolder=here::here("Results", db.name))
   
   
-  print(paste0("- Exported incidence and period prevalence results: head neck subtypes"))
-  info(logger, "- Exported incidence and period prevalence results: cancer populations")
+print(paste0("- Exported incidence and period prevalence results: head neck subtypes"))
+info(logger, "- Exported incidence and period prevalence results: cancer populations")
   
-  print(paste0("- Getting overall incidence: head neck subtypes"))
-  info(logger, "- Getting overall incidence: head neck subtypes")
+print(paste0("- Getting overall incidence: head neck subtypes"))
+info(logger, "- Getting overall incidence: head neck subtypes")
   
-  # Estimate overall incidence -------
-  inc_han_overall <- estimateIncidence(
+# Estimate overall incidence -------
+inc_han_overall <- estimateIncidence(
     cdm = cdm,
     denominatorTable = "denominator",
     outcomeTable = outcome_table_name_han,
@@ -667,28 +653,28 @@ inc_han <- estimateIncidence(
     repeatedEvents = FALSE,
     completeDatabaseIntervals = TRUE,
     minCellCount = 5,
-    returnParticipants = TRUE
+    returnParticipants = TRUE,
+    tablePrefix = outcome_table_name_han
   )
-  
-  study_results_han_overall <- gatherIncidencePrevalenceResults(cdm = cdm, 
-                                                                resultList=list(inc_han_overall ),
+
+# Get the results ----------------
+study_results_han_overall <- gatherIncidencePrevalenceResults(cdm = cdm, 
+                                                                resultList=list(inc_han_overall),
                                                                 databaseName = db.name)
-  
-  exportIncidencePrevalenceResults(result=study_results_han_overall,
+
+# Export the results -----
+exportIncidencePrevalenceResults(result=study_results_han_overall,
                                    zipName= paste0(db.name, "IPResultsHeadNeckSubtypesOverall"),
                                    outputFolder=here::here("Results", db.name))
   
-  
-  print(paste0("- Got overall incidence: head neck subtypes"))
-  info(logger, "- Got overall incidence: head neck subtypes")
+print(paste0("- Got overall incidence: head neck subtypes"))
+info(logger, "- Got overall incidence: head neck subtypes")
 
-  
-  print(paste0("- Plotting incidence and period prevalence results: head neck subtypes"))
-  info(logger, "- Plotting incidence and period prevalence results: head neck subtypes")
-  
+print(paste0("- Plotting incidence and period prevalence results: head neck subtypes"))
+info(logger, "- Plotting incidence and period prevalence results: head neck subtypes")
 
-  # Plots
-  inc_yrs_plot <- study_results_han$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
+# Plots
+inc_yrs_plot <- study_results_han$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
     filter(denominator_cohort_id == 3 &
              denominator_age_group == "18;150" &
              analysis_interval == "years") %>%
@@ -703,7 +689,7 @@ inc_han <- estimateIncidence(
     mutate(time = format(incidence_start_date, format="%Y")) %>%
     as.data.frame()
   
-  plotAll <- inc_yrs_plot %>%
+plotAll <- inc_yrs_plot %>%
     ggplot( aes(x = time, y = incidence_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
     geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
     geom_line(color = "black", size = 0.25) +
@@ -719,17 +705,15 @@ inc_han <- estimateIncidence(
           panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
           legend.key = element_rect(fill = "transparent", colour = "transparent"))
   
-  plotname <- paste0("IncidenceRatesWholePopHeadNeckCancerSubtypes", db.name,".pdf")
+plotname <- paste0("IncidenceRatesWholePopHeadNeckCancerSubtypes", db.name,".pdf")
   
-  pdf(here(qcfolder, plotname),
-      width = 7, height = 5)
-  print(plotAll, newpage = FALSE)
-  dev.off()
+pdf(here(qcfolder, plotname),
+    width = 7, height = 5)
+print(plotAll, newpage = FALSE)
+dev.off()
   
-  
-  
-  # plot the results stratified by gender
-  inc_yrs_plot <- study_results_han$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
+# plot the results stratified by gender
+inc_yrs_plot <- study_results_han$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
     filter((denominator_cohort_id == 1 | denominator_cohort_id == 2 &
               denominator_age_group == "18;150") &
              analysis_interval == "years") %>%
@@ -744,7 +728,7 @@ inc_han <- estimateIncidence(
     mutate(time = format(incidence_start_date, format="%Y")) %>%
     as.data.frame()
   
-  plotGender <- inc_yrs_plot %>%
+plotGender <- inc_yrs_plot %>%
     ggplot( aes(x = time, y = incidence_100000_pys, group=outcome_cohort_name, color = outcome_cohort_name)) +
     geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
     geom_line(color = "black", size = 0.25) +
@@ -759,21 +743,21 @@ inc_han <- estimateIncidence(
           panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
           legend.key = element_rect(fill = "transparent", colour = "transparent"))
   
-  plotGender <- plotGender + facet_wrap(~denominator_sex, scales="free_y") +
+plotGender <- plotGender + facet_wrap(~denominator_sex, scales="free_y") +
     theme(strip.background = element_rect(colour="black", fill=NA),
           panel.border = element_rect(fill = NA, color = "black"))
   
-  plotname <- paste0("IncidenceRatesGenderHeadNeckCancerSubtypes", db.name,".pdf")
+plotname <- paste0("IncidenceRatesGenderHeadNeckCancerSubtypes", db.name,".pdf")
   
-  pdf(here(qcfolder, plotname),
-      width = 11, height = 5)
-  print(plotGender, newpage = FALSE)
-  dev.off()
+pdf(here(qcfolder, plotname),
+    width = 11, height = 5)
+print(plotGender, newpage = FALSE)
+dev.off()
   
   
   
 # prev whole population
-  pp_yrs_plot <- study_results_han$prevalence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
+pp_yrs_plot <- study_results_han$prevalence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
     filter((denominator_cohort_id == 3 &
               denominator_age_group == "18;150" ) & 
              analysis_interval == "years",
@@ -789,7 +773,7 @@ inc_han <- estimateIncidence(
     mutate(time = format(prevalence_start_date, format="%Y")) %>%
     as.data.frame()
   
-  plotAll <- pp_yrs_plot %>%
+plotAll <- pp_yrs_plot %>%
     ggplot( aes(x = time, y = prevalence, group=outcome_cohort_name, color = outcome_cohort_name)) +
     geom_ribbon(aes(ymin = prevalence_95CI_lower, ymax = prevalence_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
     geom_line(color = "black", size = 0.25) +
@@ -806,17 +790,17 @@ inc_han <- estimateIncidence(
           panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
           legend.key = element_rect(fill = "transparent", colour = "transparent"))
   
-  plotname <- paste0("PeriodPrevRatesWholePopHeadNeckSubtypes", db.name,".pdf")
+plotname <- paste0("PeriodPrevRatesWholePopHeadNeckSubtypes", db.name,".pdf")
   
-  pdf(here(qcfolder, plotname),
+pdf(here(qcfolder, plotname),
       width = 7, height = 5)
   print(plotAll, newpage = FALSE)
   dev.off()
   
   
 
-  # period prevalence
-  pp_yrs_plot <- study_results_han$prevalence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
+# period prevalence
+pp_yrs_plot <- study_results_han$prevalence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
     filter((denominator_cohort_id == 1 | denominator_cohort_id == 2 &
               denominator_age_group == "18;150" ) &
              analysis_interval == "years",
@@ -832,7 +816,7 @@ inc_han <- estimateIncidence(
     mutate(time = format(prevalence_start_date, format="%Y")) %>%
     as.data.frame()
   
-  plotGender <- pp_yrs_plot %>%
+plotGender <- pp_yrs_plot %>%
     ggplot( aes(x = time, y = prevalence, group=outcome_cohort_name, color = outcome_cohort_name)) +
     geom_ribbon(aes(ymin = prevalence_95CI_lower, ymax = prevalence_95CI_upper, fill = outcome_cohort_name), alpha = .3, color = NA, show.legend = FALSE) +
     geom_line(color = "black", size = 0.25) +
@@ -848,18 +832,17 @@ inc_han <- estimateIncidence(
           panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
           legend.key = element_rect(fill = "transparent", colour = "transparent"))
   
-  plotGender <- plotGender + facet_wrap(~denominator_sex , scales="free_y") +
+plotGender <- plotGender + facet_wrap(~denominator_sex , scales="free_y") +
     theme(strip.background = element_rect(colour="black", fill=NA),
           panel.border = element_rect(fill = NA, color = "black"))
   
   
-  plotname <- paste0("PeriodPrevRatesGender", db.name,".pdf")
+plotname <- paste0("PeriodPrevRatesGender", db.name,".pdf")
   
-  pdf(here(qcfolder, plotname),
+pdf(here(qcfolder, plotname),
       width = 11, height = 5)
   print(plotGender, newpage = FALSE)
   dev.off()
   
-
 }
 
