@@ -3,7 +3,7 @@
 #renv::restore()
 # to install latest version of IncidencePrevalence
 #install.packages("remotes")
-remotes::install_github("darwin-eu-dev/IncidencePrevalence",force = TRUE)
+#remotes::install_github("darwin-eu-dev/IncidencePrevalence",force = TRUE)
 
 # load r packages
 library(CirceR)
@@ -26,7 +26,7 @@ library(bshazard)
 # The name/ acronym for the database
 #db.name<-"CPRDAurum"
 #db.name<-"CPRDGold"
-#db.name<-"CPRDAurumCovid"
+db.name<-"CPRDAurumCovid"
 
 # Set output folder location -----
 # the path to a folder where the results from this analysis will be saved
