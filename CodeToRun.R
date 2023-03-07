@@ -3,7 +3,7 @@
 #renv::restore()
 # to install latest version of IncidencePrevalence
 #install.packages("remotes")
-#remotes::install_github("darwin-eu-dev/IncidencePrevalence",force = TRUE)
+remotes::install_github("darwin-eu-dev/IncidencePrevalence",force = TRUE)
 
 # load r packages
 library(CirceR)

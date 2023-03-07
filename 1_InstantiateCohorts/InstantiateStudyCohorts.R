@@ -1,16 +1,17 @@
 # instantiate outcome cohorts
 info(logger, "- getting incident outcome definitions")
 
-outcome_cohorts <- CDMConnector::readCohortSet(here(
+outcome_cohorts <- CDMConnector::readCohortSet(here::here(
   "1_InstantiateCohorts",
   "OutcomeCohorts"
 ))
 
 info(logger, "- getting incident outcomes")
 
-cdm <- CDMConnector::generateCohortSet(cdm, outcome_cohorts,
-                         cohortTableName = outcome_table_name,
-                         overwrite = TRUE
+cdm <- CDMConnector::generateCohortSet(cdm, 
+                                       cohortSet = outcome_cohorts,
+                                       name = outcome_table_name,
+                                       overwrite = TRUE
 )
 
 info(logger, "- got outcomes")
@@ -23,8 +24,9 @@ prevalent_cohorts <- readCohortSet(here::here("1_InstantiateCohorts","PrevalentC
 
 cdm <- generateCohortSet(cdm = cdm, 
                          cohortSet = prevalent_cohorts,
-                         cohortTableName = prevalent_table_name,
+                         name = prevalent_table_name,
                          overwrite = TRUE
+                         
 )
 
 info(logger, "- got prevalent outcomes")
@@ -47,7 +49,7 @@ if (grepl("CPRD", db.name) == TRUE) {
   info(logger, "- getting incident han outcomes")
   
   cdm <- CDMConnector::generateCohortSet(cdm, outcome_cohorts_han,
-                                         cohortTableName = outcome_table_name_han,
+                                         name = outcome_table_name_han,
                                          overwrite = TRUE
   )
   
@@ -63,12 +65,10 @@ if (grepl("CPRD", db.name) == TRUE) {
   
   cdm <- generateCohortSet(cdm = cdm, 
                            cohortSet = prevalent_cohorts_han,
-                           cohortTableName = prevalent_table_name_han,
+                           name = prevalent_table_name_han,
                            overwrite = TRUE
   )
   
   info(logger, "- got prevalent han outcomes")
   
 }
-
-
