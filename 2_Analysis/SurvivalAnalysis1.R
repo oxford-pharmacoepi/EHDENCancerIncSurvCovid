@@ -102,9 +102,9 @@ for(j in 1:nrow(outcomeCohort)) {
   #carry out km estimate
   observedkm[[j]] <- survfit (Surv(time_years, status) ~ 1, data=data) %>%
     tidy() %>%
-    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All", Gender = "Both") 
+    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All", Gender = "Both") 
   
-  print(paste0("KM for observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
+  print(paste0("KM for observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
   
   # get the risk table ---
     if(ceiling(lubridate::time_length(difftime(max(data$outcome_start_date), min(data$outcome_start_date)), "years")) <=5) {   
@@ -116,10 +116,10 @@ for(j in 1:nrow(outcomeCohort)) {
   observedrisktableKM[[j]] <- RiskSetCount(grid,data$time_years) %>%
     rbind(grid) %>% as.data.frame() %>%
     `colnames<-`(grid) %>%
-    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All", Gender = "Both" ) %>%
+    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All", Gender = "Both" ) %>%
     slice(1)
   
-  print(paste0("Extract risk table ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
+  print(paste0("Extract risk table ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
   
   # KM median survival---
   modelKM <- survfit(Surv(time_years, status) ~ 1, data=data) %>%
@@ -131,13 +131,13 @@ for(j in 1:nrow(outcomeCohort)) {
     pivot_longer(-rowname) %>% 
     pivot_wider(names_from=rowname, values_from=value) %>%
     mutate(Method = "Kaplan-Meier", 
-           Cancer = outcomeCohort$cohortName[j],
+           Cancer = outcomeCohort$cohort_name[j],
            Gender = "Both" ,
            Age = "All" ) %>%
     select(-name)
   
   
-  print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
+  print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
   
   #grab survival probabilities 1,5,10 years
   sprob <- survfit(Surv(time_years, status) ~ 1, data=data) %>% 
@@ -146,11 +146,11 @@ for(j in 1:nrow(outcomeCohort)) {
   cols <- lapply(c(2:15) , function(x) sprob[x])
   observedsurprobsKM[[j]] <- do.call(data.frame, cols) %>%
     mutate(Method = "Kaplan-Meier", 
-           Cancer = outcomeCohort$cohortName[j],
+           Cancer = outcomeCohort$cohort_name[j],
            Gender = "Both" ,
            Age = "All" )
 
-  print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
+  print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
   
   
 }
@@ -202,10 +202,10 @@ for(j in 1:nrow(outcomeCohort)) {
   filter4gender <- RiskSetCount(grid,data$time_years[data$gender == "Male"])%>%
     rbind(grid) %>% as.data.frame() %>%
     `colnames<-`(grid) %>%
-    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All") %>%
+    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All") %>%
     slice(1) %>%
     rbind(RiskSetCount(grid,data$time_years[data$gender == "Female"]))%>%
-    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All", Gender = c("Male", "Female"))
+    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All", Gender = c("Male", "Female"))
   
   #creates a test that determines if both genders in the data
   genderlevels <- data %>%
@@ -218,21 +218,21 @@ for(j in 1:nrow(outcomeCohort)) {
     observedrisktableKM_gender[[j]] <- RiskSetCount(grid,data$time_years[data$gender == "Male"])%>%
       rbind(grid) %>% as.data.frame() %>%
       `colnames<-`(grid) %>%
-      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All") %>%
+      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All") %>%
       slice(1) %>%
       rbind(RiskSetCount(grid,data$time_years[data$gender == "Female"]))%>%
-      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All", Gender = c("Male", "Female")) 
+      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All", Gender = c("Male", "Female")) 
     
-    print(paste0("Extract risk table ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
+    print(paste0("Extract risk table ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
     
     #carry out km estimate
     observedkm_gender[[j]] <- survfit (Surv(time_years, status) ~ gender, data=data) %>%
       tidy() %>%
       rename(Gender = strata) %>%
-      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All", Gender = str_replace(Gender, "gender=Male", "Male"), Gender = str_replace(Gender,"gender=Female", "Female")) %>%
+      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All", Gender = str_replace(Gender, "gender=Male", "Male"), Gender = str_replace(Gender,"gender=Female", "Female")) %>%
       filter(n.risk >= 5) #remove entries with less than 5 patients
     
-    print(paste0("KM for observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
+    print(paste0("KM for observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
     
     # KM median survival ---
     modelKM <- survfit(Surv(time_years, status) ~ gender, data=data) %>%
@@ -242,11 +242,11 @@ for(j in 1:nrow(outcomeCohort)) {
     observedmedianKM_gender[[j]] <- modelKM$table %>%
       as.data.frame() %>%
       mutate(Method = "Kaplan-Meier", 
-             Cancer = outcomeCohort$cohortName[j], 
+             Cancer = outcomeCohort$cohort_name[j], 
              Age = "All" ,
              Gender = c("Male", "Female"))
     
-    print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
+    print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
     
     #grab survival probabilities 1,5,10 years
     sprob <- survfit(Surv(time_years, status) ~ gender, data=data) %>%
@@ -255,13 +255,13 @@ for(j in 1:nrow(outcomeCohort)) {
     cols <- lapply(c(2:15) , function(x) sprob[x])
     observedsurprobsKM_gender[[j]] <- do.call(data.frame, cols) %>%
       rename(Gender = strata) %>%
-      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Age = "All", Gender = str_replace(Gender, "gender=Male", "Male"), Gender = str_replace(Gender,"gender=Female", "Female"))
+      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All", Gender = str_replace(Gender, "gender=Male", "Male"), Gender = str_replace(Gender,"gender=Female", "Female"))
       
-    print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
+    print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
 
   } else{
     
-    print(paste0("Gender stratification KM analysis not carried out for ", outcomeCohort$cohortName[j], " due to only 1 gender present " , Sys.time()))
+    print(paste0("Gender stratification KM analysis not carried out for ", outcomeCohort$cohort_name[j], " due to only 1 gender present " , Sys.time()))
     
   }
   
@@ -324,13 +324,13 @@ for(j in 1:nrow(outcomeCohort)) {
     rbind(RiskSetCount(grid,data$time_years[data$age_gr == "70-79"]))%>%
     rbind(RiskSetCount(grid,data$time_years[data$age_gr == "80-89"]))%>%
     rbind(RiskSetCount(grid,data$time_years[data$age_gr == ">=90"]))%>%
-    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], Gender = "Both", Age = c("<30" ,"30-39", "40-49" ,"50-59" ,"60-69", "70-79", "80-89" ,">=90")) 
+    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Gender = "Both", Age = c("<30" ,"30-39", "40-49" ,"50-59" ,"60-69", "70-79", "80-89" ,">=90")) 
   
   #carry out km estimate
   observedkm_age[[j]] <- survfit (Surv(time_years, status) ~ age_gr, data=data) %>%
     tidy() %>%
     rename(Age = strata) %>%
-    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], 
+    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], 
            Age = str_replace(Age, "age_gr=18-29", "18-29"),
            Age = str_replace(Age, "age_gr=30-39", "30-39"),
            Age = str_replace(Age, "age_gr=40-49", "40-49"),
@@ -341,7 +341,7 @@ for(j in 1:nrow(outcomeCohort)) {
            Age = str_replace(Age, "age_gr=>=90", ">=90"),
            Gender = "Both")
   
-  print(paste0("KM for observed data age strat ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
+  print(paste0("KM for observed data age strat ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
   
   
   # KM median survival---
@@ -351,10 +351,10 @@ for(j in 1:nrow(outcomeCohort)) {
   observedmedianKM_age[[j]] <- modelKM$table %>%
     as.data.frame() %>%
     mutate(Method = "Kaplan-Meier", 
-           Cancer = outcomeCohort$cohortName[j], 
+           Cancer = outcomeCohort$cohort_name[j], 
            Gender = "Both" )
   
-  print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
+  print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
   
   
   #grab survival probabilities 1,5,10 years
@@ -365,7 +365,7 @@ for(j in 1:nrow(outcomeCohort)) {
   observedsurprobsKM_age[[j]] <- do.call(data.frame, cols) %>%
     rename(Age = strata) %>%
     mutate(Method = "Kaplan-Meier", 
-           Cancer = outcomeCohort$cohortName[j], 
+           Cancer = outcomeCohort$cohort_name[j], 
            Age = str_replace(Age, "age_gr=18-29", "18-29"),
            Age = str_replace(Age, "age_gr=30-39", "30-39"),
            Age = str_replace(Age, "age_gr=40-49", "40-49"),
@@ -376,7 +376,7 @@ for(j in 1:nrow(outcomeCohort)) {
            Age = str_replace(Age, "age_gr=>=90", ">=90"),
            Gender = "Both")
   
-  print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
+  print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
   
 }
 
@@ -456,17 +456,17 @@ for(j in 1:nrow(outcomeCohort)) {
       rbind(RiskSetCount(grid,data$time_years[data$genderAgegp == "Male_70-79"]))%>%
       rbind(RiskSetCount(grid,data$time_years[data$genderAgegp == "Male_80-89"]))%>%
       rbind(RiskSetCount(grid,data$time_years[data$genderAgegp == "Male_>=90"]))%>%
-      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j],
+      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j],
              Gender = rep(c("Female", "Male"), each = nlevels(data$age_gr)),
              Age = rep(c("18-29" ,"30-39", "40-49" ,"50-59" ,"60-69", "70-79", "80-89" ,">=90"), 2) ) %>%
       unite("GenderAge", c(Gender, Age), remove = FALSE) 
     
-    print(paste0("Extract risk table ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
+    print(paste0("Extract risk table ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
     
     #carry out km estimate ---
     observedkm_age_gender[[j]] <- survfit (Surv(time_years, status) ~ genderAgegp, data=data) %>%
       tidy() %>%
-      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohortName[j], 
+      mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], 
              Age = strata ,
              Age = str_replace(Age, "genderAgegp=Female_18-29", "18-29"),
              Age = str_replace(Age, "genderAgegp=Female_30-39", "30-39"),
@@ -504,7 +504,7 @@ for(j in 1:nrow(outcomeCohort)) {
              strata = str_replace(strata, "genderAgegp=", "") ) %>%
       rename("GenderAge" = "strata")
     
-    print(paste0("KM for observed data age strat ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
+    print(paste0("KM for observed data age strat ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
     
     
     # KM median survival---
@@ -514,12 +514,12 @@ for(j in 1:nrow(outcomeCohort)) {
     observedmedianKM_age_gender[[j]] <- modelKM$table %>%
       as.data.frame() %>%
       mutate(Method = "Kaplan-Meier", 
-             Cancer = outcomeCohort$cohortName[j],
+             Cancer = outcomeCohort$cohort_name[j],
              GenderAge = rownames(modelKM$table), 
              GenderAge = str_replace(GenderAge, "genderAgegp=", "")) %>%
       separate(col = "GenderAge", into = c("Gender", "Age"), sep = "_", remove = FALSE)
     
-    print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
+    print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
     
     #grab survival probabilities 1,5,10 years
     sprob <- survfit(Surv(time_years, status) ~ genderAgegp, data=data) %>%
@@ -528,7 +528,7 @@ for(j in 1:nrow(outcomeCohort)) {
     cols <- lapply(c(2:15) , function(x) sprob[x])
     observedsurprobsKM_age_gender[[j]] <- do.call(data.frame, cols) %>%
       mutate(Method = "Kaplan-Meier", 
-             Cancer = outcomeCohort$cohortName[j], 
+             Cancer = outcomeCohort$cohort_name[j], 
              Age = strata ,
              Age = str_replace(Age, "genderAgegp=Female_18-29", "18-29"),
              Age = str_replace(Age, "genderAgegp=Female_30-39", "30-39"),
@@ -566,12 +566,12 @@ for(j in 1:nrow(outcomeCohort)) {
              strata = str_replace(strata, "genderAgegp=", "") ) %>%
       rename("GenderAge" = "strata")
     
-    print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcomeCohort$cohortName[j], " completed"))
+    print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
     
   } else {
     
     
-    print(paste0("Gender*Age stratification KM analysis not carried out for ", outcomeCohort$cohortName[j], " due to only 1 gender present age stratification will have results " , Sys.time()))
+    print(paste0("Gender*Age stratification KM analysis not carried out for ", outcomeCohort$cohort_name[j], " due to only 1 gender present age stratification will have results " , Sys.time()))
   }
 }
 
