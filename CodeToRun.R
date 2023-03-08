@@ -90,7 +90,7 @@ studyStartDate <- "2000-01-01"
 studyEndDate <- "2019-12-31"  
 
 # Does a user want to run survival analysis? if a database does not have mortality data change this FALSE
-runSurvial <- FALSE
+runSurvial <- TRUE
 
 # Run the study ------
 source(here("RunStudy.R"))
