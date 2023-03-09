@@ -96,5 +96,5 @@ runSurvial <- TRUE
 source(here("RunStudy.R"))
 # after the study is run you should have a zip folder in your output folder to share
 
-# disconnect from the database
+# disconnect from the database (only do this after you have run all analysis)
 #dbDisconnect(db)

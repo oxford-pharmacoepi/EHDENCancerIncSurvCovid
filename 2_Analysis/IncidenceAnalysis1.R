@@ -47,7 +47,8 @@ inc <- estimateIncidence(
   repeatedEvents = FALSE,
   completeDatabaseIntervals = TRUE,
   minCellCount = 5,
-  returnParticipants = FALSE
+  returnParticipants = FALSE,
+  verbose = TRUE
 )
 
 print(paste0("- Got incidence: cancer populations"))
@@ -67,7 +68,8 @@ prev_period <- estimatePeriodPrevalence(
   interval = "years" ,
   completeDatabaseIntervals = TRUE, # prev only estimate for intervals where db captures all of the interval
   fullContribution = FALSE , # individuals only required to be present for one day in interval
-  minCellCount = 5
+  minCellCount = 5,
+  verbose = TRUE
 )
 
 print(paste0("- Got period prevalence: cancer populations"))
@@ -525,7 +527,8 @@ inc_overall <- estimateIncidence(
   completeDatabaseIntervals = TRUE,
   minCellCount = 5,
   returnParticipants = TRUE,
-  tablePrefix = outcome_table_stem
+  tablePrefix = outcome_table_stem,
+  verbose = TRUE
 )
 
 print(paste0("- Got incidence: cancer populations"))
@@ -580,7 +583,8 @@ inc_han <- estimateIncidence(
     repeatedEvents = FALSE,
     completeDatabaseIntervals = TRUE,
     minCellCount = 5,
-    returnParticipants = FALSE
+    returnParticipants = FALSE,
+    verbose = TRUE
   )
 
 
@@ -601,7 +605,8 @@ prev_period_han <- estimatePeriodPrevalence(
     interval = c("years"),
     completeDatabaseIntervals = TRUE, # prev only estimate for intervals where db captures all of the interval
     fullContribution = FALSE , # individuals only required to be present for one day in interval
-    minCellCount = 5
+    minCellCount = 5,
+    verbose = TRUE
   )
   
 print(paste0("- Got period prevalence: head neck subtypes"))
@@ -654,7 +659,8 @@ inc_han_overall <- estimateIncidence(
     completeDatabaseIntervals = TRUE,
     minCellCount = 5,
     returnParticipants = TRUE,
-    tablePrefix = outcome_table_name_han
+    tablePrefix = outcome_table_name_han,
+    verbose = TRUE
   )
 
 # Get the results ----------------
