@@ -2,7 +2,7 @@ Incidence and Prevalence of different cancers
 ========================================================================================================================================================
 
 ## Introduction
-This study is focussing on determining the incidence and prevalence for specific cancers. We will focus on the following cancers:
+This study is focussing on determining the incidence, prevalence and survival for specific cancers. We will focus on the following cancers:
 * Breast
 * Colorectal
 * Lung
