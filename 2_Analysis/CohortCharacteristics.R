@@ -1,10 +1,44 @@
 # cohort characteristics
 
 # This code extracts the participants from the incidence analysis overall and calculates their baseline characteristics (table 1 for papers)
+# This code also generates the data that is inputted into the survival analysis
+
+print(paste0("- Getting cohort characteristics: cancer populations"))
+info(logger, "- Getting cohort characteristics: cancer populations")
+
+# get denominator
+cdm$denominatordemo <- generateDenominatorCohortSet(
+  cdm = cdm,
+  startDate = as.Date(studyStartDate),
+  endDate = as.Date(studyEndDate),
+  ageGroup =list(
+    c(18, 150)),
+  sex = c("Both"),
+  daysPriorHistory = 365,
+  verbose = TRUE
+)
+
+# get overall incidence for all cancers
+inc_overall_participants <- estimateIncidence(
+  cdm = cdm,
+  denominatorTable = "denominatordemo",
+  outcomeTable = outcome_table_name,
+  denominatorCohortId = NULL,
+  outcomeCohortId = outcome_cohorts$cohort_definition_id,
+  outcomeCohortName = outcome_cohorts$cohort_name,
+  interval = c("overall"),
+  outcomeWashout = NULL,
+  repeatedEvents = FALSE,
+  completeDatabaseIntervals = TRUE,
+  minCellCount = 5,
+  returnParticipants = TRUE,
+  tablePrefix = outcome_table_stem,
+  verbose = TRUE
+)
+
 
 # #extract settings for survival from incidence results
-settings_surv <- settings(inc_overall) %>%
-  filter(analysis_interval == "overall" & denominator_cohort_id == 3)
+settings_surv <- settings(inc_overall_participants) 
 
 pops <- list()
 
@@ -12,7 +46,7 @@ for (i in 1:length(settings_surv$analysis_id)){
 #extract the participants for each cancer
   
 pops[[i]] <-cdm$person %>%
-    inner_join(participants(inc_overall, analysisId = as.numeric(settings_surv$analysis_id[i])) %>% filter(!is.na(outcome_start_date)),
+    inner_join(participants(inc_overall_participants, analysisId = as.numeric(settings_surv$analysis_id[i])) %>% filter(!is.na(outcome_start_date)),
                by = c("person_id" = "subject_id" ), copy = TRUE) %>%
     select(person_id,gender_concept_id,
            year_of_birth, month_of_birth, day_of_birth,
@@ -103,15 +137,32 @@ Pop <-Pop %>%
 # function to extract dataset based on head and neck cancer subtypes
 if (grepl("CPRD", db.name) == TRUE){
   
-  settings_surv <- settings(inc_han_overall) %>%
-    filter(analysis_interval == "overall" & denominator_cohort_id == 3)
+  # get the participants for overall
+  inc_han_overall_participants <- estimateIncidence(
+    cdm = cdm,
+    denominatorTable = "denominatordemo",
+    outcomeTable = outcome_table_name_han,
+    denominatorCohortId = NULL,
+    outcomeCohortId = outcome_cohorts_han$cohort_definition_id,
+    outcomeCohortName = outcome_cohorts_han$cohort_name,
+    interval = c("overall"), 
+    outcomeWashout = NULL,
+    repeatedEvents = FALSE,
+    completeDatabaseIntervals = TRUE,
+    minCellCount = 5,
+    returnParticipants = TRUE,
+    tablePrefix = outcome_table_name_han,
+    verbose = TRUE
+  )
+  
+  settings_surv <- settings(inc_han_overall_participants)
   
   pops <- list()
   
   for (i in 1:length(settings_surv$analysis_id)){
     #extract the participants for each cancer
     pops[[i]] <-cdm$person %>%
-      inner_join(participants(inc_han_overall, analysisId = as.numeric(settings_surv$analysis_id[i])) %>% filter(!is.na(outcome_start_date)),
+      inner_join(participants(inc_han_overall_participants, analysisId = as.numeric(settings_surv$analysis_id[i])) %>% filter(!is.na(outcome_start_date)),
                  by = c("person_id" = "subject_id" ), copy = TRUE) %>%
       select(person_id,gender_concept_id,
              year_of_birth, month_of_birth, day_of_birth,

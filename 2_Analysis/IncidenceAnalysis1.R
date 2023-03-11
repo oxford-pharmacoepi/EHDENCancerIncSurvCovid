@@ -83,7 +83,7 @@ info(logger, "- Got incidence and period prevalence: cancer population")
 print(paste0("- Gathering incidence and period prevalence results: cancer populations"))
 info(logger, "- Gathering incidence and period prevalence results: cancer populations")
 
-study_results<- gatherIncidencePrevalenceResults(cdm =cdm, 
+study_results <- gatherIncidencePrevalenceResults(cdm =cdm, 
                                                  resultList=list(inc,prev_period ),
                                                  databaseName = db.name)
 
@@ -526,8 +526,7 @@ inc_overall <- estimateIncidence(
   repeatedEvents = FALSE,
   completeDatabaseIntervals = TRUE,
   minCellCount = 5,
-  returnParticipants = TRUE,
-  tablePrefix = outcome_table_stem,
+  returnParticipants = FALSE,
   verbose = TRUE
 )
 
@@ -658,8 +657,7 @@ inc_han_overall <- estimateIncidence(
     repeatedEvents = FALSE,
     completeDatabaseIntervals = TRUE,
     minCellCount = 5,
-    returnParticipants = TRUE,
-    tablePrefix = outcome_table_name_han,
+    returnParticipants = FALSE,
     verbose = TRUE
   )
 
