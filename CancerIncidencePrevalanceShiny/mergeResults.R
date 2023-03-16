@@ -102,9 +102,10 @@ prepare_output_survival <- function(result){
   
   
   result<- result %>% 
+    mutate(Age = replace(Age, Age == ">=90", "90 +")) %>% 
+    mutate(Age = replace(Age, Age == "<30", "18-29")) %>%  
     mutate(Age= stringr::str_replace(Age, "-", " to ")) %>% 
     mutate(CalenderYearGp= stringr::str_replace(CalenderYearGp, "-", " to ")) %>% 
-    mutate(Age = replace(Age, Age == ">=90", "90 +")) %>% 
     mutate(Age = factor(Age,
                         levels = c("All",
                                    "18 to 29", "30 to 39", "40 to 49",
@@ -230,5 +231,66 @@ saveRDS(survival_estimates,
 
 
 
+# merge the risk table results together (whole dataset)
+survival_risk_table_files<-results[stringr::str_detect(results, ".csv")]
+survival_risk_table_files<-results[stringr::str_detect(results, "risk_table_results")]
+survival_risk_table_files <- survival_risk_table_files[!stringr::str_detect(survival_risk_table_files, "risk_table_results_cy")]
 
+survival_risk_table <- list()
+for(i in seq_along(survival_risk_table_files)){
+  survival_risk_table[[i]]<-readr::read_csv(survival_risk_table_files[[i]],
+                                            show_col_types = FALSE) %>%
+    mutate_if(is.double, as.character)
+  
+}
+
+survival_risk_table <- dplyr::bind_rows(survival_risk_table)
+survival_risk_table <- prepare_output_survival(survival_risk_table)
+saveRDS(survival_risk_table,
+        here("shiny", "data", "/survival_risk_table.rds"))
+
+
+
+# merge the risk table results together (calender year results)
+survival_risk_table_cy_files<-results[stringr::str_detect(results, ".csv")]
+survival_risk_table_cy_files<-results[stringr::str_detect(results, "risk_table_results_cy")]
+survival_risk_cy_table <- list()
+for(i in seq_along(survival_risk_table_cy_files)){
+  survival_risk_cy_table[[i]]<-readr::read_csv(survival_risk_table_cy_files[[i]],
+                                           show_col_types = FALSE)  %>%
+    mutate_if(is.double, as.character)
+}
+survival_risk_cy_table <- dplyr::bind_rows(survival_risk_cy_table)
+survival_risk_cy_table <- prepare_output_survival(survival_risk_cy_table)
+saveRDS(survival_risk_cy_table,
+        here("shiny", "data", "/survival_risk_table_cy.rds"))
+
+
+# merge the median results together
+survival_median_files<-results[stringr::str_detect(results, ".csv")]
+survival_median_files<-results[stringr::str_detect(results, "median_survival_results")]
+survival_median_table <- list()
+for(i in seq_along(survival_median_files)){
+  survival_median_table[[i]]<-readr::read_csv(survival_median_files[[i]],
+                                               show_col_types = FALSE)  
+}
+survival_median_table <- dplyr::bind_rows(survival_median_table)
+survival_median_table <- prepare_output_survival(survival_median_table)
+saveRDS(survival_median_table,
+        here("shiny", "data", "/survival_median_table.rds"))
+
+
+
+# merge the 1, 5 and 10 survival rates result together
+survival_rates_files<-results[stringr::str_detect(results, ".csv")]
+survival_rates_files<-results[stringr::str_detect(results, "one_five_ten_survival_rates")]
+survival_rates_table <- list()
+for(i in seq_along(survival_rates_files)){
+  survival_rates_table[[i]]<-readr::read_csv(survival_rates_files[[i]],
+                                              show_col_types = FALSE)  
+}
+survival_rates_table <- dplyr::bind_rows(survival_rates_table)
+survival_rates_table <- prepare_output_survival(survival_rates_table)
+saveRDS(survival_rates_table,
+        here("shiny", "data", "/survival_rates_table.rds"))
 
