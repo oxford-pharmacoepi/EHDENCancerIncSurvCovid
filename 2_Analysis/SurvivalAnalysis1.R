@@ -324,7 +324,7 @@ for(j in 1:nrow(outcomeCohort)) {
     rbind(RiskSetCount(grid,data$time_years[data$age_gr == "70-79"]))%>%
     rbind(RiskSetCount(grid,data$time_years[data$age_gr == "80-89"]))%>%
     rbind(RiskSetCount(grid,data$time_years[data$age_gr == ">=90"]))%>%
-    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Gender = "Both", Age = c("<30" ,"30-39", "40-49" ,"50-59" ,"60-69", "70-79", "80-89" ,">=90")) 
+    mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Gender = "Both", Age = c("18-29" ,"30-39", "40-49" ,"50-59" ,"60-69", "70-79", "80-89" ,">=90")) 
   
   #carry out km estimate
   observedkm_age[[j]] <- survfit (Surv(time_years, status) ~ age_gr, data=data) %>%
@@ -352,7 +352,8 @@ for(j in 1:nrow(outcomeCohort)) {
     as.data.frame() %>%
     mutate(Method = "Kaplan-Meier", 
            Cancer = outcomeCohort$cohort_name[j], 
-           Gender = "Both" )
+           Gender = "Both" ,
+           Age = c("18-29" ,"30-39", "40-49" ,"50-59" ,"60-69", "70-79", "80-89" ,">=90"))
   
   print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
   
