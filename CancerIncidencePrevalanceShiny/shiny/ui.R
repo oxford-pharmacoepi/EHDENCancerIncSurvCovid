@@ -20,7 +20,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                  
                  # title ------ 
                  # shown across tabs
-                 titlePanel("Incidence and Prevalence of Different cancers"),
+                 titlePanel("Incidence, Prevalence and Survival of Different Cancers"),
                  
                  # set up: pages along the side -----  
                  navlistPanel(
@@ -34,16 +34,14 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                        preliminary and subject to change.")),
                             tags$hr(),
                             tags$h5("This app is a companion to the study focussing on determining the incidence and prevalence for specific cancers. 
-    We will focus on the 8 cancers (Breast, Colorectal, Lung, Liver, Stomach, Head/neck, Prostate and Pancreas). 
-    The databases use data from 2000-2019. We used the the data for this time period in accordance with the approved CPRD application
-            for the EHDEN wp2 HTA cancer survival study. We did not want the impact of the COVID pandemic influencing the results 
-            so it was decided to restrict the analysis up to 31 Dec 2019"),
+    We will focus on the 9 cancers (Breast, Colorectal, Lung, Liver, Stomach, Head/neck, Prostate, Oesophagus, and Pancreas). 
+    We have used CPRD Aurum and GOLD databases from 2000-2019."),
                             HTML('<br>'),
                             tags$hr()
                    ), 
                    ## Prevalence ------ 
-                   tabPanel("Population prevalence",	  
-                            tags$h3("Prevalence estimates"),
+                   tabPanel("Population Prevalence",	  
+                            tags$h3("Prevalence Estimates"),
                             tags$h5("Prevalence estimates are shown below...."),
                             tags$hr(),
                             tags$h5("Database and study outcome"),
@@ -70,7 +68,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                             multiple = TRUE)
                             ),
                             tags$hr(),
-                            tags$h5("Population settings"),
+                            tags$h5("Population Settings"),
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
                                 pickerInput(inputId = "prevalence_denominator_age_group_selector",
                                             label = "Age group",
@@ -95,7 +93,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                             ),
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
                                 pickerInput(inputId = "prevalence_denominator_days_prior_history_selector",
-                                            label = "Days prior history",
+                                            label = "Days Prior History",
                                             choices = unique(prevalence_estimates$denominator_days_prior_history),
                                             selected = 365,
                                             options = list(
@@ -105,10 +103,10 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                             multiple = TRUE)
                             ),
                             tags$hr(),
-                            tags$h5("Analysis settings"),
+                            tags$h5("Analysis Settings"),
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
                                 pickerInput(inputId = "prevalence_start_date_selector",
-                                            label = "Prevalence start date",
+                                            label = "Prevalence Start Date",
                                             choices = as.character(unique(prevalence_estimates$prevalence_start_date)),
                                             selected = as.character(unique(prevalence_estimates$prevalence_start_date)),
                                             options = list(
@@ -118,11 +116,11 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                             multiple = TRUE)
                             ),
                             tabsetPanel(type = "tabs",
-                                        tabPanel("Table of estimates", 
+                                        tabPanel("Table of Estimates", 
                                                  DTOutput('tbl_prevalence_estimates') %>% withSpinner()), 
-                                        tabPanel("Plot of estimates",
+                                        tabPanel("Plot of Estimates",
                                                  tags$hr(),
-                                                 tags$h5("Plotting options"),
+                                                 tags$h5("Plotting Options"),
                                                  div(style="display: inline-block;vertical-align:top; width: 150px;",
                                                      pickerInput(inputId = "prevalence_x_axis",
                                                                  label = "X axis",
@@ -179,11 +177,11 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                    
                    
                    ## Incidence ------ 
-                   tabPanel("Population incidence",	  
-                            tags$h3("Incidence estimates"),
+                   tabPanel("Population Incidence",	  
+                            tags$h3("Incidence Estimates"),
                             tags$h5("Incidence estimates are shown below...."),
                             tags$hr(),
-                            tags$h5("Database and study outcome"),
+                            tags$h5("Database and Study Outcome"),
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
                                 pickerInput(inputId = "incidence_database_name_selector",
                                             label = "Database",
@@ -207,7 +205,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                             multiple = TRUE)
                             ),
                             tags$hr(),
-                            tags$h5("Population settings"),
+                            tags$h5("Population Settings"),
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
                                 pickerInput(inputId = "incidence_denominator_age_group_selector",
                                             label = "Age group",
@@ -232,7 +230,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                             ),
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
                                 pickerInput(inputId = "incidence_denominator_days_prior_history_selector",
-                                            label = "Days prior history",
+                                            label = "Days Prior History",
                                             choices = unique(incidence_estimates$denominator_days_prior_history),
                                             selected = 365,
                                             options = list(
@@ -243,10 +241,10 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                          
                             ),
                             tags$hr(),
-                            tags$h5("Analysis settings"),
+                            tags$h5("Analysis Settings"),
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
                                 pickerInput(inputId = "incidence_start_date_selector",
-                                            label = "incidence start date",
+                                            label = "Incidence Start Date",
                                             choices = as.character(unique(incidence_estimates$incidence_start_date)),
                                             selected = as.character(unique(incidence_estimates$incidence_start_date)),
                                             options = list(
@@ -269,11 +267,11 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                             multiple = TRUE)
                             ),
                             tabsetPanel(type = "tabs",
-                                        tabPanel("Table of estimates", 
+                                        tabPanel("Table of Estimates", 
                                                  DTOutput('tbl_incidence_estimates') %>% withSpinner()), 
-                                        tabPanel("Plot of estimates",
+                                        tabPanel("Plot of Estimates",
                                                  tags$hr(),
-                                                 tags$h5("Plotting options"),
+                                                 tags$h5("Plotting Options"),
                                                  div(style="display: inline-block;vertical-align:top; width: 150px;",
                                                      pickerInput(inputId = "incidence_x_axis",
                                                                  label = "X axis",
@@ -330,16 +328,16 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                    
                    
                    ## Survival ------ 
-                   tabPanel("Population Survival",	  
+                   tabPanel("Whole Population Survival",	  
                             tags$h3("KM Survival Analysis"),
                             tags$h5("For this study we also calculated overall survival using the kaplan meier method. The results contain the estimates (including median survival). risk tables and KM survival plots which are shown below.... TBC"),
                             tags$hr(),
-                            tags$h5("Database and study outcome"),
+                            tags$h5("Database and Study Outcome"),
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
-                                pickerInput(inputId = "incidence_database_name_selector",
+                                pickerInput(inputId = "survival_database_name_selector",
                                             label = "Database",
-                                            choices = unique(incidence_estimates$database_name),
-                                            selected = unique(incidence_estimates$database_name),
+                                            choices = unique(survival_estimates$Database),
+                                            selected = unique(survival_estimates$Database),
                                             options = list(
                                               `actions-box` = TRUE,
                                               size = 10,
@@ -347,10 +345,10 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                             multiple = TRUE)
                             ),
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
-                                pickerInput(inputId = "incidence_outcome_cohort_name_selector",
+                                pickerInput(inputId = "survival_outcome_cohort_name_selector",
                                             label = "Outcome",
-                                            choices = sort(unique(incidence_estimates$outcome_cohort_name)),
-                                            selected = c("MalignantBreastCancer"),
+                                            choices = sort(unique(survival_estimates$Cancer)),
+                                            selected = c("Breast"),
                                             options = list(
                                               `actions-box` = TRUE,
                                               size = 10,
@@ -359,11 +357,11 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                             )
                             ,
                             tags$hr(),
-                            tags$h5("Population settings"),
+                            tags$h5("Population Settings"),
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
-                                pickerInput(inputId = "incidence_denominator_age_group_selector",
+                                pickerInput(inputId = "survival_age_group_selector",
                                             label = "Age group",
-                                            choices = levels(incidence_estimates$denominator_age_group),
+                                            choices = levels(survival_estimates$Age),
                                             selected = "All",
                                             options = list(
                                               `actions-box` = TRUE,
@@ -372,9 +370,9 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                             multiple = TRUE)
                             ),
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
-                                pickerInput(inputId = "incidence_denominator_sex_selector",
+                                pickerInput(inputId = "survival_sex_selector",
                                             label = "Sex",
-                                            choices = unique(incidence_estimates$denominator_sex),
+                                            choices = unique(survival_estimates$Gender),
                                             selected = "Both",
                                             options = list(
                                               `actions-box` = TRUE,
@@ -383,12 +381,12 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                             multiple = TRUE)
                             ),
                             tags$hr(),
-                            tags$h5("Analysis settings"),
+                            tags$h5("Analysis Settings"),
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
-                                pickerInput(inputId = "incidence_start_date_selector",
-                                            label = "incidence start date",
-                                            choices = as.character(unique(incidence_estimates$incidence_start_date)),
-                                            selected = as.character(unique(incidence_estimates$incidence_start_date)),
+                                pickerInput(inputId = "calender_year_selector",
+                                            label = "Calender Years",
+                                            choices = "2000 to 2019",
+                                            selected =  "2000 to 2019",
                                             options = list(
                                               `actions-box` = TRUE,
                                               size = 10,
@@ -397,17 +395,108 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                             ),
                             tabsetPanel(type = "tabs",
                                         tabPanel("KM survival curve"),
-                                        tabPanel("KM risk table"),
-                                        tabPanel("Median survival estimates"),
-                                        tabPanel("Survival risk estimates"),
-                                        tabPanel("Table of estimates")
+                                        tabPanel("KM risk table", 
+                                                 DTOutput('tbl_survival_risk_table') %>% withSpinner()),
+                                        tabPanel("Median survival estimates", 
+                                                 DTOutput('tbl_survival_median_table') %>% withSpinner()),
+                                        tabPanel("Survival Probabilities", 
+                                                 DTOutput('tbl_survival_rates_table') %>% withSpinner()),
+                                        tabPanel("Table of estimates", 
+                                                 DTOutput('tbl_survival_estimates') %>% withSpinner())
+                                        
+                                        
+                                               
+                            )
+                            
+                   ) ,
+                   
+                   
+                   
+                   ## Survival ------ 
+                   tabPanel("Calender Year Population Survival",	  
+                            tags$h3("KM Survival Analysis"),
+                            tags$h5("For this study we also calculated overall survival using the kaplan meier method. The results contain the estimates (including median survival). risk tables and KM survival plots which are shown below split by calender year of cancer diagnosis.... TBC"),
+                            tags$hr(),
+                            tags$h5("Database and Study Outcome"),
+                            div(style="display: inline-block;vertical-align:top; width: 150px;",
+                                pickerInput(inputId = "survival_database_name_selector_cy",
+                                            label = "Database",
+                                            choices = unique(survival_estimates_calender$Database),
+                                            selected = unique(survival_estimates_calender$Database),
+                                            options = list(
+                                              `actions-box` = TRUE,
+                                              size = 10,
+                                              `selected-text-format` = "count > 3"),
+                                            multiple = TRUE)
+                            ),
+                            div(style="display: inline-block;vertical-align:top; width: 150px;",
+                                pickerInput(inputId = "survival_outcome_cohort_name_selector_cy",
+                                            label = "Outcome",
+                                            choices = sort(unique(survival_estimates_calender$Cancer)),
+                                            selected = c("Breast"),
+                                            options = list(
+                                              `actions-box` = TRUE,
+                                              size = 10,
+                                              `selected-text-format` = "count > 3"),
+                                            multiple = TRUE)
+                            )
+                            ,
+                            tags$hr(),
+                            tags$h5("Population Settings"),
+                            div(style="display: inline-block;vertical-align:top; width: 150px;",
+                                pickerInput(inputId = "survival_age_group_selector_cy",
+                                            label = "Age group",
+                                            choices = levels(survival_estimates_calender$Age),
+                                            selected = "All",
+                                            options = list(
+                                              `actions-box` = TRUE,
+                                              size = 10,
+                                              `selected-text-format` = "count > 3"),
+                                            multiple = TRUE)
+                            ),
+                            div(style="display: inline-block;vertical-align:top; width: 150px;",
+                                pickerInput(inputId = "survival_sex_selector_cy",
+                                            label = "Sex",
+                                            choices = unique(survival_estimates_calender$Gender),
+                                            selected = "Both",
+                                            options = list(
+                                              `actions-box` = TRUE,
+                                              size = 10,
+                                              `selected-text-format` = "count > 3"),
+                                            multiple = TRUE)
+                            ),
+                            tags$hr(),
+                            tags$h5("Analysis Settings"),
+                            div(style="display: inline-block;vertical-align:top; width: 150px;",
+                                pickerInput(inputId = "calender_year_selector_cy",
+                                            label = "Calender Years",
+                                            choices = as.character(unique(survival_estimates_calender$CalenderYearGp)),
+                                            selected = as.character(unique(survival_estimates_calender$CalenderYearGp)),
+                                            options = list(
+                                              `actions-box` = TRUE,
+                                              size = 10,
+                                              `selected-text-format` = "count > 3"),
+                                            multiple = TRUE)
+                            ),
+                            tabsetPanel(type = "tabs",
+                                        tabPanel("KM survival curve"),
+                                        tabPanel("KM risk table", 
+                                                 DTOutput('tbl_survival_risk_table_cy') %>% withSpinner()),
+                                        tabPanel("Median survival estimates", 
+                                                 DTOutput('tbl_survival_median_table_cy') %>% withSpinner()),
+                                        tabPanel("Survival Probabilities", 
+                                                 DTOutput('tbl_survival_rates_table_cy') %>% withSpinner()),
+                                        tabPanel("Table of estimates", 
+                                                 DTOutput('tbl_survival_estimates_cy') %>% withSpinner())
+                                        
+                                        
                                         
                             )
                             
                    ) ,
                    
                    ## Population characteristics ------ 
-                   tabPanel("Population characteristics",	  
+                   tabPanel("Population Characteristics",	  
                             tags$h3("Study Population Characteristics"),
                             tags$h5("The population characteristics are shown below....TBC"),
                             tags$hr(),
@@ -427,7 +516,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                 pickerInput(inputId = "incidence_outcome_cohort_name_selector",
                                             label = "Outcome",
                                             choices = sort(unique(incidence_estimates$outcome_cohort_name)),
-                                            selected = c("MalignantBreastCancer"),
+                                            selected = c("Breast"),
                                             options = list(
                                               `actions-box` = TRUE,
                                               size = 10,
@@ -436,7 +525,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                             )
                             ,
                             tags$hr(),
-                            tags$h5("Population settings"),
+                            tags$h5("Population Settings"),
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
                                 pickerInput(inputId = "incidence_denominator_age_group_selector",
                                             label = "Age group",
@@ -460,7 +549,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                             multiple = TRUE)
                             ),
                             tags$hr(),
-                            tags$h5("Analysis settings"),
+                            tags$h5("Analysis Settings"),
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
                                 pickerInput(inputId = "incidence_start_date_selector",
                                             label = "incidence start date",
@@ -473,7 +562,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                             multiple = TRUE)
                             ),
                             tabsetPanel(type = "tabs",
-                                        tabPanel("Study Population characteristics")
+                                        tabPanel("Study Population Characteristics")
                                         
                             )
                             
