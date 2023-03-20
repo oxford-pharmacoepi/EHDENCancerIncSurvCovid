@@ -134,6 +134,90 @@ Pop <-Pop %>%
   filter(!is.na(observation_period_end_date))
 
 
+# get the co morbidites and medication usage
+# read in table containing list to create
+table1features <- read_csv(
+  here::here(
+    "1_InstantiateCohorts",
+    "Table1Features.csv"))
+
+# split into drugs and conditions
+table1features_drugs <- table1features %>% filter(table1features$Class == "Drug")
+
+table1features_conditions <- table1features %>% filter(table1features$Class == "Condition")
+
+
+# conditions
+for(i in seq_along(table1features_conditions$Name)){
+  
+  working_id_name <- glue::glue("{table1features_conditions$Name[[i]]}")
+  working_concept_id <- table1features_conditions$Concept_ID[i]
+  
+  #get the feature and its descendants
+  feature.codes<-tbl(db, sql("SELECT * FROM concept_ancestor")) %>% 
+    filter(ancestor_concept_id == working_concept_id) %>% 
+    collect()
+  
+  Pop <- 
+    Pop %>% 
+    left_join(Pop %>% 
+        select("person_id", "outcome_start_date") %>% 
+        inner_join(cdm$condition_occurrence %>% 
+                  select("person_id","condition_concept_id", "condition_start_date") %>%
+                  filter(condition_concept_id %in% !!feature.codes$descendant_concept_id),
+                  by=c("person_id"), copy = TRUE) %>% 
+        filter(condition_start_date < outcome_start_date) %>% 
+        select(person_id) %>% 
+        distinct() %>% 
+        mutate(!!working_id_name:=1),
+      by="person_id")  %>% 
+    compute()
+  
+  print(paste0("Getting features for ", table1features_conditions$Description[i], " (" , i , " of ", length(table1features_conditions$Name), ")")) 
+  
+}
+
+# medications
+
+# medications
+for(i in seq_along(table1features_drugs$Name)){
+  
+  working_id_name <- glue::glue("{table1features_drugs$Name[[i]]}")
+  working_concept_id <- table1features_drugs$Concept_ID[i]
+  
+  #get the feature and its descendants
+  feature.codes<-tbl(db, sql("SELECT * FROM concept_ancestor")) %>% 
+    filter(ancestor_concept_id == working_concept_id) %>% 
+    collect()
+  
+  Pop <-
+    Pop %>%
+    left_join(
+      Pop %>%
+        select("person_id", "outcome_start_date") %>% 
+        inner_join(cdm$drug_exposure %>% 
+                     select("person_id","drug_concept_id", "drug_exposure_start_date", "drug_exposure_end_date") %>%
+                     filter(drug_concept_id %in% !!feature.codes$descendant_concept_id),
+                   by=c("person_id"), copy = TRUE) %>% 
+        filter(
+          # overlapping
+          (drug_exposure_start_date <= (outcome_start_date-lubridate::days(-1)) &
+             drug_exposure_end_date >= (outcome_start_date-lubridate::days(-1))) |
+            # ending in window
+            (drug_exposure_start_date >= (outcome_start_date-lubridate::days(90)) &
+               drug_exposure_end_date <= (outcome_start_date-lubridate::days(-1)))) %>%
+        select(person_id) %>%
+        distinct() %>%
+        mutate(!!working_id_name:=1),
+      by="person_id") %>%
+    compute()
+  
+  print(paste0("Getting features for ", table1features_drugs$Description[i], " (" , i , " of ", length(table1features_drugs$Name), ")")) 
+  
+}
+
+
+
 # function to extract dataset based on head and neck cancer subtypes
 if (grepl("CPRD", db.name) == TRUE){
   
