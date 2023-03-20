@@ -134,7 +134,8 @@ Pop <-Pop %>%
   filter(!is.na(observation_period_end_date))
 
 
-# get the co morbidites and medication usage
+# get the co morbidites and medication usage for subset of cohort ----
+
 # read in table containing list to create
 table1features <- read_csv(
   here::here(
@@ -147,7 +148,7 @@ table1features_drugs <- table1features %>% filter(table1features$Class == "Drug"
 table1features_conditions <- table1features %>% filter(table1features$Class == "Condition")
 
 
-# conditions
+# conditions (any time in history)
 for(i in seq_along(table1features_conditions$Name)){
   
   working_id_name <- glue::glue("{table1features_conditions$Name[[i]]}")
@@ -177,9 +178,8 @@ for(i in seq_along(table1features_conditions$Name)){
   
 }
 
-# medications
 
-# medications
+# medications (3 months before index date)
 for(i in seq_along(table1features_drugs$Name)){
   
   working_id_name <- glue::glue("{table1features_drugs$Name[[i]]}")
@@ -215,6 +215,126 @@ for(i in seq_along(table1features_drugs$Name)){
   print(paste0("Getting features for ", table1features_drugs$Description[i], " (" , i , " of ", length(table1features_drugs$Name), ")")) 
   
 }
+
+# get GP number of visits the year prior to diagnosis
+ip.codes<-c(9201, 262)
+# add all descendents
+ip.codes.w.desc<-cdm$concept_ancestor %>%
+  filter(ancestor_concept_id  %in% ip.codes ) %>% 
+  collect() %>% 
+  select(descendant_concept_id) %>% 
+  distinct() %>% 
+  pull()
+
+Pop <- Pop %>%
+  left_join(
+    Pop %>% 
+      select("person_id", "outcome_start_date") %>% 
+      inner_join(cdm$visit_occurrence %>% 
+                   filter(!visit_concept_id %in% ip.codes.w.desc) %>% 
+                   select("person_id", "visit_start_date") %>% 
+                   compute(),
+                 by=c("person_id"), copy = TRUE) %>% 
+      filter(visit_start_date < outcome_start_date &
+               visit_start_date >= (outcome_start_date- lubridate::days(365))) %>% 
+      select("person_id") %>% 
+      group_by(person_id) %>% 
+      tally(name = "outpatient_vist") %>% 
+      mutate(outpatient_vist = as.numeric(outpatient_vist)), 
+    by="person_id") %>% 
+  compute()
+Pop  <- Pop %>% 
+  mutate(outpatient_vist=ifelse(is.na(outpatient_vist), 0, outpatient_vist))
+
+# Prior history from date of diagnosis
+
+
+
+
+get_summary_characteristics<-function(data){
+  
+  summary_characteristics<- bind_rows(
+    data %>% 
+      count() %>% 
+      mutate(var="N"),
+    data %>% 
+      summarise(mean=nice.num.count(mean(age)),
+                standard_deviation = nice.num(sd(age)),
+                median = nice.num(median(age)),
+                interquartile_range=paste0(nice.num.count(quantile(age,probs=0.25)),  " to ",
+                                           nice.num.count(quantile(age,probs=0.75)))) %>% 
+      mutate(var="age"),
+    data %>% 
+      group_by(age_gr) %>% 
+      summarise(n=n(),
+                percent=paste0(nice.num((n/nrow(data))*100),  "%")) %>%   
+      rename("var"="age_gr") %>% 
+      mutate(var=paste0("Age group: ", var)),
+    data %>% 
+      mutate(gender=factor(gender, levels=c("Male", "Female"))) %>% 
+      group_by(gender) %>% 
+      summarise(n=n(),
+                percent=paste0(nice.num((n/nrow(data))*100),  "%")) %>%   
+      rename("var"="gender") %>% 
+      mutate(var=paste0("Sex: ", var)),
+    
+    data %>% 
+      summarise(mean=nice.num.count(mean(outpatient_vist)),
+                standard_deviation = nice.num(sd(outpatient_vist)),
+                median = nice.num(median(outpatient_vist)),
+                interquartile_range=paste0(nice.num.count(quantile(outpatient_vist,probs=0.25)),  " to ",
+                                           nice.num.count(quantile(outpatient_vist,probs=0.75)))) %>% 
+      mutate(var="outpatient vists"))
+  
+  for(i in seq_along(table1features_conditions$Name)){
+    working_id_name <- glue::glue("{table1features_conditions$Name[[i]]}")
+    summary_characteristics <- bind_rows(summary_characteristics,
+                                         data %>% 
+                                           summarise(n=sum(!is.na(!!rlang::sym(working_id_name))),
+                                                     percent=paste0(nice.num((n/nrow(data))*100),  "%"))%>% 
+                                           mutate(var=working_id_name)
+    )
+  }
+  
+  for(i in seq_along(table1features_drugs$Name)){
+    working_id_name <- glue::glue("{table1features_drugs$Name[[i]]}")
+    summary_characteristics <- bind_rows(summary_characteristics,
+                                         data %>% 
+                                           summarise(n=sum(!is.na(!!rlang::sym(working_id_name))),
+                                                     percent=paste0(nice.num((n/nrow(data))*100),  "%"))%>% 
+                                           mutate(var=working_id_name)
+    )
+  }
+  
+  # filter any less than 5
+  summary_characteristics <- summary_characteristics %>% 
+    mutate(mean=ifelse(!is.na(n) & n<5, NA, mean)) %>% 
+    mutate(percent=ifelse(!is.na(n) & n<5, NA, percent)) %>% 
+    mutate(interquartile_range=ifelse(!is.na(n) & n<5, NA, interquartile_range)) %>% 
+    mutate(standard_deviation=ifelse(!is.na(n) & n<5, NA, standard_deviation)) %>% 
+    mutate(n=ifelse(!is.na(n) & n<5, "<5", n))
+  
+  return(summary_characteristics %>% 
+           relocate(any_of(c("var", "n", "percent",
+                             "mean", "standard_deviation",
+                             "median", "interquartile_range"))))
+  
+}
+
+summary_characteristics_breast<-get_summary_characteristics(Pop %>% 
+                                                           filter(outcome_cohort_name=="IncidentBreastCancer"))
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -55,6 +55,19 @@ exportSurvivalResults <- function(result, zipName, outputFolder) {
   invisible(result)
 }
 
+#formatting for table 1
+nice.num<-function(x) {
+  trimws(format(round(x,1),
+                big.mark=",", nsmall = 1, digits=1, scientific=FALSE))}
+# printing numbers with 2 decimal place and commas 
+nice.num2<-function(x) {
+  trimws(format(round(x,2),
+                big.mark=",", nsmall = 2, digits=2, scientific=FALSE))}
+# for counts- without decimal place
+nice.num.count<-function(x) {
+  trimws(format(x,
+                big.mark=",", nsmall = 0, digits=1, scientific=FALSE))}
+
 
 start<-Sys.time()
 
