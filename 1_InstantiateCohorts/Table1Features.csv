@@ -1,0 +1,54 @@
+Name,Description,Concept ID,Class
+AgentsReninAngiotensinSystem,Agents acting on the renin angiotensin system,21601782,Drug
+Antibacterials for systemic use,Antibacterials for systemic use,21602796,Drug
+Antidepressants,Antidepressants,21604686,Drug
+Antiepileptics,Antiepileptics,21604389,Drug
+AntiinflammatoryAntirheumatic,Antiinflammatory and antirheumatic products,21603932,Drug
+Antineoplastics,Antineoplastic agents,21601387,Drug
+Antipsoriatics,Antipsoriatics,21602028,Drug
+Antithrombotics,Antithrombotic agents,21600960,Drug
+BetaBlockers,Beta blocking agents,21601664,Drug
+CalciumChannelBlockers,Calcium channel blockers,21601744,Drug
+Diuretics,Diuretics,21601461,Drug
+DrugsAcidRelatedDisorders,Drugs for acid related disorders,21600046,Drug
+DrugsObstructiveAirwayDiseases,Drugs for obstructive airway diseases,21603248,Drug
+DrugsDiabetes,Drugs used in diabetes,21600712,Drug
+Immunosuppressants,Immunosuppressants,21603890,Drug
+LipidModifyingAgents,Lipid modifying agents,21601853,Drug
+Opioids,Opioids,21604254,Drug
+Psycholeptics,Psycholeptics,21604489,Drug
+Psychostimulants,"Psychostimulants, agents used for adhd and nootropics",21604752,Drug
+AcuteRespiratoryDisease,Acute respiratory disease,4006969,Condition
+ChronicLiverDisease,Chronic liver disease,4212540,Condition
+ChronicObstructiveLungDisease,Chronic obstructive lung disease,255573,Condition
+CrohnsDisease,Crohn's disease,201606,Condition
+Dementia,Dementia,4182210,Condition
+DepressiveDisorder,Depressive disorder,440383,Condition
+DiabetesMellitus,Diabetes mellitus,201820,Condition
+GastroesophagealRefluxDisease,Gastroesophageal reflux disease,318800,Condition
+GastrointestinalHemorrhage,Gastrointestinal hemorrhage,192671,Condition
+HIV,Human immunodeficiency virus infection,439727,Condition
+Hyperlipidemia,Hyperlipidemia,432867,Condition
+Hypertension,Hypertensive disorder,316866,Condition
+LesionLiver,Lesion of liver,4104000,Condition
+Obesity,Obesity,433736,Condition
+Osteoarthritis,Osteoarthritis,80180,Condition
+Pneumonia,Pneumonia,255848,Condition
+Psoriasis,Psoriasis,140168,Condition
+RenalImpairment,Renal impairment,4030518,Condition
+RheumatoidArthritis,Rheumatoid arthritis,80809,Condition
+Schizophrenia,Schizophrenia,435783,Condition
+UlcerativeColitis,Ulcerative colitis,81893,Condition
+UTIDisease,Urinary tract infectious disease,81902,Condition
+HepatitisC,Viral hepatitis C,197494,Condition
+VisualSystemDisorder,Visual system disorder,4134440,Condition
+AtrialFibrillation,Atrial fibrillation,313217,Condition
+CerebrovascularDisease,Cerebrovascular disease,381591,Condition
+CoronaryArteriosclerosis,Coronary arteriosclerosis,317576,Condition
+HeartDisease,Heart disease,321588,Condition
+HeartFailure,Heart failure,316139,Condition
+IschemicHeartDisease,Ischemic heart disease,4185932,Condition
+PeripheralVascularDisease,Peripheral vascular disease,321052,Condition
+PulmonaryEmbolism,Pulmonary embolism,440417,Condition
+VenousThrombosis,Venous thrombosis,444247,Condition
+HpyloriGIInfection,Helicobacter pylori gastrointestinal tract infection,4146776,Condition
