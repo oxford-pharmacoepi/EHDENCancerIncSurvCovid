@@ -21,8 +21,7 @@ server <-	function(input, output, session) {
 
     table
   }) 
-  
-  output$tbl_prevalence_estimates<-  renderDataTable({
+  output$tbl_prevalence_estimates<-  DT::renderDataTable({
 
     table<-get_prevalence_estimates() 
     
@@ -52,14 +51,13 @@ server <-	function(input, output, session) {
               rownames= FALSE,
               extensions = 'Buttons',
               options = list(lengthChange = FALSE,
-                             dom = 'l<"sep">Bfrtip',
+                             dom = 'tB',
                              pageLength = 100000000,
                              buttons = list(list(extend = "csv", 
                                                  text = "Download results as csv",
                                                  filename = "prevalence_estimates"))
               ))
   } )
-  
   output$plot_prevalence_estimates<- renderPlotly({ 
     
     table<-get_prevalence_estimates() 
@@ -142,7 +140,6 @@ server <-	function(input, output, session) {
     p
     
     })
-  
   get_prevalence_attrition<-reactive({
     
     table<-prevalence_attrition %>% 
@@ -161,8 +158,7 @@ server <-	function(input, output, session) {
     
     table
   }) 
-  
-  output$tbl_prevalence_attrition<-  renderDataTable({
+  output$tbl_prevalence_attrition<-  DT::renderDataTable({
     
     table<-get_prevalence_attrition() 
     
@@ -177,7 +173,7 @@ server <-	function(input, output, session) {
               rownames= FALSE,
               extensions = 'Buttons',
               options = list(lengthChange = FALSE,
-                             dom = 'l<"sep">Bfrtip',
+                             dom = 'tB',
                              pageLength = 100000000,
                              buttons = list(list(extend = "csv", 
                                                  text = "Download results as csv",
@@ -205,7 +201,7 @@ server <-	function(input, output, session) {
 
     table
   }) 
-  output$tbl_incidence_estimates<-  renderDataTable({
+  output$tbl_incidence_estimates<-  DT::renderDataTable({
 
     table<-get_incidence_estimates() 
     
@@ -237,7 +233,7 @@ server <-	function(input, output, session) {
               rownames= FALSE,
               extensions = 'Buttons',
               options = list(lengthChange = FALSE,
-                             dom = 'l<"sep">Bfrtip',
+                             dom = 'tB',
                              pageLength = 100000000,
                              buttons = list(list(extend = "csv", 
                                                  text = "Download results as csv",
@@ -341,7 +337,7 @@ server <-	function(input, output, session) {
     filter(analysis_interval %in% input$incidence_denominator_analysis_interval_selector) 
     table
   }) 
-  output$tbl_incidence_attrition<-  renderDataTable({
+  output$tbl_incidence_attrition<-  DT::renderDataTable({
     
     table<-get_incidence_attrition() 
     
@@ -356,7 +352,7 @@ server <-	function(input, output, session) {
               rownames= FALSE,
               extensions = 'Buttons',
               options = list(lengthChange = FALSE,
-                             dom = 'l<"sep">Bfrtip',
+                             dom = 'tB',
                              pageLength = 100000000,
                              buttons = list(list(extend = "csv", 
                                                  text = "Download results as csv",
@@ -375,11 +371,11 @@ server <-	function(input, output, session) {
       filter(Age %in% input$survival_age_group_selector)     %>% 
       filter(Gender %in% input$survival_sex_selector)     %>% 
       filter(Cancer %in% input$survival_outcome_cohort_name_selector) %>%
-      filter(CalenderYearGp %in% input$calender_year_selector) 
+      filter(CalendarYearGp %in% input$calendar_year_selector) 
     
     table
   }) 
-  output$tbl_survival_estimates<-  renderDataTable({
+  output$tbl_survival_estimates<-  DT::renderDataTable({
 
     table<-get_survival_estimates()
 
@@ -401,7 +397,7 @@ server <-	function(input, output, session) {
               rownames= FALSE,
               extensions = 'Buttons',
               options = list(lengthChange = FALSE,
-                             dom = 'l<"sep">Bfrtip',
+                             dom = 'tB',
                              pageLength = 100000000,
                              buttons = list(list(extend = "csv", 
                                                  text = "Download results as csv",
@@ -409,102 +405,142 @@ server <-	function(input, output, session) {
               ))
   } )
 
-  # output$plot_incidence_estimates<- renderPlotly({
-  # 
-  #   table<-get_incidence_estimates()
-  #   validate(need(ncol(table)>1,
-  #                 "No results for selected inputs"))
-  # 
-  #   if(is.null(input$incidence_plot_group)){
-  #     if(!is.null(input$incidence_plot_facet)){
-  #       p<-table %>%
-  #         unite("facet_var",
-  #               c(all_of(input$incidence_plot_facet)), remove = FALSE, sep = "; ") %>%
-  #         ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
-  #                           ymin = "incidence_100000_pys_95CI_lower",
-  #                           ymax = "incidence_100000_pys_95CI_upper")) +
-  #         geom_point(position=position_dodge(width=1))+
-  #         geom_errorbar(width=0) +
-  #         facet_wrap(vars(facet_var),ncol = 2)+
-  #         scale_y_continuous(
-  #           limits = c(0, NA)
-  #         ) +
-  #         theme_bw()
-  #     } else{
-  #       p<-table %>%
-  #         ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
-  #                           ymin = "incidence_100000_pys_95CI_lower",
-  #                           ymax = "incidence_100000_pys_95CI_upper")) +
-  #         geom_point(position=position_dodge(width=1))+
-  #         geom_errorbar(width=0) +
-  #         scale_y_continuous(
-  #           limits = c(0, NA)
-  #         ) +
-  #         theme_bw()
-  #     }
-  #   }
-  # 
-  # 
-  #   if(!is.null(input$incidence_plot_group) ){
-  # 
-  #     if(is.null(input$incidence_plot_facet) ){
-  #       p<-table %>%
-  #         unite("Group",
-  #               c(all_of(input$incidence_plot_group)), remove = FALSE, sep = "; ") %>%
-  #         ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
-  #                           ymin = "incidence_100000_pys_95CI_lower",
-  #                           ymax = "incidence_100000_pys_95CI_upper",
-  #                           group="Group",
-  #                           colour="Group")) +
-  #         geom_point(position=position_dodge(width=1))+
-  #         geom_errorbar(width=0, position=position_dodge(width=1)) +
-  #         theme_bw()
-  #     }
-  # 
-  #     if(!is.null(input$incidence_plot_facet) ){
-  #       if(!is.null(input$incidence_plot_group) ){
-  #         p<-table %>%
-  #           unite("Group",
-  #                 c(all_of(input$incidence_plot_group)), remove = FALSE, sep = "; ") %>%
-  #           unite("facet_var",
-  #                 c(all_of(input$incidence_plot_facet)), remove = FALSE, sep = "; ") %>%
-  #           ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
-  #                             ymin = "incidence_100000_pys_95CI_lower",
-  #                             ymax = "incidence_100000_pys_95CI_upper",
-  #                             group="Group",
-  #                             colour="Group")) +
-  #           geom_point(position=position_dodge(width=1))+
-  #           geom_errorbar(width=0, position=position_dodge(width=1)) +
-  #           facet_wrap(vars(facet_var),ncol = 2)+
-  #           scale_y_continuous(
-  #             limits = c(0, NA)
-  #           )  +
-  #           theme_bw()
-  #       }
-  #     }
-  # 
-  #   }
-  # 
-  #   p
-  # 
-  # })
+  # KM plots for whole population
+  output$plot_survival_estimates<- renderPlotly({
+
+    table<-get_survival_estimates()
+    validate(need(ncol(table)>1,
+                  "No results for selected inputs"))
+
+    if(is.null(input$survival_plot_group)){
+      if(!is.null(input$survival_plot_facet)){
+        p<-table %>%
+          unite("facet_var",
+                c(all_of(input$survival_plot_facet)), remove = FALSE, sep = "; ") %>%
+          ggplot(aes_string(x=input$time, y="est",
+                            ymin = "lcl",
+                            ymax = "ucl")) +
+          geom_line() +
+          #geom_point(position=position_dodge(width=1))+
+          #geom_errorbar(width=0) +
+          facet_wrap(vars(facet_var),ncol = 2)+
+          scale_y_continuous(
+            limits = c(0, NA)
+          ) +
+          theme_bw()
+      } else{
+        p<-table %>%
+          ggplot(aes_string(x=input$time, y="est",
+                            ymin = "lcl",
+                            ymax = "ucl")) +
+          #geom_point(position=position_dodge(width=1))+
+          #geom_errorbar(width=0) +
+          scale_y_continuous(
+            limits = c(0, NA)
+          ) +
+          theme_bw()
+      }
+    }
+
+
+    if(!is.null(input$survival_plot_group) ){
+
+      if(is.null(input$survival_plot_facet) ){
+        p<-table %>%
+          unite("Group",
+                c(all_of(input$survival_plot_group)), remove = FALSE, sep = "; ") %>%
+          ggplot(aes_string(x=input$time, y="est",
+                            ymin = "lcl",
+                            ymax = "ucl",
+                            group="Group",
+                            colour="Group")) +
+          geom_line() +
+          #geom_point(position=position_dodge(width=1))+
+          #geom_errorbar(width=0, position=position_dodge(width=1)) +
+          theme_bw()
+      }
+
+      if(!is.null(input$survival_plot_facet) ){
+        if(!is.null(input$survival_plot_group) ){
+          p<-table %>%
+            unite("Group",
+                  c(all_of(input$survival_plot_group)), remove = FALSE, sep = "; ") %>%
+            unite("facet_var",
+                  c(all_of(input$survival_plot_facet)), remove = FALSE, sep = "; ") %>%
+            ggplot(aes_string(x=input$time, y="est",
+                              ymin = "lcl",
+                              ymax = "ucl",
+                              group="Group",
+                              colour="Group")) +
+            #geom_point(position=position_dodge(width=1))+
+            #geom_errorbar(width=0, position=position_dodge(width=1)) +
+            geom_line() +
+            facet_wrap(vars(facet_var),ncol = 2)+
+            scale_y_continuous(
+              limits = c(0, NA)
+            )  +
+            theme_bw()
+        }
+      }
+
+    }
+
+    p
+
+  })
   
   
-# survival estimates: calender year population
+
+  # example code
+  # if(input$IncStrataSelector=="Overall"){
+  #   plot<-  plot.data %>%
+  #     ggplot()+
+  #     geom_step(aes(x=time, surv)) +
+  #     geom_step(aes(x=time, y=lower), linetype=2)+
+  #     geom_step(aes(x=time, y=upper), linetype=2)+
+  #     geom_ribbon(aes(x=time, 
+  #                     ymin = lower, 
+  #                     ymax = upper), 
+  #                 stat="stepribbon",
+  #                 alpha = .2)+
+  #     xlab("Days since index date")+
+  #     ylab("Cumulative incidence")+
+  #     scale_y_continuous(labels = scales::percent)
+  # } else {
+  #   
+  #   plot<-  plot.data %>%
+  #     ggplot()+
+  #     geom_step(aes(x=time, surv, colour=Strata)) +
+  #     geom_step(aes(x=time, y=lower, colour=Strata), linetype=2)+
+  #     geom_step(aes(x=time, y=upper, colour=Strata), linetype=2)+
+  #     geom_ribbon(aes(x=time, 
+  #                     ymin = lower, 
+  #                     ymax = upper, fill=Strata), 
+  #                 stat="stepribbon",
+  #                 alpha = .2)+
+  #     xlab("Days since index date")+
+  #     ylab("Cumulative incidence")+
+  #     scale_y_continuous(labels = scales::percent)
+  #   
+  #   
+  # } 
+  
+  
+# survival estimates: calendar year population
   get_survival_estimates_cy<-reactive({
     
-    table<-survival_estimates_calender %>% 
+    table<-survival_estimates_calendar %>% 
       # first deselect settings which did not vary for this study
       select(!c(GenderAge, Method)) %>% 
       filter(Database %in% input$survival_database_name_selector_cy)  %>% 
       filter(Age %in% input$survival_age_group_selector_cy)     %>% 
       filter(Gender %in% input$survival_sex_selector_cy)     %>% 
       filter(Cancer %in% input$survival_outcome_cohort_name_selector_cy)  %>%
-      filter(CalenderYearGp %in% input$calender_year_selector_cy) 
+      filter(CalendarYearGp %in% input$calendar_year_selector_cy) 
     
     table
   }) 
-  output$tbl_survival_estimates_cy<-  renderDataTable({
+  output$tbl_survival_estimates_cy<-  DT::renderDataTable({
     
     table<-get_survival_estimates_cy()
     
@@ -526,14 +562,78 @@ server <-	function(input, output, session) {
               rownames= FALSE,
               extensions = 'Buttons',
               options = list(lengthChange = FALSE,
-                             dom = 'l<"sep">Bfrtip',
+                             dom = 'tB',
                              pageLength = 100000000,
                              buttons = list(list(extend = "csv", 
                                                  text = "Download results as csv",
-                                                 filename = "survival_estimates_calenderYears"))
+                                                 filename = "survival_estimates_calendarYears"))
               ))
   } )
-
+  
+# KM plots for calendar year population
+  output$plot_survival_estimates_cy<- renderPlotly({
+    
+    table<-get_survival_estimates_cy()
+    validate(need(ncol(table)>1,
+                  "No results for selected inputs"))
+    
+    if(is.null(input$survival_plot_group_cy)){
+      if(!is.null(input$survival_plot_facet_cy)){
+        p<-table %>%
+          unite("facet_var",
+                c(all_of(input$survival_plot_facet_cy)), remove = FALSE, sep = "; ") %>%
+          ggplot(aes_string(x=input$time, y="est", colour="CalendarYearGp")) +
+          geom_line() +
+          facet_wrap(vars(facet_var),ncol = 2)+
+          scale_y_continuous(limits = c(NA, 1) ) +
+          theme_bw()
+      } else{
+        p<-table %>%
+          ggplot(aes_string(x=input$time, y="est", colour="CalendarYearGp")) +
+          scale_y_continuous(
+            limits = c(NA, 1)
+          ) +
+          theme_bw()
+      }
+    }
+    
+    
+    if(!is.null(input$survival_plot_group_cy) ){
+      
+      if(is.null(input$survival_plot_facet_cy) ){
+        p<-table %>%
+          unite("Group",
+                c(all_of(input$survival_plot_group_cy)), remove = FALSE, sep = "; ") %>%
+          ggplot(aes_string(x=input$time, y="est",
+                            group="Group",
+                            colour="Group")) +
+          geom_line() +
+          theme_bw()
+      }
+      
+      if(!is.null(input$survival_plot_facet_cy) ){
+        if(!is.null(input$survival_plot_group_cy) ){
+          p<-table %>%
+            unite("Group",
+                  c(all_of(input$survival_plot_group_cy)), remove = FALSE, sep = "; ") %>%
+            unite("facet_var",
+                  c(all_of(input$survival_plot_facet_cy)), remove = FALSE, sep = "; ") %>%
+            ggplot(aes_string(x=input$time, y="est",
+                              group="Group",
+                              colour="Group")) +
+            geom_line() +
+            facet_wrap(vars(facet_var_cy),ncol = 2)+
+            scale_y_continuous(limits = c(NA, 1) )  +
+            theme_bw()
+        }
+      }
+      
+    }
+    
+    p
+    
+  })    
+  
 # risk table whole population 
   get_survival_risktable<-reactive({
     
@@ -544,11 +644,11 @@ server <-	function(input, output, session) {
       filter(Age %in% input$survival_age_group_selector)     %>% 
       filter(Gender %in% input$survival_sex_selector)     %>% 
       filter(Cancer %in% input$survival_outcome_cohort_name_selector)  %>%
-      filter(CalenderYearGp %in% input$calender_year_selector) 
+      filter(CalendarYearGp %in% input$calendar_year_selector) 
     
     table
   }) 
-  output$tbl_survival_risk_table<-  renderDataTable({
+  output$tbl_survival_risk_table<-  DT::renderDataTable({
     
     table<-get_survival_risktable()
     
@@ -562,7 +662,7 @@ server <-	function(input, output, session) {
               rownames= FALSE,
               extensions = 'Buttons',
               options = list(lengthChange = FALSE,
-                             dom = 'l<"sep">Bfrtip',
+                             dom = 'tB',
                              pageLength = 100000000,
                              buttons = list(list(extend = "csv", 
                                                  text = "Download results as csv",
@@ -570,7 +670,7 @@ server <-	function(input, output, session) {
               ))
   } )
   
-# risk table calender years  
+# risk table calendar years  
   get_survival_risktable_cy<-reactive({
     
     table<- survival_risk_table_cy %>% 
@@ -580,11 +680,11 @@ server <-	function(input, output, session) {
       filter(Age %in% input$survival_age_group_selector_cy)     %>% 
       filter(Gender %in% input$survival_sex_selector_cy)     %>% 
       filter(Cancer %in% input$survival_outcome_cohort_name_selector_cy)  %>%
-      filter(CalenderYearGp %in% input$calender_year_selector_cy) 
+      filter(CalendarYearGp %in% input$calendar_year_selector_cy) 
     
     table
   }) 
-  output$tbl_survival_risk_table_cy <-  renderDataTable({
+  output$tbl_survival_risk_table_cy <-  DT::renderDataTable({
     
     table<-get_survival_risktable_cy()
     
@@ -598,15 +698,15 @@ server <-	function(input, output, session) {
               rownames= FALSE,
               extensions = 'Buttons',
               options = list(lengthChange = FALSE,
-                             dom = 'l<"sep">Bfrtip',
+                             dom = 'tB',
                              pageLength = 100000000,
                              buttons = list(list(extend = "csv", 
                                                  text = "Download results as csv",
-                                                 filename = "survival_risk_table_by_calenderyr"))
+                                                 filename = "survival_risk_table_by_calendaryr"))
               ))
   } )
 
-# median survival calender years
+# median survival calendar years
   get_survival_median_table_cy<-reactive({
 
     table<- survival_median_table_cy %>%
@@ -616,11 +716,11 @@ server <-	function(input, output, session) {
       filter(Age %in% input$survival_age_group_selector_cy)     %>%
       filter(Gender %in% input$survival_sex_selector_cy)     %>%
       filter(Cancer %in% input$survival_outcome_cohort_name_selector_cy)  %>%
-      filter(CalenderYearGp %in% input$calender_year_selector_cy)
+      filter(CalendarYearGp %in% input$calendar_year_selector_cy)
 
     table
   })
-  output$tbl_survival_median_table_cy <-  renderDataTable({
+  output$tbl_survival_median_table_cy <-  DT::renderDataTable({
 
     table<-get_survival_median_table_cy()
 
@@ -628,17 +728,23 @@ server <-	function(input, output, session) {
                   "No results for selected inputs"))
 
     table <- table %>%
-      select(!c("Stratification"))
-
+      select(!c("Stratification", "n.max", "n.start")) %>%
+      mutate(rmean=nice.num3(rmean)) %>%
+      mutate(`se(rmean)`=nice.num3(`se(rmean)`)) %>%
+      mutate(median=nice.num3(median)) %>%
+      mutate(`0.95LCL`=nice.num3(`0.95LCL`)) %>%
+      mutate(`0.95UCL`=nice.num3(`0.95UCL`)) %>%
+      relocate(Cancer) 
+      
     datatable(table,
               rownames= FALSE,
               extensions = 'Buttons',
               options = list(lengthChange = FALSE,
-                             dom = 'l<"sep">Bfrtip',
+                             dom = 'tB',
                              pageLength = 100000000,
                              buttons = list(list(extend = "csv",
                                                  text = "Download results as csv",
-                                                 filename = "survival_median_by_calenderyr"))
+                                                 filename = "survival_median_by_calendaryr"))
               ))
   } )
 
@@ -652,11 +758,11 @@ server <-	function(input, output, session) {
       filter(Age %in% input$survival_age_group_selector)     %>% 
       filter(Gender %in% input$survival_sex_selector)     %>% 
       filter(Cancer %in% input$survival_outcome_cohort_name_selector) %>%
-      filter(CalenderYearGp %in% input$calender_year_selector) 
+      filter(CalendarYearGp %in% input$calendar_year_selector) 
     
     table
   }) 
-  output$tbl_survival_median_table<-  renderDataTable({
+  output$tbl_survival_median_table<-  DT::renderDataTable({
     
     table<-get_survival_median_table()
     
@@ -664,14 +770,19 @@ server <-	function(input, output, session) {
                   "No results for selected inputs"))
     
     table <- table %>%
-      select(!c("Stratification")) %>%
+      select(!c("Stratification", "n.max", "n.start")) %>%
+      mutate(rmean=nice.num3(rmean)) %>%
+      mutate(`se(rmean)`=nice.num3(`se(rmean)`)) %>%
+      mutate(median=nice.num3(median)) %>%
+      mutate(`0.95LCL`=nice.num3(`0.95LCL`)) %>%
+      mutate(`0.95UCL`=nice.num3(`0.95UCL`)) %>%
       relocate(Cancer) 
     
     datatable(table,
               rownames= FALSE,
               extensions = 'Buttons',
               options = list(lengthChange = FALSE,
-                             dom = 'l<"sep">Bfrtip',
+                             dom = 'tB',
                              pageLength = 100000000,
                              buttons = list(list(extend = "csv", 
                                                  text = "Download results as csv",
@@ -679,7 +790,7 @@ server <-	function(input, output, session) {
               ))
   } )
 
-# survival risk rates calender years
+# survival risk rates calendar years
   get_survival_rates_table_cy<-reactive({
     
     table<- survival_rates_table_cy %>%
@@ -689,11 +800,11 @@ server <-	function(input, output, session) {
       filter(Age %in% input$survival_age_group_selector_cy)     %>%
       filter(Gender %in% input$survival_sex_selector_cy)     %>%
       filter(Cancer %in% input$survival_outcome_cohort_name_selector_cy)  %>%
-      filter(CalenderYearGp %in% input$calender_year_selector_cy)
+      filter(CalendarYearGp %in% input$calendar_year_selector_cy)
     
     table
   })
-  output$tbl_survival_rates_table_cy <-  renderDataTable({
+  output$tbl_survival_rates_table_cy <-  DT::renderDataTable({
     
     table<-get_survival_rates_table_cy()
     
@@ -701,17 +812,31 @@ server <-	function(input, output, session) {
                   "No results for selected inputs"))
     
     table <- table %>%
-      select(!c("Stratification"))
+      select(!c("Stratification",
+                "type",
+                "logse",
+                "conf.int",
+                "conf.type")) %>%
+      mutate(surv=nice.num3(surv)) %>%
+      mutate(std.err=nice.num3(std.err)) %>%
+      mutate(cumhaz=nice.num3(cumhaz)) %>%
+      mutate(std.chaz=nice.num3(std.chaz)) %>%      
+      mutate(lower=nice.num3(lower)) %>%
+      mutate(upper=nice.num3(upper)) %>%
+      relocate(Cancer) %>%
+      relocate(surv, .after = time) %>%
+      relocate(lower, .after = surv) %>%
+      relocate(upper, .after = lower)
     
     datatable(table,
               rownames= FALSE,
               extensions = 'Buttons',
               options = list(lengthChange = FALSE,
-                             dom = 'l<"sep">Bfrtip',
+                             dom = 'tB',
                              pageLength = 100000000,
                              buttons = list(list(extend = "csv",
                                                  text = "Download results as csv",
-                                                 filename = "survival_median_by_calenderyr"))
+                                                 filename = "survival_median_by_calendaryr"))
               ))
   } )
   
@@ -725,11 +850,11 @@ server <-	function(input, output, session) {
       filter(Age %in% input$survival_age_group_selector)     %>%
       filter(Gender %in% input$survival_sex_selector)     %>%
       filter(Cancer %in% input$survival_outcome_cohort_name_selector)  %>%
-      filter(CalenderYearGp %in% input$calender_year_selector)
+      filter(CalendarYearGp %in% input$calendar_year_selector)
     
     table
   })
-  output$tbl_survival_rates_table <-  renderDataTable({
+  output$tbl_survival_rates_table <-  DT::renderDataTable({
     
     table<-get_survival_rates_table()
     
@@ -737,13 +862,27 @@ server <-	function(input, output, session) {
                   "No results for selected inputs"))
     
     table <- table %>%
-      select(!c("Stratification"))
+      select(!c("Stratification",
+                "type",
+                "logse",
+                "conf.int",
+                "conf.type")) %>%
+      mutate(surv=nice.num3(surv)) %>%
+      mutate(std.err=nice.num3(std.err)) %>%
+      mutate(cumhaz=nice.num3(cumhaz)) %>%
+      mutate(std.chaz=nice.num3(std.chaz)) %>%      
+      mutate(lower=nice.num3(lower)) %>%
+      mutate(upper=nice.num3(upper)) %>%
+      relocate(Cancer) %>%
+      relocate(surv, .after = time) %>%
+      relocate(lower, .after = surv) %>%
+      relocate(upper, .after = lower)
     
     datatable(table,
               rownames= FALSE,
               extensions = 'Buttons',
               options = list(lengthChange = FALSE,
-                             dom = 'l<"sep">Bfrtip',
+                             dom = 'tB',
                              pageLength = 100000000,
                              buttons = list(list(extend = "csv",
                                                  text = "Download results as csv",

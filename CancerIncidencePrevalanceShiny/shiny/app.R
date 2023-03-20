@@ -864,9 +864,9 @@ if(input$IncStrataSelector=="Overall"){
   geom_step(aes(x=time, surv)) +
   geom_step(aes(x=time, y=lower), linetype=2)+
   geom_step(aes(x=time, y=upper), linetype=2)+
-  geom_ribbon(aes(x=time, 
-                  ymin = lower, 
-                  ymax = upper), 
+  geom_ribbon(aes(x=time,
+                  ymin = lower,
+                  ymax = upper),
               stat="stepribbon",
                 alpha = .2)+
  xlab("Days since index date")+
@@ -879,16 +879,16 @@ if(input$IncStrataSelector=="Overall"){
   geom_step(aes(x=time, surv, colour=Strata)) +
   geom_step(aes(x=time, y=lower, colour=Strata), linetype=2)+
   geom_step(aes(x=time, y=upper, colour=Strata), linetype=2)+
-  geom_ribbon(aes(x=time, 
-                  ymin = lower, 
-                  ymax = upper, fill=Strata), 
+  geom_ribbon(aes(x=time,
+                  ymin = lower,
+                  ymax = upper, fill=Strata),
               stat="stepribbon",
                 alpha = .2)+
  xlab("Days since index date")+
     ylab("Cumulative incidence")+
     scale_y_continuous(labels = scales::percent)
-  
-  
+
+
 }
 
 

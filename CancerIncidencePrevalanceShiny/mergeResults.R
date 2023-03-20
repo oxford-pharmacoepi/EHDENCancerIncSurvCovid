@@ -103,7 +103,7 @@ prepare_output_survival <- function(result){
   
   result<- result %>% 
     mutate(Age = replace(Age, Age == ">=90", "90 +")) %>% 
-    mutate(Age = replace(Age, Age == "<30", "18-29")) %>%  
+    mutate(Age = replace(Age, Age == "<30", "18-29")) %>% 
     mutate(Age= stringr::str_replace(Age, "-", " to ")) %>% 
     mutate(CalenderYearGp= stringr::str_replace(CalenderYearGp, "-", " to ")) %>% 
     mutate(Age = factor(Age,
@@ -117,6 +117,7 @@ prepare_output_survival <- function(result){
                                               "2005 to 2009", 
                                               "2010 to 2014",
                                               "2015 to 2019")))
+
   
   result <- result %>%
     mutate(Database = replace(Database, Database == "CPRDAurum", "CPRD Aurum")) %>%
@@ -293,4 +294,7 @@ survival_rates_table <- dplyr::bind_rows(survival_rates_table)
 survival_rates_table <- prepare_output_survival(survival_rates_table)
 saveRDS(survival_rates_table,
         here("shiny", "data", "/survival_rates_table.rds"))
+
+
+
 
