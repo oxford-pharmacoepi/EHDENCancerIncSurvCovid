@@ -348,12 +348,15 @@ for(j in 1:nrow(outcomeCohort)) {
   modelKM <- survfit(Surv(time_years, status) ~ age_gr, data=data) %>%
     summary()
   
+  # to create an age label 
+  agelabel <- table(data$age_gr) %>% as.data.frame() %>% filter(Freq != 0)
+  
   observedmedianKM_age[[j]] <- modelKM$table %>%
     as.data.frame() %>%
     mutate(Method = "Kaplan-Meier", 
            Cancer = outcomeCohort$cohort_name[j], 
            Gender = "Both" ,
-           Age = c("18-29" ,"30-39", "40-49" ,"50-59" ,"60-69", "70-79", "80-89" ,">=90"))
+           Age = agelabel$Var1)
   
   print(paste0("Median survival from KM from observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
   
@@ -668,9 +671,6 @@ for(l in 1:length(PopAll)) {
   SurResults[[l]] <- SurAnalysis(dataset = PopAll[[l]],
                        outcomeCohort = outcome_cohorts)
 }
-
-# test2 <- SurAnalysis(dataset = PopAll[[2]],
-#                                outcomeCohort = outcome_cohorts)
 
 # extract results for the whole population
 whole_pop_results <- list(
