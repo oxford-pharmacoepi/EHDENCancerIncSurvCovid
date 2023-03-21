@@ -1,6 +1,5 @@
 Name,Description,Concept_ID,Class
 AgentsReninAngiotensinSystem,Agents acting on the renin angiotensin system,21601782,Drug
-Antibacterials for systemic use,Antibacterials for systemic use,21602796,Drug
 Antidepressants,Antidepressants,21604686,Drug
 Antiepileptics,Antiepileptics,21604389,Drug
 AntiinflammatoryAntirheumatic,Antiinflammatory and antirheumatic products,21603932,Drug
@@ -16,8 +15,10 @@ DrugsDiabetes,Drugs used in diabetes,21600712,Drug
 Immunosuppressants,Immunosuppressants,21603890,Drug
 LipidModifyingAgents,Lipid modifying agents,21601853,Drug
 Opioids,Opioids,21604254,Drug
-Psycholeptics,Psycholeptics,21604489,Drug
 Psychostimulants,"Psychostimulants, agents used for adhd and nootropics",21604752,Drug
+Antipsychotics,Antipsychotics,21604490,Drug
+Anxiolytics,Anxiolytics,21604564,Drug
+HypnoticsSedatives,Hypnotics and sedatives,21604606,Drug
 AcuteRespiratoryDisease,Acute respiratory disease,4006969,Condition
 ChronicLiverDisease,Chronic liver disease,4212540,Condition
 ChronicObstructiveLungDisease,Chronic obstructive lung disease,255573,Condition
