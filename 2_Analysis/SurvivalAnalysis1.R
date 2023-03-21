@@ -5,25 +5,25 @@ DataExtraction <- function(dataset){
   
   #for whole dataset
   #make new end of observation period to studyEndDate parameter ----
-  data <-dataset %>%
-    mutate(endOfObservation = ifelse(observation_period_end_date >= studyEndDate, studyEndDate, NA)) %>%
-    mutate(endOfObservation = as.Date(endOfObservation) ) %>%
-    mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
-
-  # binary death outcome (for survival) ---
-  # need to take into account follow up
-  # if death date is > database end data set death to 0
-  data <-data %>%
-    mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
-    mutate(status= ifelse(death_date > endOfObservation , 1, status )) %>%
-    mutate(status= ifelse(is.na(status), 1, status ))
-
-  # calculate follow up in years
-  data <-data %>%
-    mutate(time_days=as.numeric(difftime(endOfObservation,
-                                         outcome_start_date,
-                                         units="days"))) %>%
-    mutate(time_years=time_days/365.25)
+  # data <-dataset %>%
+  #   mutate(endOfObservation = ifelse(observation_period_end_date >= studyEndDate, studyEndDate, NA)) %>%
+  #   mutate(endOfObservation = as.Date(endOfObservation) ) %>%
+  #   mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
+  # 
+  # # binary death outcome (for survival) ---
+  # # need to take into account follow up
+  # # if death date is > database end data set death to 0
+  # data <-data %>%
+  #   mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
+  #   mutate(status= ifelse(death_date > endOfObservation , 1, status )) %>%
+  #   mutate(status= ifelse(is.na(status), 1, status ))
+  # 
+  # # calculate follow up in years
+  # data <-data %>%
+  #   mutate(time_days=as.numeric(difftime(endOfObservation,
+  #                                        outcome_start_date,
+  #                                        units="days"))) %>%
+  #   mutate(time_years=time_days/365.25)
   
   # take "dataset" and do the code for each calender year
   # carry out for calender year
