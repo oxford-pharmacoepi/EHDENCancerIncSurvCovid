@@ -147,6 +147,11 @@ table1features_drugs <- table1features %>% filter(table1features$Class == "Drug"
 
 table1features_conditions <- table1features %>% filter(table1features$Class == "Condition")
 
+#set this up first to speed up loop for grabbing diseases
+cdm$condition_occurrence2 <- Pop %>%
+  select("person_id") %>%
+  inner_join(cdm$condition_occurrence, by = "person_id", copy = TRUE) %>%
+  compute()
 
 # conditions (any time in history)
 for(i in seq_along(table1features_conditions$Name)){
@@ -163,10 +168,10 @@ for(i in seq_along(table1features_conditions$Name)){
     Pop %>% 
     left_join(Pop %>% 
         select("person_id", "outcome_start_date") %>% 
-        inner_join(cdm$condition_occurrence %>% 
+        inner_join(cdm$condition_occurrence2 %>% 
                   select("person_id","condition_concept_id", "condition_start_date") %>%
                   filter(condition_concept_id %in% !!feature.codes$descendant_concept_id),
-                  by=c("person_id"), copy = TRUE) %>% 
+                  by=c("person_id"), copy = TRUE, multiple = "all") %>% 
         filter(condition_start_date < outcome_start_date) %>% 
         select(person_id) %>% 
         distinct() %>% 
@@ -203,6 +208,13 @@ for(i in seq_along(outcome_cohorts$cohort_name)){
   
 }
 
+
+#set this up first to speed up loop for grabbing diseases
+cdm$drug_exposure2 <- Pop %>%
+  select("person_id") %>%
+  inner_join(cdm$drug_exposure, by = "person_id", copy = TRUE, multiple = "all") %>%
+  compute()
+
 # medications (3 months before index date)
 for(i in seq_along(table1features_drugs$Name)){
   
@@ -219,10 +231,10 @@ for(i in seq_along(table1features_drugs$Name)){
     left_join(
       Pop %>%
         select("person_id", "outcome_start_date") %>% 
-        inner_join(cdm$drug_exposure %>% 
+        inner_join(cdm$drug_exposure2 %>% 
                      select("person_id","drug_concept_id", "drug_exposure_start_date", "drug_exposure_end_date") %>%
                      filter(drug_concept_id %in% !!feature.codes$descendant_concept_id),
-                   by=c("person_id"), copy = TRUE) %>% 
+                   by=c("person_id"), copy = TRUE, multiple = "all") %>% 
         filter(
           # overlapping
           (drug_exposure_start_date <= (outcome_start_date-lubridate::days(-1)) &
@@ -250,15 +262,17 @@ ip.codes.w.desc<-cdm$concept_ancestor %>%
   distinct() %>% 
   pull()
 
+
 Pop <- Pop %>%
   left_join(
     Pop %>% 
       select("person_id", "outcome_start_date") %>% 
       inner_join(cdm$visit_occurrence %>% 
                    filter(!visit_concept_id %in% ip.codes.w.desc) %>% 
+                   filter(visit_start_date > (as.Date(studyStartDate) - lubridate::days(365))) %>%
                    select("person_id", "visit_start_date") %>% 
                    compute(),
-                 by=c("person_id"), copy = TRUE) %>% 
+                 by=c("person_id"), copy = TRUE, multiple = "all") %>% 
       filter(visit_start_date < outcome_start_date &
                visit_start_date >= (outcome_start_date- lubridate::days(365))) %>% 
       select("person_id") %>% 
@@ -270,9 +284,37 @@ Pop <- Pop %>%
 Pop  <- Pop %>% 
   mutate(outpatient_vist=ifelse(is.na(outpatient_vist), 0, outpatient_vist))
 
-# Prior history from date of diagnosis (from 1 jan 2001)
+# Prior history from date of diagnosis from start of observation period
 Pop  <- Pop %>% 
   mutate(Prior_history_days = as.numeric(outcome_start_date - observation_period_start_date ))
+
+# Prior history from date of diagnosis (from 1 jan 2001)
+Pop  <- Pop %>% 
+  mutate(Prior_history_days_study_start = as.numeric(as.Date(cohort_start_date) - observation_period_start_date ))
+
+# calculate Follow up - calculate end of observation period
+Pop <- Pop %>%
+  mutate(endOfObservation = ifelse(observation_period_end_date >= studyEndDate, studyEndDate, NA)) %>%
+  mutate(endOfObservation = as.Date(endOfObservation) ) %>%
+  mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
+
+# calculate follow up in years and days
+Pop <-Pop %>%
+  mutate(time_days=as.numeric(difftime(endOfObservation,
+                                       outcome_start_date,
+                                       units="days"))) %>%
+  mutate(time_years=time_days/365.25)
+
+# binary death outcome (for survival) ---
+# need to take into account follow up
+# if death date is > database end data set death to 0
+Pop <-Pop %>%
+  mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
+  mutate(status= ifelse(death_date > endOfObservation , 1, status )) %>%
+  mutate(status= ifelse(is.na(status), 1, status )) %>%
+  mutate(Death = recode(status, 
+                        "1" = "Alive", 
+                        "2" = "Dead"))
 
 # tidy up results for table 1
 get_summary_characteristics<-function(data){
@@ -306,6 +348,14 @@ get_summary_characteristics<-function(data){
       mutate(var=paste0("Sex: ", var)),
     
     data %>% 
+      mutate(Death=factor(Death, levels=c("Alive", "Dead"))) %>% 
+      group_by(Death) %>% 
+      summarise(n=n(),
+                percent=paste0(nice.num((n/nrow(data))*100),  "%")) %>%   
+      rename("var"="Death") %>% 
+      mutate(var=paste0("Death: ", var)),
+    
+    data %>% 
       summarise(mean=nice.num.count(mean(Prior_history_days)),
                 standard_deviation = nice.num(sd(Prior_history_days)),
                 median = nice.num(median(Prior_history_days)),
@@ -314,12 +364,46 @@ get_summary_characteristics<-function(data){
       mutate(var="Prior_history_days"),
     
     data %>% 
-      summarise(mean=nice.num.count(mean((Prior_history_days/365))),
-                standard_deviation = nice.num(sd((Prior_history_days/365))),
-                median = nice.num(median((Prior_history_days/365))),
-                interquartile_range=paste0(nice.num.count(quantile((Prior_history_days/365),probs=0.25)),  " to ",
-                                           nice.num.count(quantile((Prior_history_days/365),probs=0.75)))) %>% 
+      summarise(mean=nice.num.count(mean((Prior_history_days/365.25))),
+                standard_deviation = nice.num(sd((Prior_history_days/365.25))),
+                median = nice.num(median((Prior_history_days/365.25))),
+                interquartile_range=paste0(nice.num.count(quantile((Prior_history_days/365.25),probs=0.25)),  " to ",
+                                           nice.num.count(quantile((Prior_history_days/365.25),probs=0.75)))) %>% 
       mutate(var="Prior_history_years"),
+    
+    data %>% 
+      summarise(mean=nice.num.count(mean(Prior_history_days_study_start)),
+                standard_deviation = nice.num(sd(Prior_history_days_study_start)),
+                median = nice.num(median(Prior_history_days_study_start)),
+                interquartile_range=paste0(nice.num.count(quantile(Prior_history_days_study_start,probs=0.25)),  " to ",
+                                           nice.num.count(quantile(Prior_history_days_study_start,probs=0.75)))) %>% 
+      mutate(var="Prior_history_days_study_start"),
+    
+    data %>% 
+      summarise(mean=nice.num.count(mean((Prior_history_days_study_start/365.25))),
+                standard_deviation = nice.num(sd((Prior_history_days_study_start/365.25))),
+                median = nice.num(median((Prior_history_days_study_start/365.25))),
+                interquartile_range=paste0(nice.num.count(quantile((Prior_history_days_study_start/365.25),probs=0.25)),  " to ",
+                                           nice.num.count(quantile((Prior_history_days_study_start/365.25),probs=0.75)))) %>% 
+      mutate(var="Prior_history_years_start"),
+    
+    
+    data %>% 
+      summarise(mean=nice.num.count(mean(time_days)),
+                standard_deviation = nice.num(sd(time_days)),
+                median = nice.num(median(time_days)),
+                interquartile_range=paste0(nice.num.count(quantile(time_days,probs=0.25)),  " to ",
+                                           nice.num.count(quantile(time_days,probs=0.75)))) %>% 
+      mutate(var="time_days"),
+    
+    data %>% 
+      summarise(mean=nice.num.count(mean((time_years))),
+                standard_deviation = nice.num(sd((time_years))),
+                median = nice.num(median((time_years))),
+                interquartile_range=paste0(nice.num.count(quantile((time_years),probs=0.25)),  " to ",
+                                           nice.num.count(quantile((time_years),probs=0.75)))) %>% 
+      mutate(var="time_years"),
+    
     
     data %>% 
       summarise(mean=nice.num.count(mean(outpatient_vist)),
