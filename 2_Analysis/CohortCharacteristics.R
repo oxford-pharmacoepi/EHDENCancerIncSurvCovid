@@ -6,7 +6,18 @@
 print(paste0("- Getting cohort characteristics: cancer populations"))
 info(logger, "- Getting cohort characteristics: cancer populations")
 
-# get denominator
+# read in table containing list for feature for table 1
+table1features <- read_csv(
+  here::here(
+    "1_InstantiateCohorts",
+    "Table1Features.csv"))
+
+# split into drugs and conditions
+table1features_drugs <- table1features %>% filter(table1features$Class == "Drug")
+
+table1features_conditions <- table1features %>% filter(table1features$Class == "Condition")
+
+# get denominator to get participants
 cdm$denominatordemo <- generateDenominatorCohortSet(
   cdm = cdm,
   startDate = as.Date(studyStartDate),
@@ -135,18 +146,6 @@ Pop <-Pop %>%
 
 
 # get the co morbidites and medication usage for subset of cohort ----
-
-# read in table containing list to create
-table1features <- read_csv(
-  here::here(
-    "1_InstantiateCohorts",
-    "Table1Features.csv"))
-
-# split into drugs and conditions
-table1features_drugs <- table1features %>% filter(table1features$Class == "Drug")
-
-table1features_conditions <- table1features %>% filter(table1features$Class == "Condition")
-
 #set this up first to speed up loop for grabbing diseases
 cdm$condition_occurrence2 <- Pop %>%
   select("person_id") %>%
@@ -595,6 +594,168 @@ if (grepl("CPRD", db.name) == TRUE){
   Pophan <-Pophan %>%
     filter(!is.na(observation_period_end_date)) 
   
+  # get the co morbidites and medication usage for subset of cohort ----
+  #set this up first to speed up loop for grabbing diseases
+  cdm$condition_occurrence3 <- Pophan %>%
+    select("person_id") %>%
+    inner_join(cdm$condition_occurrence, by = "person_id", copy = TRUE) %>%
+    compute()
+  
+  # conditions (any time in history)
+  for(i in seq_along(table1features_conditions$Name)){
+    
+    working_id_name <- glue::glue("{table1features_conditions$Name[[i]]}")
+    working_concept_id <- table1features_conditions$Concept_ID[i]
+    
+    #get the feature and its descendants
+    feature.codes<-tbl(db, sql("SELECT * FROM concept_ancestor")) %>% 
+      filter(ancestor_concept_id == working_concept_id) %>% 
+      collect()
+    
+    Pop <- 
+      Pop %>% 
+      left_join(Pop %>% 
+                  select("person_id", "outcome_start_date") %>% 
+                  inner_join(cdm$condition_occurrence3 %>% 
+                               select("person_id","condition_concept_id", "condition_start_date") %>%
+                               filter(condition_concept_id %in% !!feature.codes$descendant_concept_id),
+                             by=c("person_id"), copy = TRUE, multiple = "all") %>% 
+                  filter(condition_start_date < outcome_start_date) %>% 
+                  select(person_id) %>% 
+                  distinct() %>% 
+                  mutate(!!working_id_name:=1),
+                by="person_id")  %>% 
+      compute()
+    
+    print(paste0("Getting features for ", table1features_conditions$Description[i], " (" , i , " of ", length(table1features_conditions$Name), ")")) 
+    
+  }
+  
+  # conditions (other cancers)
+  for(i in seq_along(outcome_cohorts$cohort_name)){
+    
+    working_name <- glue::glue("{outcome_cohorts_han$cohort_name[[i]]}")
+    working_id <- outcome_cohorts_han$cohort_definition_id[[i]]
+    Pophan <- 
+      Pophan %>% 
+      left_join(
+        Pophan %>% 
+          select("person_id", "cohort_start_date") %>% 
+          inner_join(cdm[[outcome_table_name]] %>% 
+                       rename("feature_start_date"="cohort_start_date") %>% 
+                       filter(cohort_definition_id== working_id ) %>% 
+                       select(!c(cohort_definition_id,
+                                 cohort_end_date)),
+                     by=c("person_id" = "subject_id"), copy = TRUE) %>% 
+          filter(feature_start_date < cohort_start_date) %>% 
+          select(person_id) %>% 
+          distinct() %>% 
+          mutate(!!working_name:=1),
+        by="person_id")  %>% 
+      compute()
+    
+  }
+  
+  
+  #set this up first to speed up loop for grabbing diseases
+  cdm$drug_exposure3 <- Pophan %>%
+    select("person_id") %>%
+    inner_join(cdm$drug_exposure, by = "person_id", copy = TRUE, multiple = "all") %>%
+    compute()
+  
+  # medications (3 months before index date)
+  for(i in seq_along(table1features_drugs$Name)){
+    
+    working_id_name <- glue::glue("{table1features_drugs$Name[[i]]}")
+    working_concept_id <- table1features_drugs$Concept_ID[i]
+    
+    #get the feature and its descendants
+    feature.codes<-tbl(db, sql("SELECT * FROM concept_ancestor")) %>% 
+      filter(ancestor_concept_id == working_concept_id) %>% 
+      collect()
+    
+    Pophan <-
+      Pophan %>%
+      left_join(
+        Pophan %>%
+          select("person_id", "outcome_start_date") %>% 
+          inner_join(cdm$drug_exposure3 %>% 
+                       select("person_id","drug_concept_id", "drug_exposure_start_date", "drug_exposure_end_date") %>%
+                       filter(drug_concept_id %in% !!feature.codes$descendant_concept_id),
+                     by=c("person_id"), copy = TRUE, multiple = "all") %>% 
+          filter(
+            # overlapping
+            (drug_exposure_start_date <= (outcome_start_date-lubridate::days(-1)) &
+               drug_exposure_end_date >= (outcome_start_date-lubridate::days(-1))) |
+              # ending in window
+              (drug_exposure_start_date >= (outcome_start_date-lubridate::days(90)) &
+                 drug_exposure_end_date <= (outcome_start_date-lubridate::days(-1)))) %>%
+          select(person_id) %>%
+          distinct() %>%
+          mutate(!!working_id_name:=1),
+        by="person_id") %>%
+      compute()
+    
+    print(paste0("Getting features for ", table1features_drugs$Description[i], " (" , i , " of ", length(table1features_drugs$Name), ")")) 
+    
+  }
+  
+  # get GP number of visits the year prior to diagnosis
+  Pophan <- Pophan %>%
+    left_join(
+      Pophan %>% 
+        select("person_id", "outcome_start_date") %>% 
+        inner_join(cdm$visit_occurrence %>% 
+                     filter(!visit_concept_id %in% ip.codes.w.desc) %>% 
+                     filter(visit_start_date > (as.Date(studyStartDate) - lubridate::days(365))) %>%
+                     select("person_id", "visit_start_date") %>% 
+                     compute(),
+                   by=c("person_id"), copy = TRUE, multiple = "all") %>% 
+        filter(visit_start_date < outcome_start_date &
+                 visit_start_date >= (outcome_start_date- lubridate::days(365))) %>% 
+        select("person_id") %>% 
+        group_by(person_id) %>% 
+        tally(name = "outpatient_vist") %>% 
+        mutate(outpatient_vist = as.numeric(outpatient_vist)), 
+      by="person_id") %>% 
+    compute()
+  Pophan  <- Pophan %>% 
+    mutate(outpatient_vist=ifelse(is.na(outpatient_vist), 0, outpatient_vist))
+  
+  # Prior history from date of diagnosis from start of observation period
+  Pophan  <- Pophan %>% 
+    mutate(Prior_history_days = as.numeric(outcome_start_date - observation_period_start_date ))
+  
+  # Prior history from date of diagnosis (from 1 jan 2001)
+  Pophan  <- Pophan %>% 
+    mutate(Prior_history_days_study_start = as.numeric(as.Date(cohort_start_date) - observation_period_start_date ))
+  
+  # calculate Follow up - calculate end of observation period
+  Pophan <- Pophan %>%
+    mutate(endOfObservation = ifelse(observation_period_end_date >= studyEndDate, studyEndDate, NA)) %>%
+    mutate(endOfObservation = as.Date(endOfObservation) ) %>%
+    mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
+  
+  # calculate follow up in years and days
+  Pophan <-Pophan %>%
+    mutate(time_days=as.numeric(difftime(endOfObservation,
+                                         outcome_start_date,
+                                         units="days"))) %>%
+    mutate(time_years=time_days/365.25)
+  
+  # binary death outcome (for survival) ---
+  # need to take into account follow up
+  # if death date is > database end data set death to 0
+  Pophan <- Pophan %>%
+    mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
+    mutate(status= ifelse(death_date > endOfObservation , 1, status )) %>%
+    mutate(status= ifelse(is.na(status), 1, status )) %>%
+    mutate(Death = recode(status, 
+                          "1" = "Alive", 
+                          "2" = "Dead"))
+  
+  # tidy up results for table 1
+  
   # conditions (any time in history)
   for(i in seq_along(table1features_conditions$Name)){
     
@@ -686,40 +847,6 @@ if (grepl("CPRD", db.name) == TRUE){
     print(paste0("Getting features for ", table1features_drugs$Description[i], " (" , i , " of ", length(table1features_drugs$Name), ")")) 
     
   }
-  
-  # get GP number of visits the year prior to diagnosis
-  ip.codes<-c(9201, 262)
-  # add all descendants
-  ip.codes.w.desc<-cdm$concept_ancestor %>%
-    filter(ancestor_concept_id  %in% ip.codes ) %>% 
-    collect() %>% 
-    select(descendant_concept_id) %>% 
-    distinct() %>% 
-    pull()
-  
-  Pophan <- Pophan %>%
-    left_join(
-      Pophan %>% 
-        select("person_id", "outcome_start_date") %>% 
-        inner_join(cdm$visit_occurrence %>% 
-                     filter(!visit_concept_id %in% ip.codes.w.desc) %>% 
-                     select("person_id", "visit_start_date") %>% 
-                     compute(),
-                   by=c("person_id"), copy = TRUE) %>% 
-        filter(visit_start_date < outcome_start_date &
-                 visit_start_date >= (outcome_start_date- lubridate::days(365))) %>% 
-        select("person_id") %>% 
-        group_by(person_id) %>% 
-        tally(name = "outpatient_vist") %>% 
-        mutate(outpatient_vist = as.numeric(outpatient_vist)), 
-      by="person_id") %>% 
-    compute()
-  Pophan  <- Pophan %>% 
-    mutate(outpatient_vist=ifelse(is.na(outpatient_vist), 0, outpatient_vist))
-  
-  # Prior history from date of diagnosis (from 1 jan 2001)
-  Pophan  <- Pophan %>% 
-    mutate(Prior_history_days = as.numeric(outcome_start_date - observation_period_start_date ))
   
   # get a list to put results into
   table1Characteristics_han <- list()
