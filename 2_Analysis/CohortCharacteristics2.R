@@ -181,40 +181,37 @@ Pop <- Pop %>%
 Pop <-Pop %>%
   filter(!is.na(observation_period_end_date))
 
-# get the co morbidites and medication usage for subset of cohort ----
-# conditions (any time in history)
-for(i in seq_along(table1features_conditions$Name)){
-  
-  working_id_name <- glue::glue("{table1features_conditions$Name[[i]]}")
-  working_concept_id <- table1features_conditions$Concept_ID[i]
-  
-  #get the feature and its descendants
-  feature.codes<-tbl(db, sql("SELECT * FROM concept_ancestor")) %>% 
-    filter(ancestor_concept_id == working_concept_id) %>% 
-    collect()
-  
-  Pop <- 
-    Pop %>% 
-    left_join(Pop %>% 
+# medications (3 months before index date)
+for(i in seq_along(medication_cohorts$cohortId)){
+  working_name <- glue::glue("{medication_cohorts$cohortName[[i]]}")
+  working_id <- medication_cohorts$cohortId[[i]]
+  Pop <-
+    Pop %>%
+    left_join(
+      Pop %>%
         select("person_id", "outcome_start_date") %>% 
-        inner_join(cdm$condition_occurrence %>% 
-                  select("person_id","condition_concept_id", "condition_start_date") %>%
-                  filter(condition_concept_id %in% !!feature.codes$descendant_concept_id),
-                  by=c("person_id"), copy = TRUE, multiple = "all") %>% 
-        filter(condition_start_date < outcome_start_date) %>% 
-        select(person_id) %>% 
-        distinct() %>% 
-        mutate(!!working_id_name:=1),
-      by="person_id")  %>% 
+        inner_join(cdm[[feature_medication_table_name]] %>%
+                     rename("feature_start_date"="cohort_start_date") %>%
+                     rename("feature_end_date"="cohort_end_date") %>%
+                     filter(cohort_definition_id== working_id ) %>%
+                     select(!cohort_definition_id),
+                   by=c("person_id" = "subject_id"), copy = TRUE) %>% 
+        filter(
+          # overlapping
+          (feature_start_date <= (outcome_start_date-days(-1)) &
+             feature_end_date >= (outcome_start_date-days(-1))) |
+            # ending in window
+            (feature_end_date >= (outcome_start_date-days(90)) &
+               feature_end_date <= (outcome_start_date-days(-1)))) %>%
+        select(person_id) %>%
+        distinct() %>%
+        mutate(!!working_name:=1),
+      by="person_id") %>%
     compute()
-  
-  print(paste0("Getting features for ", table1features_conditions$Description[i], " (" , i , " of ", length(table1features_conditions$Name), ")")) 
-  
 }
 
 # conditions (other cancers)
 for(i in seq_along(outcome_cohorts$cohort_name)){
-  
   working_name <- glue::glue("{outcome_cohorts$cohort_name[[i]]}")
   working_id <- outcome_cohorts$cohort_definition_id[[i]]
   Pop <- 
@@ -237,40 +234,28 @@ for(i in seq_along(outcome_cohorts$cohort_name)){
   
 }
 
-# medications (3 months before index date)
-for(i in seq_along(table1features_drugs$Name)){
+# conditions (any time in history)
+for(i in seq_along(disease_cohorts$cohortId)){
   
-  working_id_name <- glue::glue("{table1features_drugs$Name[[i]]}")
-  working_concept_id <- table1features_drugs$Concept_ID[i]
-  
-  #get the feature and its descendants
-  feature.codes<-tbl(db, sql("SELECT * FROM concept_ancestor")) %>% 
-    filter(ancestor_concept_id == working_concept_id) %>% 
-    collect()
-  
-  Pop <-
-    Pop %>%
+  working_name <- glue::glue("{disease_cohorts$cohortName[[i]]}")
+  working_id <- disease_cohorts$cohortId[[i]]
+  Pop <- 
+    Pop %>% 
     left_join(
-      Pop %>%
+      Pop %>% 
         select("person_id", "outcome_start_date") %>% 
-        inner_join(cdm$drug_exposure %>% 
-                     select("person_id","drug_concept_id", "drug_exposure_start_date", "drug_exposure_end_date") %>%
-                     filter(drug_concept_id %in% !!feature.codes$descendant_concept_id),
-                   by=c("person_id"), copy = TRUE, multiple = "all") %>% 
-        filter(
-          # overlapping
-          (drug_exposure_start_date <= (outcome_start_date-lubridate::days(-1)) &
-             drug_exposure_end_date >= (outcome_start_date-lubridate::days(-1))) |
-            # ending in window
-            (drug_exposure_start_date >= (outcome_start_date-lubridate::days(90)) &
-               drug_exposure_end_date <= (outcome_start_date-lubridate::days(-1)))) %>%
-        select(person_id) %>%
-        distinct() %>%
-        mutate(!!working_id_name:=1),
-      by="person_id") %>%
+        inner_join(cdm[[feature_disease_table_name]] %>% 
+                     rename("feature_start_date"="cohort_start_date") %>% 
+                     filter(cohort_definition_id== working_id ) %>% 
+                     select(!c(cohort_definition_id,
+                               cohort_end_date)),
+                   by=c("person_id" = "subject_id"), copy = TRUE) %>% 
+        filter(feature_start_date < outcome_start_date) %>% 
+        select(person_id) %>% 
+        distinct() %>% 
+        mutate(!!working_name:=1),
+      by="person_id")  %>% 
     compute()
-  
-  print(paste0("Getting features for ", table1features_drugs$Description[i], " (" , i , " of ", length(table1features_drugs$Name), ")")) 
   
 }
 
@@ -620,34 +605,33 @@ if (grepl("CPRD", db.name) == TRUE){
   
   # get the co morbidites and medication usage for subset of cohort ----
   
-  # conditions (any time in history)
-  for(i in seq_along(table1features_conditions$Name)){
-    
-    working_id_name <- glue::glue("{table1features_conditions$Name[[i]]}")
-    working_concept_id <- table1features_conditions$Concept_ID[i]
-    
-    #get the feature and its descendants
-    feature.codes<-tbl(db, sql("SELECT * FROM concept_ancestor")) %>% 
-      filter(ancestor_concept_id == working_concept_id) %>% 
-      collect()
-    
-    Pophan <- 
-      Pophan %>% 
-      left_join(Pophan %>% 
-                  select("person_id", "outcome_start_date") %>% 
-                  inner_join(cdm$condition_occurrence %>% 
-                               select("person_id","condition_concept_id", "condition_start_date") %>%
-                               filter(condition_concept_id %in% !!feature.codes$descendant_concept_id),
-                             by=c("person_id"), copy = TRUE, multiple = "all") %>% 
-                  filter(condition_start_date < outcome_start_date) %>% 
-                  select(person_id) %>% 
-                  distinct() %>% 
-                  mutate(!!working_id_name:=1),
-                by="person_id")  %>% 
+  # medications (3 months before index date)
+  for(i in seq_along(medication_cohorts$cohortId)){
+    working_name <- glue::glue("{medication_cohorts$cohortName[[i]]}")
+    working_id <- medication_cohorts$cohortId[[i]]
+    Pophan <-
+      Pophan %>%
+      left_join(
+        Pophan %>%
+          select("person_id", "outcome_start_date") %>% 
+          inner_join(cdm[[feature_medication_table_name]] %>%
+                       rename("feature_start_date"="cohort_start_date") %>%
+                       rename("feature_end_date"="cohort_end_date") %>%
+                       filter(cohort_definition_id== working_id ) %>%
+                       select(!cohort_definition_id),
+                     by=c("person_id" = "subject_id"), copy = TRUE) %>% 
+          filter(
+            # overlapping
+            (feature_start_date <= (outcome_start_date-days(-1)) &
+               feature_end_date >= (outcome_start_date-days(-1))) |
+              # ending in window
+              (feature_end_date >= (outcome_start_date-days(90)) &
+                 feature_end_date <= (outcome_start_date-days(-1)))) %>%
+          select(person_id) %>%
+          distinct() %>%
+          mutate(!!working_name:=1),
+        by="person_id") %>%
       compute()
-    
-    print(paste0("Getting features for ", table1features_conditions$Description[i], " (" , i , " of ", length(table1features_conditions$Name), ")")) 
-    
   }
   
   # conditions (other cancers)
@@ -675,42 +659,31 @@ if (grepl("CPRD", db.name) == TRUE){
     
   }
   
-  # medications (3 months before index date)
-  for(i in seq_along(table1features_drugs$Name)){
+  # conditions (any time in history)
+  for(i in seq_along(disease_cohorts$cohortId)){
     
-    working_id_name <- glue::glue("{table1features_drugs$Name[[i]]}")
-    working_concept_id <- table1features_drugs$Concept_ID[i]
-    
-    #get the feature and its descendants
-    feature.codes<-tbl(db, sql("SELECT * FROM concept_ancestor")) %>% 
-      filter(ancestor_concept_id == working_concept_id) %>% 
-      collect()
-    
-    Pophan <-
-      Pophan %>%
+    working_name <- glue::glue("{disease_cohorts$cohortName[[i]]}")
+    working_id <- disease_cohorts$cohortId[[i]]
+    Pophan <- 
+      Pophan %>% 
       left_join(
-        Pophan %>%
+        Pophan %>% 
           select("person_id", "outcome_start_date") %>% 
-          inner_join(cdm$drug_exposure %>% 
-                       select("person_id","drug_concept_id", "drug_exposure_start_date", "drug_exposure_end_date") %>%
-                       filter(drug_concept_id %in% !!feature.codes$descendant_concept_id),
-                     by=c("person_id"), copy = TRUE, multiple = "all") %>% 
-          filter(
-            # overlapping
-            (drug_exposure_start_date <= (outcome_start_date-lubridate::days(-1)) &
-               drug_exposure_end_date >= (outcome_start_date-lubridate::days(-1))) |
-              # ending in window
-              (drug_exposure_start_date >= (outcome_start_date-lubridate::days(90)) &
-                 drug_exposure_end_date <= (outcome_start_date-lubridate::days(-1)))) %>%
-          select(person_id) %>%
-          distinct() %>%
-          mutate(!!working_id_name:=1),
-        by="person_id") %>%
+          inner_join(cdm[[feature_disease_table_name]] %>% 
+                       rename("feature_start_date"="cohort_start_date") %>% 
+                       filter(cohort_definition_id== working_id ) %>% 
+                       select(!c(cohort_definition_id,
+                                 cohort_end_date)),
+                     by=c("person_id" = "subject_id"), copy = TRUE) %>% 
+          filter(feature_start_date < outcome_start_date) %>% 
+          select(person_id) %>% 
+          distinct() %>% 
+          mutate(!!working_name:=1),
+        by="person_id")  %>% 
       compute()
     
-    print(paste0("Getting features for ", table1features_drugs$Description[i], " (" , i , " of ", length(table1features_drugs$Name), ")")) 
-    
   }
+  
   
   # get GP number of visits the year prior to diagnosis
   Pophan <- Pophan %>%
