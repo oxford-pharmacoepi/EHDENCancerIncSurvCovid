@@ -7,16 +7,52 @@ start <-Sys.time()
 print(paste0("- Getting cohort characteristics: cancer populations"))
 info(logger, "- Getting cohort characteristics: cancer populations")
 
-# read in table containing list for feature for table 1
-table1features <- read_csv(
-  here::here(
-    "1_InstantiateCohorts",
-    "Table1Features.csv"))
+#instantiate feature disease and medication cohorts
+#instantiate feature cohorts (disease)
+info(logger, "- getting feature for diseases definitions")
 
-# split into drugs and conditions
-table1features_drugs <- table1features %>% filter(table1features$Class == "Drug")
+disease_cohorts <- readCohortSet(here(
+  "1_InstantiateCohorts",
+  "ConditionFeatureCohorts"
+))
 
-table1features_conditions <- table1features %>% filter(table1features$Class == "Condition")
+info(logger, "- getting features: diseases")
+
+cdm <- generateCohortSet(cdm, disease_cohorts,
+                         cohortTableName = feature_disease_table_name,
+                         overwrite = TRUE
+)
+
+info(logger, "- got features for diseases")
+
+# instantiate feature cohorts (medications)
+info(logger, "- getting feature for medications definitions")
+
+medication_cohorts <- readCohortSet(here(
+  "1_InstantiateCohorts",
+  "MedicationFeatureCohorts"
+))
+
+info(logger, "- getting features: medications")
+
+cdm <- generateCohortSet(cdm, medication_cohorts,
+                         cohortTableName = feature_medication_table_name,
+                         overwrite = TRUE
+)
+
+info(logger, "- got features for medications")
+
+
+# # read in table containing list for feature for table 1
+# table1features <- read_csv(
+#   here::here(
+#     "1_InstantiateCohorts",
+#     "Table1Features.csv"))
+# 
+# # split into drugs and conditions
+# table1features_drugs <- table1features %>% filter(table1features$Class == "Drug")
+# 
+# table1features_conditions <- table1features %>% filter(table1features$Class == "Condition")
 
 # get denominator to get participants
 cdm$denominatordemo <- generateDenominatorCohortSet(
