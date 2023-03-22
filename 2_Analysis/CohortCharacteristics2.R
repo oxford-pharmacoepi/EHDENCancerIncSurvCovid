@@ -18,10 +18,12 @@ disease_cohorts <- readCohortSet(here(
 
 info(logger, "- getting features: diseases")
 
-cdm <- generateCohortSet(cdm, disease_cohorts,
-                         cohortTableName = feature_disease_table_name,
+cdm <- generateCohortSet(cdm, 
+                         cohortSet = disease_cohorts,
+                         name = feature_disease_table_name,
                          overwrite = TRUE
 )
+
 
 info(logger, "- got features for diseases")
 
@@ -35,8 +37,9 @@ medication_cohorts <- readCohortSet(here(
 
 info(logger, "- getting features: medications")
 
-cdm <- generateCohortSet(cdm, medication_cohorts,
-                         cohortTableName = feature_medication_table_name,
+cdm <- generateCohortSet(cdm, 
+                         cohortSet = medication_cohorts,
+                         name = feature_medication_table_name,
                          overwrite = TRUE
 )
 
@@ -182,9 +185,9 @@ Pop <-Pop %>%
   filter(!is.na(observation_period_end_date))
 
 # medications (3 months before index date)
-for(i in seq_along(medication_cohorts$cohortId)){
-  working_name <- glue::glue("{medication_cohorts$cohortName[[i]]}")
-  working_id <- medication_cohorts$cohortId[[i]]
+for(i in seq_along(medication_cohorts$cohort_name)){
+  working_name <- glue::glue("{medication_cohorts$cohort_name[[i]]}")
+  working_id <- medication_cohorts$cohort_definition_id[[i]]
   Pop <-
     Pop %>%
     left_join(
@@ -198,11 +201,11 @@ for(i in seq_along(medication_cohorts$cohortId)){
                    by=c("person_id" = "subject_id"), copy = TRUE) %>% 
         filter(
           # overlapping
-          (feature_start_date <= (outcome_start_date-days(-1)) &
-             feature_end_date >= (outcome_start_date-days(-1))) |
+          (feature_start_date <= (outcome_start_date-lubridate::days(-1)) &
+             feature_end_date >= (outcome_start_date-lubridate::days(-1))) |
             # ending in window
-            (feature_end_date >= (outcome_start_date-days(90)) &
-               feature_end_date <= (outcome_start_date-days(-1)))) %>%
+            (feature_end_date >= (outcome_start_date-lubridate::days(90)) &
+               feature_end_date <= (outcome_start_date-lubridate::days(-1)))) %>%
         select(person_id) %>%
         distinct() %>%
         mutate(!!working_name:=1),
@@ -235,10 +238,10 @@ for(i in seq_along(outcome_cohorts$cohort_name)){
 }
 
 # conditions (any time in history)
-for(i in seq_along(disease_cohorts$cohortId)){
+for(i in seq_along(disease_cohorts$cohort_definition_id)){
   
-  working_name <- glue::glue("{disease_cohorts$cohortName[[i]]}")
-  working_id <- disease_cohorts$cohortId[[i]]
+  working_name <- glue::glue("{disease_cohorts$cohort_name[[i]]}")
+  working_id <- disease_cohorts$cohort_definition_id[[i]]
   Pop <- 
     Pop %>% 
     left_join(
@@ -420,8 +423,8 @@ get_summary_characteristics<-function(data){
                                            nice.num.count(quantile(outpatient_vist,probs=0.75)))) %>% 
       mutate(var="outpatient vists"))
   
-  for(i in seq_along(table1features_conditions$Name)){
-    working_id_name <- glue::glue("{table1features_conditions$Name[[i]]}")
+  for(i in seq_along(disease_cohorts$cohort_name)){
+    working_id_name <- glue::glue("{disease_cohorts$cohort_name[[i]]}")
     summary_characteristics <- bind_rows(summary_characteristics,
                                          data %>% 
                                            summarise(n=sum(!is.na(!!rlang::sym(working_id_name))),
@@ -440,8 +443,8 @@ get_summary_characteristics<-function(data){
     )
   }
   
-  for(i in seq_along(table1features_drugs$Name)){
-    working_id_name <- glue::glue("{table1features_drugs$Name[[i]]}")
+  for(i in seq_along(medication_cohorts$cohort_name)){
+    working_id_name <- glue::glue("{medication_cohorts$cohort_name[[i]]}")
     summary_characteristics <- bind_rows(summary_characteristics,
                                          data %>% 
                                            summarise(n=sum(!is.na(!!rlang::sym(working_id_name))),
@@ -604,11 +607,10 @@ if (grepl("CPRD", db.name) == TRUE){
     filter(!is.na(observation_period_end_date)) 
   
   # get the co morbidites and medication usage for subset of cohort ----
-  
   # medications (3 months before index date)
-  for(i in seq_along(medication_cohorts$cohortId)){
-    working_name <- glue::glue("{medication_cohorts$cohortName[[i]]}")
-    working_id <- medication_cohorts$cohortId[[i]]
+  for(i in seq_along(medication_cohorts$cohort_definition_id)){
+    working_name <- glue::glue("{medication_cohorts$cohort_name[[i]]}")
+    working_id <- medication_cohorts$cohort_definition_id[[i]]
     Pophan <-
       Pophan %>%
       left_join(
@@ -622,11 +624,11 @@ if (grepl("CPRD", db.name) == TRUE){
                      by=c("person_id" = "subject_id"), copy = TRUE) %>% 
           filter(
             # overlapping
-            (feature_start_date <= (outcome_start_date-days(-1)) &
-               feature_end_date >= (outcome_start_date-days(-1))) |
+            (feature_start_date <= (outcome_start_date-lubridate::days(-1)) &
+               feature_end_date >= (outcome_start_date-lubridate::days(-1))) |
               # ending in window
-              (feature_end_date >= (outcome_start_date-days(90)) &
-                 feature_end_date <= (outcome_start_date-days(-1)))) %>%
+              (feature_end_date >= (outcome_start_date-lubridate::days(90)) &
+                 feature_end_date <= (outcome_start_date-lubridate::days(-1)))) %>%
           select(person_id) %>%
           distinct() %>%
           mutate(!!working_name:=1),
@@ -635,16 +637,15 @@ if (grepl("CPRD", db.name) == TRUE){
   }
   
   # conditions (other cancers)
-  for(i in seq_along(outcome_cohorts_han$cohort_name)){
-    
-    working_name <- glue::glue("{outcome_cohorts_han$cohort_name[[i]]}")
-    working_id <- outcome_cohorts_han$cohort_definition_id[[i]]
+  for(i in seq_along(outcome_cohorts$cohort_name)){
+    working_name <- glue::glue("{outcome_cohorts$cohort_name[[i]]}")
+    working_id <- outcome_cohorts$cohort_definition_id[[i]]
     Pophan <- 
       Pophan %>% 
       left_join(
         Pophan %>% 
           select("person_id", "cohort_start_date") %>% 
-          inner_join(cdm[[outcome_table_name_han]] %>% 
+          inner_join(cdm[[outcome_table_name]] %>% 
                        rename("feature_start_date"="cohort_start_date") %>% 
                        filter(cohort_definition_id== working_id ) %>% 
                        select(!c(cohort_definition_id,
@@ -660,10 +661,10 @@ if (grepl("CPRD", db.name) == TRUE){
   }
   
   # conditions (any time in history)
-  for(i in seq_along(disease_cohorts$cohortId)){
+  for(i in seq_along(disease_cohorts$cohort_definition_id)){
     
-    working_name <- glue::glue("{disease_cohorts$cohortName[[i]]}")
-    working_id <- disease_cohorts$cohortId[[i]]
+    working_name <- glue::glue("{disease_cohorts$cohort_name[[i]]}")
+    working_id <- disease_cohorts$cohort_definition_id[[i]]
     Pophan <- 
       Pophan %>% 
       left_join(
@@ -739,148 +740,6 @@ if (grepl("CPRD", db.name) == TRUE){
                           "1" = "Alive", 
                           "2" = "Dead"))
   
-  
-  get_summary_characteristics_han <-function(data){
-    
-    summary_characteristics<- bind_rows(
-      data %>% 
-        count() %>% 
-        mutate(var="N"),
-      
-      data %>% 
-        summarise(mean=nice.num.count(mean(age)),
-                  standard_deviation = nice.num(sd(age)),
-                  median = nice.num(median(age)),
-                  interquartile_range=paste0(nice.num.count(quantile(age,probs=0.25)),  " to ",
-                                             nice.num.count(quantile(age,probs=0.75)))) %>% 
-        mutate(var="age"),
-      
-      data %>% 
-        group_by(age_gr) %>% 
-        summarise(n=n(),
-                  percent=paste0(nice.num((n/nrow(data))*100),  "%")) %>%   
-        rename("var"="age_gr") %>% 
-        mutate(var=paste0("Age group: ", var)),
-      
-      data %>% 
-        mutate(gender=factor(gender, levels=c("Male", "Female"))) %>% 
-        group_by(gender) %>% 
-        summarise(n=n(),
-                  percent=paste0(nice.num((n/nrow(data))*100),  "%")) %>%   
-        rename("var"="gender") %>% 
-        mutate(var=paste0("Sex: ", var)),
-      
-      data %>% 
-        mutate(Death=factor(Death, levels=c("Alive", "Dead"))) %>% 
-        group_by(Death) %>% 
-        summarise(n=n(),
-                  percent=paste0(nice.num((n/nrow(data))*100),  "%")) %>%   
-        rename("var"="Death") %>% 
-        mutate(var=paste0("Death: ", var)),
-      
-      data %>% 
-        summarise(mean=nice.num.count(mean(Prior_history_days)),
-                  standard_deviation = nice.num(sd(Prior_history_days)),
-                  median = nice.num(median(Prior_history_days)),
-                  interquartile_range=paste0(nice.num.count(quantile(Prior_history_days,probs=0.25)),  " to ",
-                                             nice.num.count(quantile(Prior_history_days,probs=0.75)))) %>% 
-        mutate(var="Prior_history_days"),
-      
-      data %>% 
-        summarise(mean=nice.num.count(mean((Prior_history_days/365.25))),
-                  standard_deviation = nice.num(sd((Prior_history_days/365.25))),
-                  median = nice.num(median((Prior_history_days/365.25))),
-                  interquartile_range=paste0(nice.num.count(quantile((Prior_history_days/365.25),probs=0.25)),  " to ",
-                                             nice.num.count(quantile((Prior_history_days/365.25),probs=0.75)))) %>% 
-        mutate(var="Prior_history_years"),
-      
-      data %>% 
-        summarise(mean=nice.num.count(mean(Prior_history_days_study_start)),
-                  standard_deviation = nice.num(sd(Prior_history_days_study_start)),
-                  median = nice.num(median(Prior_history_days_study_start)),
-                  interquartile_range=paste0(nice.num.count(quantile(Prior_history_days_study_start,probs=0.25)),  " to ",
-                                             nice.num.count(quantile(Prior_history_days_study_start,probs=0.75)))) %>% 
-        mutate(var="Prior_history_days_study_start"),
-      
-      data %>% 
-        summarise(mean=nice.num.count(mean((Prior_history_days_study_start/365.25))),
-                  standard_deviation = nice.num(sd((Prior_history_days_study_start/365.25))),
-                  median = nice.num(median((Prior_history_days_study_start/365.25))),
-                  interquartile_range=paste0(nice.num.count(quantile((Prior_history_days_study_start/365.25),probs=0.25)),  " to ",
-                                             nice.num.count(quantile((Prior_history_days_study_start/365.25),probs=0.75)))) %>% 
-        mutate(var="Prior_history_years_start"),
-      
-      
-      data %>% 
-        summarise(mean=nice.num.count(mean(time_days)),
-                  standard_deviation = nice.num(sd(time_days)),
-                  median = nice.num(median(time_days)),
-                  interquartile_range=paste0(nice.num.count(quantile(time_days,probs=0.25)),  " to ",
-                                             nice.num.count(quantile(time_days,probs=0.75)))) %>% 
-        mutate(var="time_days"),
-      
-      data %>% 
-        summarise(mean=nice.num.count(mean((time_years))),
-                  standard_deviation = nice.num(sd((time_years))),
-                  median = nice.num(median((time_years))),
-                  interquartile_range=paste0(nice.num.count(quantile((time_years),probs=0.25)),  " to ",
-                                             nice.num.count(quantile((time_years),probs=0.75)))) %>% 
-        mutate(var="time_years"),
-      
-      
-      data %>% 
-        summarise(mean=nice.num.count(mean(outpatient_vist)),
-                  standard_deviation = nice.num(sd(outpatient_vist)),
-                  median = nice.num(median(outpatient_vist)),
-                  interquartile_range=paste0(nice.num.count(quantile(outpatient_vist,probs=0.25)),  " to ",
-                                             nice.num.count(quantile(outpatient_vist,probs=0.75)))) %>% 
-        mutate(var="outpatient vists"))
-    
-    for(i in seq_along(table1features_conditions$Name)){
-      working_id_name <- glue::glue("{table1features_conditions$Name[[i]]}")
-      summary_characteristics <- bind_rows(summary_characteristics,
-                                           data %>% 
-                                             summarise(n=sum(!is.na(!!rlang::sym(working_id_name))),
-                                                       percent=paste0(nice.num((n/nrow(data))*100),  "%"))%>% 
-                                             mutate(var=working_id_name)
-      )
-    }
-    
-    for(i in seq_along(outcome_cohorts_han$cohort_name)){
-      working_name <- glue::glue("{outcome_cohorts_han$cohort_name[[i]]}")
-      summary_characteristics <- bind_rows(summary_characteristics,
-                                           data %>% 
-                                             summarise(n=sum(!is.na(!!rlang::sym(working_name))),
-                                                       percent=paste0(nice.num((n/nrow(data))*100),  "%"))%>% 
-                                             mutate(var=working_name)
-      )
-    }
-    
-    for(i in seq_along(table1features_drugs$Name)){
-      working_id_name <- glue::glue("{table1features_drugs$Name[[i]]}")
-      summary_characteristics <- bind_rows(summary_characteristics,
-                                           data %>% 
-                                             summarise(n=sum(!is.na(!!rlang::sym(working_id_name))),
-                                                       percent=paste0(nice.num((n/nrow(data))*100),  "%"))%>% 
-                                             mutate(var=working_id_name)
-      )
-    }
-    
-    # filter any less than 5
-    summary_characteristics <- summary_characteristics %>% 
-      mutate(mean=ifelse(!is.na(n) & n<5, NA, mean)) %>% 
-      mutate(percent=ifelse(!is.na(n) & n<5, NA, percent)) %>% 
-      mutate(interquartile_range=ifelse(!is.na(n) & n<5, NA, interquartile_range)) %>% 
-      mutate(standard_deviation=ifelse(!is.na(n) & n<5, NA, standard_deviation)) %>% 
-      mutate(n=ifelse(!is.na(n) & n<5, "<5", n))
-    
-    return(summary_characteristics %>% 
-             relocate(any_of(c("var", "n", "percent",
-                               "mean", "standard_deviation",
-                               "median", "interquartile_range"))))
-    
-  }
-  
   # tidy up results for table 1
   # get a list to put results into
   table1Characteristics_han <- list()
@@ -888,7 +747,7 @@ if (grepl("CPRD", db.name) == TRUE){
   #create a loop that puts table 1 for each outcome
   for(j in seq_along(outcome_cohorts_han$cohort_definition_id)){
     
-    table1Characteristics_han[[j]] <- get_summary_characteristics_han(Pophan %>% 
+    table1Characteristics_han[[j]] <- get_summary_characteristics(Pophan %>% 
                                                                 filter(outcome_cohort_name==outcome_cohorts_han$cohort_name[[j]])) %>%
       mutate(Cancer = outcome_cohorts_han$cohort_name[[j]])
     
