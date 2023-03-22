@@ -157,7 +157,7 @@ for(j in 1:nrow(outcomeCohort)) {
 
 # take the results from a list (one element for each cancer) and put into dataframe for KM survival
 observedkmcombined <- dplyr::bind_rows(observedkm) %>%
-  rename(est = estimate ,ucl = conf.high, lcl = conf.low ) %>%
+  rename(est = estimate , ucl = conf.high, lcl = conf.low ) %>%
   mutate(Stratification = "None")
 
 medkmcombined <- dplyr::bind_rows(observedmedianKM) %>%
@@ -251,8 +251,8 @@ for(j in 1:nrow(outcomeCohort)) {
     #grab survival probabilities 1,5,10 years
     sprob <- survfit(Surv(time_years, status) ~ gender, data=data) %>%
       summary(times = c(1,5,10), extend = TRUE)
-
-    cols <- lapply(c(2:15) , function(x) sprob[x])
+    
+    cols <- lapply(c(2:16) , function(x) sprob[x])
     observedsurprobsKM_gender[[j]] <- do.call(data.frame, cols) %>%
       rename(Gender = strata) %>%
       mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All", Gender = str_replace(Gender, "gender=Male", "Male"), Gender = str_replace(Gender,"gender=Female", "Female"))
@@ -365,7 +365,7 @@ for(j in 1:nrow(outcomeCohort)) {
   sprob <- survfit(Surv(time_years, status) ~ age_gr, data=data) %>%
     summary(times = c(1,5,10), extend = TRUE)
   
-  cols <- lapply(c(2:15) , function(x) sprob[x])
+  cols <- lapply(c(2:16) , function(x) sprob[x])
   observedsurprobsKM_age[[j]] <- do.call(data.frame, cols) %>%
     rename(Age = strata) %>%
     mutate(Method = "Kaplan-Meier", 
@@ -529,7 +529,7 @@ for(j in 1:nrow(outcomeCohort)) {
     sprob <- survfit(Surv(time_years, status) ~ genderAgegp, data=data) %>%
       summary(times = c(1,5,10), extend = TRUE)
     
-    cols <- lapply(c(2:15) , function(x) sprob[x])
+    cols <- lapply(c(2:16) , function(x) sprob[x])
     observedsurprobsKM_age_gender[[j]] <- do.call(data.frame, cols) %>%
       mutate(Method = "Kaplan-Meier", 
              Cancer = outcomeCohort$cohort_name[j], 

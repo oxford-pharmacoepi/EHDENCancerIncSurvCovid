@@ -147,10 +147,10 @@ Pop <-Pop %>%
 
 # get the co morbidites and medication usage for subset of cohort ----
 #set this up first to speed up loop for grabbing diseases
-cdm$condition_occurrence2 <- Pop %>%
-  select("person_id") %>%
-  inner_join(cdm$condition_occurrence, by = "person_id", copy = TRUE, multiple = "all") %>%
-  compute()
+# cdm$condition_occurrence2 <- Pop %>%
+#   select("person_id") %>%
+#   inner_join(cdm$condition_occurrence, by = "person_id", copy = TRUE, multiple = "all") %>%
+#   compute()
 
 # conditions (any time in history)
 for(i in seq_along(table1features_conditions$Name)){
@@ -167,7 +167,7 @@ for(i in seq_along(table1features_conditions$Name)){
     Pop %>% 
     left_join(Pop %>% 
         select("person_id", "outcome_start_date") %>% 
-        inner_join(cdm$condition_occurrence2 %>% 
+        inner_join(cdm$condition_occurrence %>% 
                   select("person_id","condition_concept_id", "condition_start_date") %>%
                   filter(condition_concept_id %in% !!feature.codes$descendant_concept_id),
                   by=c("person_id"), copy = TRUE, multiple = "all") %>% 
@@ -208,10 +208,10 @@ for(i in seq_along(outcome_cohorts$cohort_name)){
 }
 
 #set this up first to speed up loop for grabbing diseases
-cdm$drug_exposure2 <- Pop %>%
-  select("person_id") %>%
-  inner_join(cdm$drug_exposure, by = "person_id", copy = TRUE, multiple = "all") %>%
-  compute()
+# cdm$drug_exposure2 <- Pop %>%
+#   select("person_id") %>%
+#   inner_join(cdm$drug_exposure, by = "person_id", copy = TRUE, multiple = "all") %>%
+#   compute()
 
 # medications (3 months before index date)
 for(i in seq_along(table1features_drugs$Name)){
@@ -229,7 +229,7 @@ for(i in seq_along(table1features_drugs$Name)){
     left_join(
       Pop %>%
         select("person_id", "outcome_start_date") %>% 
-        inner_join(cdm$drug_exposure2 %>% 
+        inner_join(cdm$drug_exposure %>% 
                      select("person_id","drug_concept_id", "drug_exposure_start_date", "drug_exposure_end_date") %>%
                      filter(drug_concept_id %in% !!feature.codes$descendant_concept_id),
                    by=c("person_id"), copy = TRUE, multiple = "all") %>% 
@@ -595,10 +595,10 @@ if (grepl("CPRD", db.name) == TRUE){
   
   # get the co morbidites and medication usage for subset of cohort ----
   #set this up first to speed up loop for grabbing diseases
-  cdm$condition_occurrence3 <- Pophan %>%
-    select("person_id") %>%
-    inner_join(cdm$condition_occurrence, by = "person_id", copy = TRUE) %>%
-    compute()
+  # cdm$condition_occurrence3 <- Pophan %>%
+  #   select("person_id") %>%
+  #   inner_join(cdm$condition_occurrence, by = "person_id", copy = TRUE) %>%
+  #   compute()
   
   # conditions (any time in history)
   for(i in seq_along(table1features_conditions$Name)){
@@ -615,7 +615,7 @@ if (grepl("CPRD", db.name) == TRUE){
       Pophan %>% 
       left_join(Pophan %>% 
                   select("person_id", "outcome_start_date") %>% 
-                  inner_join(cdm$condition_occurrence3 %>% 
+                  inner_join(cdm$condition_occurrence %>% 
                                select("person_id","condition_concept_id", "condition_start_date") %>%
                                filter(condition_concept_id %in% !!feature.codes$descendant_concept_id),
                              by=c("person_id"), copy = TRUE, multiple = "all") %>% 
@@ -655,13 +655,6 @@ if (grepl("CPRD", db.name) == TRUE){
     
   }
   
-  
-  #set this up first to speed up loop for grabbing diseases
-  cdm$drug_exposure3 <- Pophan %>%
-    select("person_id") %>%
-    inner_join(cdm$drug_exposure, by = "person_id", copy = TRUE, multiple = "all") %>%
-    compute()
-  
   # medications (3 months before index date)
   for(i in seq_along(table1features_drugs$Name)){
     
@@ -678,7 +671,7 @@ if (grepl("CPRD", db.name) == TRUE){
       left_join(
         Pophan %>%
           select("person_id", "outcome_start_date") %>% 
-          inner_join(cdm$drug_exposure3 %>% 
+          inner_join(cdm$drug_exposure %>% 
                        select("person_id","drug_concept_id", "drug_exposure_start_date", "drug_exposure_end_date") %>%
                        filter(drug_concept_id %in% !!feature.codes$descendant_concept_id),
                      by=c("person_id"), copy = TRUE, multiple = "all") %>% 
