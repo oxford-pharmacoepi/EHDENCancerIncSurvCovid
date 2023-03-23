@@ -836,7 +836,7 @@ server <-	function(input, output, session) {
                              pageLength = 100000000,
                              buttons = list(list(extend = "csv",
                                                  text = "Download results as csv",
-                                                 filename = "survival_median_by_calendaryr"))
+                                                 filename = "survival_rates_by_calendaryr"))
               ))
   } )
   
@@ -886,7 +886,7 @@ server <-	function(input, output, session) {
                              pageLength = 100000000,
                              buttons = list(list(extend = "csv",
                                                  text = "Download results as csv",
-                                                 filename = "survival_median_whole_pop"))
+                                                 filename = "survival_rates_whole_pop"))
               ))
   } )
 
