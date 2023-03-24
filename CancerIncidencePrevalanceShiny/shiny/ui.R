@@ -33,9 +33,9 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                             tags$h4(tags$strong("Please note, the results presented here should be considered as 
                        preliminary and subject to change.")),
                             tags$hr(),
-                            tags$h5("This app is a companion to the study focussing on determining the incidence and prevalence for specific cancers. 
+                            tags$h5("This app is a companion to the study focussing on determining the incidence,prevalence and survival for a variety of different cancers. 
     We will focus on the 9 cancers (Breast, Colorectal, Lung, Liver, Stomach, Head/neck, Prostate, Oesophagus, and Pancreas). 
-    We have used CPRD Aurum and GOLD databases from 2000-2019."),
+    We have used CPRD Aurum and GOLD databases from 2000-2019 for people 18 and over with at least one year of prior observation."),
                             HTML('<br>'),
                             tags$hr()
                    ), 
@@ -579,71 +579,28 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                    ## Population characteristics ------ 
                    tabPanel("Population Characteristics",	  
                             tags$h3("Study Population Characteristics"),
-                            tags$h5("The population characteristics are shown below....TBC"),
+                            tags$h5("The population characteristics are shown below....Just GOLD at the moment"),
                             tags$hr(),
-                            tags$h5("Database and study outcome") ,
+                            tags$h5("Study outcome") ,
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
-                                pickerInput(inputId = "incidence_database_name_selector",
-                                            label = "Database",
-                                            choices = unique(incidence_estimates$database_name),
-                                            selected = unique(incidence_estimates$database_name),
-                                            options = list(
-                                              `actions-box` = TRUE,
-                                              size = 10,
-                                              `selected-text-format` = "count > 3"),
-                                            multiple = TRUE)
-                            ),
-                            div(style="display: inline-block;vertical-align:top; width: 150px;",
-                                pickerInput(inputId = "incidence_outcome_cohort_name_selector",
+                                pickerInput(inputId = "table1_outcome_cohort_name_selector",
                                             label = "Outcome",
-                                            choices = sort(unique(incidence_estimates$outcome_cohort_name)),
+                                            choices = sort(unique(table_one_results$Cancer)),
                                             selected = c("Breast"),
                                             options = list(
                                               `actions-box` = TRUE,
                                               size = 10,
                                               `selected-text-format` = "count > 3"),
                                             multiple = TRUE)
-                            )
-                            ,
-                            tags$hr(),
-                            tags$h5("Population Settings"),
-                            div(style="display: inline-block;vertical-align:top; width: 150px;",
-                                pickerInput(inputId = "incidence_denominator_age_group_selector",
-                                            label = "Age group",
-                                            choices = levels(incidence_estimates$denominator_age_group),
-                                            selected = "All",
-                                            options = list(
-                                              `actions-box` = TRUE,
-                                              size = 10,
-                                              `selected-text-format` = "count > 3"),
-                                            multiple = TRUE)
-                            ),
-                            div(style="display: inline-block;vertical-align:top; width: 150px;",
-                                pickerInput(inputId = "incidence_denominator_sex_selector",
-                                            label = "Sex",
-                                            choices = unique(incidence_estimates$denominator_sex),
-                                            selected = "Both",
-                                            options = list(
-                                              `actions-box` = TRUE,
-                                              size = 10,
-                                              `selected-text-format` = "count > 3"),
-                                            multiple = TRUE)
-                            ),
-                            tags$hr(),
-                            tags$h5("Analysis Settings"),
-                            div(style="display: inline-block;vertical-align:top; width: 150px;",
-                                pickerInput(inputId = "incidence_start_date_selector",
-                                            label = "incidence start date",
-                                            choices = as.character(unique(incidence_estimates$incidence_start_date)),
-                                            selected = as.character(unique(incidence_estimates$incidence_start_date)),
-                                            options = list(
-                                              `actions-box` = TRUE,
-                                              size = 10,
-                                              `selected-text-format` = "count > 3"),
-                                            multiple = TRUE)
+
+
+
                             ),
                             tabsetPanel(type = "tabs",
-                                        tabPanel("Study Population Characteristics")
+                                        tabPanel("Study Population Characteristics", 
+                                                 DTOutput('tbl_table_one') %>% withSpinner()
+                                                 
+                                                 )
                                         
                             )
                             

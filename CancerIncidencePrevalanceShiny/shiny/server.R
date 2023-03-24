@@ -489,43 +489,6 @@ server <-	function(input, output, session) {
 
   })
   
-  
-
-  # example code
-  # if(input$IncStrataSelector=="Overall"){
-  #   plot<-  plot.data %>%
-  #     ggplot()+
-  #     geom_step(aes(x=time, surv)) +
-  #     geom_step(aes(x=time, y=lower), linetype=2)+
-  #     geom_step(aes(x=time, y=upper), linetype=2)+
-  #     geom_ribbon(aes(x=time, 
-  #                     ymin = lower, 
-  #                     ymax = upper), 
-  #                 stat="stepribbon",
-  #                 alpha = .2)+
-  #     xlab("Days since index date")+
-  #     ylab("Cumulative incidence")+
-  #     scale_y_continuous(labels = scales::percent)
-  # } else {
-  #   
-  #   plot<-  plot.data %>%
-  #     ggplot()+
-  #     geom_step(aes(x=time, surv, colour=Strata)) +
-  #     geom_step(aes(x=time, y=lower, colour=Strata), linetype=2)+
-  #     geom_step(aes(x=time, y=upper, colour=Strata), linetype=2)+
-  #     geom_ribbon(aes(x=time, 
-  #                     ymin = lower, 
-  #                     ymax = upper, fill=Strata), 
-  #                 stat="stepribbon",
-  #                 alpha = .2)+
-  #     xlab("Days since index date")+
-  #     ylab("Cumulative incidence")+
-  #     scale_y_continuous(labels = scales::percent)
-  #   
-  #   
-  # } 
-  
-  
 # survival estimates: calendar year population
   get_survival_estimates_cy<-reactive({
     
@@ -890,5 +853,32 @@ server <-	function(input, output, session) {
               ))
   } )
 
+# table 1
+  get_table_one <-reactive({
+    
+    table<-table_one_results %>% 
+      filter(Cancer %in% input$table1_outcome_cohort_name_selector)
+
+    
+    table
+  }) 
+  output$tbl_table_one<-  DT::renderDataTable({
+    
+    table<-get_table_one()
+    
+    validate(need(ncol(table)>1,
+                  "No results for selected inputs"))
+
+    datatable(table,
+              rownames= FALSE,
+              extensions = 'Buttons',
+              options = list(lengthChange = FALSE,
+                             dom = 'tB',
+                             pageLength = 100000000,
+                             buttons = list(list(extend = "csv", 
+                                                 text = "Download results as csv",
+                                                 filename = "tableOne"))
+              ))
+  } )
    
 }

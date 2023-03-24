@@ -61,3 +61,8 @@ survival_rates_table_cy <- readRDS(here("data","survival_rates_table.rds")) %>%
   droplevels() %>%
   filter(time != 10)
 
+table_one_results <- readRDS(here("data","table1_results.rds")) 
+
+
+
+
