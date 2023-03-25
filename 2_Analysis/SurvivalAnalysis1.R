@@ -2,7 +2,7 @@
 
 #FUNCTION to extract the data and calculate the correct observation time and event (death) for different calender strata
 DataExtraction <- function(dataset){
-  
+  data <-dataset
   #for whole dataset
   #make new end of observation period to studyEndDate parameter ----
   # data <-dataset %>%
@@ -73,8 +73,13 @@ DataExtraction <- function(dataset){
   
 }
 
+# remove people who died on the same day as the outcome
+Pop<-Pop %>%
+  filter(time_days != 0)
+
 #OUTPUT data for whole dataset and strata based on calender year
 PopAll <- DataExtraction(dataset = Pop)
+
 
 
 ### KAPLAIN MEIER CODE ####
