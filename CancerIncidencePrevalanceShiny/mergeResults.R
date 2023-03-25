@@ -129,11 +129,19 @@ prepare_output_survival <- function(result){
   return(result)
 } 
 
+
+
 # Load, prepare, and merge results -----
 results <-list.files(here("networkResults"), full.names = TRUE,
                      recursive = TRUE,
                      include.dirs = TRUE,
                      pattern = ".zip")
+
+#load the table 1 for the i/p results
+resultstb1 <-list.files(here("networkResults"), full.names = TRUE,
+                     recursive = TRUE,
+                     include.dirs = TRUE,
+                     pattern = ".csv")
 
 #unzip data
 for (i in (1:length(results))) {
@@ -296,5 +304,81 @@ saveRDS(survival_rates_table,
         here("shiny", "data", "/survival_rates_table.rds"))
 
 
+# table 1 
 
+##preparation the output for table 1
+prepare_output_table1 <- function(result){
+  result <- result %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerHypopharynx", "Hypopharynx")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerLarynx", "Larynx")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerNasalCavitySinus", "Nasal Cavity & Sinus")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerNasopharynx", "Nasopharynx")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerOralCavityPrevalent", "Oral Cavity")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerOropharynx", "Oropharynx")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerSalivaryGland", "Salivary Gland")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerTonguePrevalent", "Tongue")) %>% 
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerOralCavityIncidence", "Oral Cavity")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerTongueIncidence", "Tongue")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentProstateCancer", "Prostate")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentLungCancer", "Lung")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentBreastCancer", "Breast")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentColorectalCancer", "Colorectal")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentHeadNeckCancer", "Head & Neck")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentLiverCancer", "Liver")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentPancreaticCancer", "Pancreas")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentStomachCancer", "Stomach")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentEsophagealCancer", "Esophagus")) %>%    
+    mutate(Cancer = replace(Cancer, Cancer == "PrevalentProstateCancer", "Prostate")) 
+  
+  result <- result %>%
+    mutate(Database = replace(Database, Database == "CPRDAurum", "CPRD Aurum")) %>%
+    mutate(Database = replace(Database, Database == "CPRDGold", "CPRD GOLD")) 
+  
+
+  
+  return(result)
+} 
+
+table1_results <- list()
+for(i in seq_along(resultstb1)){
+  table1_results[[i]]<-readr::read_csv(resultstb1[[i]], 
+                                             show_col_types = FALSE)  
+}
+table1_results <- dplyr::bind_rows(table1_results)
+
+
+
+table1_results <- prepare_output_table1(table1_results)
+
+
+table1_results <- table1_results %>% 
+  mutate("Variable"= ifelse(!is.na(percent),
+                                       paste0(n, " (",
+                                              paste0(percent, ")")),
+                                       NA
+  )) %>%
+  mutate("Variable1"= ifelse(!is.na(mean),
+                            paste0(mean, " (SD ",
+                                   paste0(standard_deviation, ")")),
+                            NA
+  )) %>%
+  mutate("Variable2"= ifelse(!is.na(median),
+                             paste0(median, " (",
+                                    paste0(interquartile_range, ")")),
+                             NA
+  )) %>%
+  mutate(Variable = case_when(n == "<5" ~ "<5", TRUE ~ Variable)) %>%
+  mutate(Variable = coalesce(Variable, Variable2)) %>%
+  mutate(Variable = coalesce(Variable, n))
+
+# remove rows we dont need
+table1_results <- table1_results %>% 
+  filter(!grepl("Sex: Female",var)) %>%
+  filter(!grepl("Death: Alive",var)) %>%
+  filter(!grepl("Prior_history_days_study_start",var))%>%
+  filter(!grepl("Prior_history_years_start",var)) %>%
+  select(c(var, Variable, Cancer, Database ))
+
+saveRDS(table1_results, 
+        here("shiny", "data", "table1_results.rds"))
 
