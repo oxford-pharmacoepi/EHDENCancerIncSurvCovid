@@ -740,6 +740,10 @@ exportSurvivalResults(result=calenderyr_results,
 # for head and neck cancer substypes
 if (grepl("CPRD", db.name) == TRUE){
   
+  #remove those who got a diagnosis on same date as death
+  Pophan<-Pophan %>%
+    filter(time_days != 0)
+  
   #OUTPUT data for whole dataset and strata based on calender year for head and neck
   PopAll <- DataExtraction(dataset = Pophan)
   

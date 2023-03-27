@@ -50,18 +50,6 @@ cdm <- generateCohortSet(cdm,
 
 info(logger, "- got features for medications")
 
-
-# # read in table containing list for feature for table 1
-# table1features <- read_csv(
-#   here::here(
-#     "1_InstantiateCohorts",
-#     "Table1Features.csv"))
-# 
-# # split into drugs and conditions
-# table1features_drugs <- table1features %>% filter(table1features$Class == "Drug")
-# 
-# table1features_conditions <- table1features %>% filter(table1features$Class == "Condition")
-
 # get denominator to get participants
 cdm$denominatordemo <- generateDenominatorCohortSet(
   cdm = cdm,
@@ -189,6 +177,69 @@ Pop <- Pop %>%
 Pop <-Pop %>%
   filter(!is.na(observation_period_end_date))
 
+# get GP number of visits the year prior to diagnosis
+# ip.codes<-c(9202)
+# # add all descendents
+# ip.codes.w.desc<-cdm$concept_ancestor %>%
+#   filter(ancestor_concept_id  %in% ip.codes ) %>% 
+#   collect() %>% 
+#   select(descendant_concept_id) %>% 
+#   distinct() %>% 
+#   pull()
+# 
+# Pop <- Pop %>%
+#   left_join(
+#     Pop %>% 
+#       select("person_id", "outcome_start_date") %>% 
+#       inner_join(cdm$visit_occurrence %>% 
+#                    filter(visit_concept_id %in% ip.codes.w.desc) %>% 
+#                    filter(visit_start_date > (as.Date(studyStartDate) - lubridate::days(365))) %>%
+#                    select("person_id", "visit_start_date") %>% 
+#                    compute(),
+#                  by=c("person_id"), copy = TRUE, multiple = "all") %>% 
+#       filter(visit_start_date < outcome_start_date &
+#                visit_start_date >= (outcome_start_date- lubridate::days(365))) %>% 
+#       select("person_id") %>% 
+#       group_by(person_id) %>% 
+#       tally(name = "outpatient_vist") %>% 
+#       mutate(outpatient_vist = as.numeric(outpatient_vist)), 
+#     by="person_id") %>% 
+#   compute()
+# Pop  <- Pop %>% 
+#   mutate(outpatient_vist=ifelse(is.na(outpatient_vist), 0, outpatient_vist))
+
+# Prior history from date of diagnosis from start of observation period
+Pop  <- Pop %>% 
+  mutate(Prior_history_days = as.numeric(outcome_start_date - observation_period_start_date ))
+
+# Prior history from date of diagnosis (from 1 jan 2001)
+Pop  <- Pop %>% 
+  mutate(Prior_history_days_study_start = as.numeric(as.Date(cohort_start_date) - observation_period_start_date ))
+
+# calculate Follow up - calculate end of observation period
+Pop <- Pop %>%
+  mutate(endOfObservation = ifelse(observation_period_end_date >= studyEndDate, studyEndDate, NA)) %>%
+  mutate(endOfObservation = as.Date(endOfObservation) ) %>%
+  mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
+
+# calculate follow up in years and days
+Pop <-Pop %>%
+  mutate(time_days=as.numeric(difftime(endOfObservation,
+                                       outcome_start_date,
+                                       units="days"))) %>%
+  mutate(time_years=time_days/365.25)
+
+# binary death outcome (for survival) ---
+# need to take into account follow up
+# if death date is > database end data set death to 0
+Pop <-Pop %>%
+  mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
+  mutate(status= ifelse(death_date > endOfObservation , 1, status )) %>%
+  mutate(status= ifelse(is.na(status), 1, status )) %>%
+  mutate(Death = recode(status, 
+                        "1" = "Alive", 
+                        "2" = "Dead"))
+
 # medications (3 months before index date)
 for(i in seq_along(medication_cohorts$cohort_name)){
   working_name <- glue::glue("{medication_cohorts$cohort_name[[i]]}")
@@ -266,69 +317,6 @@ for(i in seq_along(disease_cohorts$cohort_definition_id)){
     compute()
   
 }
-
-# get GP number of visits the year prior to diagnosis
-ip.codes<-c(9202)
-# add all descendents
-ip.codes.w.desc<-cdm$concept_ancestor %>%
-  filter(ancestor_concept_id  %in% ip.codes ) %>% 
-  collect() %>% 
-  select(descendant_concept_id) %>% 
-  distinct() %>% 
-  pull()
-
-Pop <- Pop %>%
-  left_join(
-    Pop %>% 
-      select("person_id", "outcome_start_date") %>% 
-      inner_join(cdm$visit_occurrence %>% 
-                   filter(visit_concept_id %in% ip.codes.w.desc) %>% 
-                   filter(visit_start_date > (as.Date(studyStartDate) - lubridate::days(365))) %>%
-                   select("person_id", "visit_start_date") %>% 
-                   compute(),
-                 by=c("person_id"), copy = TRUE, multiple = "all") %>% 
-      filter(visit_start_date < outcome_start_date &
-               visit_start_date >= (outcome_start_date- lubridate::days(365))) %>% 
-      select("person_id") %>% 
-      group_by(person_id) %>% 
-      tally(name = "outpatient_vist") %>% 
-      mutate(outpatient_vist = as.numeric(outpatient_vist)), 
-    by="person_id") %>% 
-  compute()
-Pop  <- Pop %>% 
-  mutate(outpatient_vist=ifelse(is.na(outpatient_vist), 0, outpatient_vist))
-
-# Prior history from date of diagnosis from start of observation period
-Pop  <- Pop %>% 
-  mutate(Prior_history_days = as.numeric(outcome_start_date - observation_period_start_date ))
-
-# Prior history from date of diagnosis (from 1 jan 2001)
-Pop  <- Pop %>% 
-  mutate(Prior_history_days_study_start = as.numeric(as.Date(cohort_start_date) - observation_period_start_date ))
-
-# calculate Follow up - calculate end of observation period
-Pop <- Pop %>%
-  mutate(endOfObservation = ifelse(observation_period_end_date >= studyEndDate, studyEndDate, NA)) %>%
-  mutate(endOfObservation = as.Date(endOfObservation) ) %>%
-  mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
-
-# calculate follow up in years and days
-Pop <-Pop %>%
-  mutate(time_days=as.numeric(difftime(endOfObservation,
-                                       outcome_start_date,
-                                       units="days"))) %>%
-  mutate(time_years=time_days/365.25)
-
-# binary death outcome (for survival) ---
-# need to take into account follow up
-# if death date is > database end data set death to 0
-Pop <-Pop %>%
-  mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
-  mutate(status= ifelse(death_date > endOfObservation , 1, status )) %>%
-  mutate(status= ifelse(is.na(status), 1, status )) %>%
-  mutate(Death = recode(status, 
-                        "1" = "Alive", 
-                        "2" = "Dead"))
 
 # tidy up results for table 1
 get_summary_characteristics<-function(data){
@@ -416,16 +404,7 @@ get_summary_characteristics<-function(data){
                 median = nice.num(median((time_years))),
                 interquartile_range=paste0(nice.num.count(quantile((time_years),probs=0.25)),  " to ",
                                            nice.num.count(quantile((time_years),probs=0.75)))) %>% 
-      mutate(var="time_years"),
-    
-    
-    data %>% 
-      summarise(mean=nice.num.count(mean(outpatient_vist)),
-                standard_deviation = nice.num(sd(outpatient_vist)),
-                median = nice.num(median(outpatient_vist)),
-                interquartile_range=paste0(nice.num.count(quantile(outpatient_vist,probs=0.25)),  " to ",
-                                           nice.num.count(quantile(outpatient_vist,probs=0.75)))) %>% 
-      mutate(var="outpatient vists"))
+      mutate(var="time_years"))
   
   for(i in seq_along(disease_cohorts$cohort_name)){
     working_id_name <- glue::glue("{disease_cohorts$cohort_name[[i]]}")
@@ -446,119 +425,6 @@ get_summary_characteristics<-function(data){
                                            mutate(var=working_name)
     )
   }
-  
-  for(i in seq_along(medication_cohorts$cohort_name)){
-    working_id_name <- glue::glue("{medication_cohorts$cohort_name[[i]]}")
-    summary_characteristics <- bind_rows(summary_characteristics,
-                                         data %>% 
-                                           summarise(n=sum(!is.na(!!rlang::sym(working_id_name))),
-                                                     percent=paste0(nice.num((n/nrow(data))*100),  "%"))%>% 
-                                           mutate(var=working_id_name)
-    )
-  }
-  
-  # filter any less than 5
-  summary_characteristics <- summary_characteristics %>% 
-    mutate(mean=ifelse(!is.na(n) & n<5, NA, mean)) %>% 
-    mutate(percent=ifelse(!is.na(n) & n<5, NA, percent)) %>% 
-    mutate(interquartile_range=ifelse(!is.na(n) & n<5, NA, interquartile_range)) %>% 
-    mutate(standard_deviation=ifelse(!is.na(n) & n<5, NA, standard_deviation)) %>% 
-    mutate(n=ifelse(!is.na(n) & n<5, "<5", n))
-  
-  return(summary_characteristics %>% 
-           relocate(any_of(c("var", "n", "percent",
-                             "mean", "standard_deviation",
-                             "median", "interquartile_range"))))
-  
-}
-
-get_summary_characteristics<-function(data){
-  
-  summary_characteristics<- bind_rows(
-    data %>% 
-      count() %>% 
-      mutate(var="N"),
-    
-    data %>% 
-      summarise(mean=nice.num(mean(age)),
-                standard_deviation = nice.num(sd(age)),
-                median = nice.num(median(age)),
-                interquartile_range=paste0(nice.num.count(quantile(age,probs=0.25)),  " to ",
-                                           nice.num.count(quantile(age,probs=0.75)))) %>% 
-      mutate(var="age"),
-    
-    data %>% 
-      group_by(age_gr) %>% 
-      summarise(n=n(),
-                percent=paste0(nice.num((n/nrow(data))*100),  "%")) %>%   
-      rename("var"="age_gr") %>% 
-      mutate(var=paste0("Age group: ", var)),
-    
-    data %>% 
-      mutate(gender=factor(gender, levels=c("Male", "Female"))) %>% 
-      group_by(gender) %>% 
-      summarise(n=n(),
-                percent=paste0(nice.num((n/nrow(data))*100),  "%")) %>%   
-      rename("var"="gender") %>% 
-      mutate(var=paste0("Sex: ", var)),
-    
-    data %>% 
-      mutate(Death=factor(Death, levels=c("Alive", "Dead"))) %>% 
-      group_by(Death) %>% 
-      summarise(n=n(),
-                percent=paste0(nice.num((n/nrow(data))*100),  "%")) %>%   
-      rename("var"="Death") %>% 
-      mutate(var=paste0("Death: ", var)),
-    
-    data %>% 
-      summarise(mean=nice.num.count(mean(Prior_history_days)),
-                standard_deviation = nice.num(sd(Prior_history_days)),
-                median = nice.num(median(Prior_history_days)),
-                interquartile_range=paste0(nice.num.count(quantile(Prior_history_days,probs=0.25)),  " to ",
-                                           nice.num.count(quantile(Prior_history_days,probs=0.75)))) %>% 
-      mutate(var="Prior_history_days"),
-    
-    data %>% 
-      summarise(mean=nice.num.count(mean((Prior_history_days/365.25))),
-                standard_deviation = nice.num(sd((Prior_history_days/365.25))),
-                median = nice.num(median((Prior_history_days/365.25))),
-                interquartile_range=paste0(nice.num.count(quantile((Prior_history_days/365.25),probs=0.25)),  " to ",
-                                           nice.num.count(quantile((Prior_history_days/365.25),probs=0.75)))) %>% 
-      mutate(var="Prior_history_years"),
-    
-    data %>% 
-      summarise(mean=nice.num.count(mean(Prior_history_days_study_start)),
-                standard_deviation = nice.num(sd(Prior_history_days_study_start)),
-                median = nice.num(median(Prior_history_days_study_start)),
-                interquartile_range=paste0(nice.num.count(quantile(Prior_history_days_study_start,probs=0.25)),  " to ",
-                                           nice.num.count(quantile(Prior_history_days_study_start,probs=0.75)))) %>% 
-      mutate(var="Prior_history_days_study_start"),
-    
-    data %>% 
-      summarise(mean=nice.num.count(mean((Prior_history_days_study_start/365.25))),
-                standard_deviation = nice.num(sd((Prior_history_days_study_start/365.25))),
-                median = nice.num(median((Prior_history_days_study_start/365.25))),
-                interquartile_range=paste0(nice.num.count(quantile((Prior_history_days_study_start/365.25),probs=0.25)),  " to ",
-                                           nice.num.count(quantile((Prior_history_days_study_start/365.25),probs=0.75)))) %>% 
-      mutate(var="Prior_history_years_start"),
-    
-    
-    data %>% 
-      summarise(mean=nice.num.count(mean(time_days)),
-                standard_deviation = nice.num(sd(time_days)),
-                median = nice.num(median(time_days)),
-                interquartile_range=paste0(nice.num.count(quantile(time_days,probs=0.25)),  " to ",
-                                           nice.num.count(quantile(time_days,probs=0.75)))) %>% 
-      mutate(var="time_days"),
-    
-    data %>% 
-      summarise(mean=nice.num.count(mean((time_years))),
-                standard_deviation = nice.num(sd((time_years))),
-                median = nice.num(median((time_years))),
-                interquartile_range=paste0(nice.num.count(quantile((time_years),probs=0.25)),  " to ",
-                                           nice.num.count(quantile((time_years),probs=0.75)))) %>% 
-      mutate(var="time_years"))
-  
   
   for(i in seq_along(medication_cohorts$cohort_name)){
     working_id_name <- glue::glue("{medication_cohorts$cohort_name[[i]]}")
@@ -607,7 +473,7 @@ table1Characteristics_all <- bind_rows(table1Characteristics) %>%
   mutate(Database = db.name)
 
 #save the results
-write_csv(table1Characteristics_all, here::here(paste0("Results/",db.name,"/Table1",db.name,".csv")))
+write_csv(table1Characteristics_all, here::here(paste0("Results/",db.name,"/Table1Med",db.name,".csv")))
   
 
 # PREVALENCE POPULATION
@@ -618,9 +484,9 @@ prev_period_participants <- estimatePeriodPrevalence(
   denominatorTable = "denominatordemo",
   outcomeCohortId = prevalent_cohorts$cohort_definition_id,
   outcomeCohortName = prevalent_cohorts$cohort_name,
-  outcomeLookbackDays = 0, 
+  outcomeLookbackDays = 0,
   outcomeTable = prevalent_table_name,
-  interval = "overall" ,
+  interval = "years" ,
   completeDatabaseIntervals = TRUE, # prev only estimate for intervals where db captures all of the interval
   fullContribution = FALSE , # individuals only required to be present for one day in interval
   minCellCount = 5,
@@ -629,255 +495,241 @@ prev_period_participants <- estimatePeriodPrevalence(
   verbose = TRUE
 )
 
-settings_surv_prev <- settings(prev_period_participants) 
-
-popsprev <- list()
-
-for (i in 1:length(settings_surv_prev$analysis_id)){
-  #extract the participants for each cancer
-  
-  popsprev[[i]] <-cdm$person %>%
-    inner_join(participants(prev_period_participants, analysisId = as.numeric(settings_surv_prev$analysis_id[i])) %>% filter(!is.na(outcome_start_date)),
-               by = c("person_id" = "subject_id" ), copy = TRUE) %>%
-    select(person_id,gender_concept_id,
-           year_of_birth, month_of_birth, day_of_birth,
-           cohort_start_date,
-           cohort_end_date,
-           outcome_start_date) %>%
-    left_join(cdm$observation_period %>%
-                select("person_id",  "observation_period_start_date", "observation_period_end_date") %>%
-                distinct(),
-              by = "person_id") %>%
-    left_join(cdm$death %>%
-                select("person_id",  "death_date") %>%
-                distinct(),
-              by = "person_id") %>%
-    collect()
-  
-  popsprev[[i]] <- popsprev[[i]]  %>%
-    mutate(outcome_cohort_name = settings_surv_prev$outcome_cohort_name[i]) %>%
-    mutate(outcome_cohort_id = settings_surv_prev$outcome_cohort_id[i])
-  
-}
-
-PopPrev <- dplyr::bind_rows(popsprev)
-
-# format data -----
-#add age -----
-PopPrev$age<- NA
-if(sum(is.na(PopPrev$day_of_birth))==0 & sum(is.na(PopPrev$month_of_birth))==0){
-  # if we have day and month
-  PopPrev <-PopPrev %>%
-    mutate(age=floor(as.numeric((ymd(outcome_start_date)-
-                                   ymd(paste(year_of_birth,
-                                             month_of_birth,
-                                             day_of_birth, sep="-"))))/365.25))
-} else {
-  PopPrev <- PopPrev %>%
-    mutate(age= lubridate::year(outcome_start_date)-year_of_birth)
-}
-
-# # age age groups ----
-PopPrev <- PopPrev %>%
-  mutate(age_gr=ifelse(age<30,  "18-29",
-                       ifelse(age>=30 &  age<=39,  "30-39",
-                              ifelse(age>=40 & age<=49,  "40-49",
-                                     ifelse(age>=50 & age<=59,  "50-59",
-                                            ifelse(age>=60 & age<=69, "60-69",
-                                                   ifelse(age>=70 & age<=79, "70-79",
-                                                          ifelse(age>=80 & age<=89, "80-89",
-                                                                 ifelse(age>=90, ">=90",
-                                                                        NA))))))))) %>%
-  mutate(age_gr= factor(age_gr,
-                        levels = c("18-29","30-39","40-49", "50-59",
-                                   "60-69", "70-79","80-89",">=90")))
-table(PopPrev$age_gr, useNA = "always")
-
-# # reformat gender
-# # add gender -----
-# #8507 male
-# #8532 female
-PopPrev <-PopPrev %>%
-  mutate(gender= ifelse(gender_concept_id==8507, "Male",
-                        ifelse(gender_concept_id==8532, "Female", NA ))) %>%
-  mutate(gender= factor(gender,
-                        levels = c("Male", "Female")))
-table(PopPrev$gender, useNA = "always")
-
-# # if missing (or unreasonable) age or gender, drop ----
-PopPrev <-PopPrev %>%
-  filter(!is.na(age)) %>%
-  filter(age>=18) %>%
-  filter(age<=110) %>%
-  filter(!is.na(gender))
+# study_results1 <- gatherIncidencePrevalenceResults(cdm =cdm,
+#                                                    resultList=list(prev_period_participants),
+#                                                    databaseName = db.name)
 #
-# # create sex:agegp categorical variables
-PopPrev <- PopPrev %>%
-  unite('genderAgegp', c(gender,age_gr), remove = FALSE) %>%
-  mutate(genderAgegp= factor(genderAgegp,
-                             levels = c("Female_18-29","Female_30-39","Female_40-49", "Female_50-59",
-                                        "Female_60-69", "Female_70-79","Female_80-89","Female_>=90",
-                                        "Male_18-29","Male_30-39","Male_40-49", "Male_50-59",
-                                        "Male_60-69", "Male_70-79","Male_80-89","Male_>=90")))
+# #where completeDatabaseIntervals = TRUE
+# studyswd <- study_results1$prevalence_estimates_CPRDGold
 
-# # drop if missing observation period end date ----
-PopPrev <-PopPrev %>%
-  filter(!is.na(observation_period_end_date))
-
-# medications (3 months before index date)
-for(i in seq_along(medication_cohorts$cohort_name)){
-  working_name <- glue::glue("{medication_cohorts$cohort_name[[i]]}")
-  working_id <- medication_cohorts$cohort_definition_id[[i]]
-  PopPrev <-
-    PopPrev %>%
-    left_join(
-      PopPrev %>%
-        select("person_id", "outcome_start_date") %>% 
-        inner_join(cdm[[feature_medication_table_name]] %>%
-                     rename("feature_start_date"="cohort_start_date") %>%
-                     rename("feature_end_date"="cohort_end_date") %>%
-                     filter(cohort_definition_id== working_id ) %>%
-                     select(!cohort_definition_id),
-                   by=c("person_id" = "subject_id"), copy = TRUE) %>% 
-        filter(
-          # overlapping
-          (feature_start_date <= (outcome_start_date-lubridate::days(-1)) &
-             feature_end_date >= (outcome_start_date-lubridate::days(-1))) |
-            # ending in window
-            (feature_end_date >= (outcome_start_date-lubridate::days(90)) &
-               feature_end_date <= (outcome_start_date-lubridate::days(-1)))) %>%
-        select(person_id) %>%
-        distinct() %>%
-        mutate(!!working_name:=1),
-      by="person_id") %>%
-    compute()
-}
-
-# conditions (other cancers)
-for(i in seq_along(outcome_cohorts$cohort_name)){
-  working_name <- glue::glue("{outcome_cohorts$cohort_name[[i]]}")
-  working_id <- outcome_cohorts$cohort_definition_id[[i]]
-  PopPrev <- 
-    PopPrev %>% 
-    left_join(
-      PopPrev %>% 
-        select("person_id", "cohort_start_date") %>% 
-        inner_join(cdm[[outcome_table_name]] %>% 
-                     rename("feature_start_date"="cohort_start_date") %>% 
-                     filter(cohort_definition_id== working_id ) %>% 
-                     select(!c(cohort_definition_id,
-                               cohort_end_date)),
-                   by=c("person_id" = "subject_id"), copy = TRUE) %>% 
-        filter(feature_start_date < cohort_start_date) %>% 
-        select(person_id) %>% 
-        distinct() %>% 
-        mutate(!!working_name:=1),
-      by="person_id")  %>% 
-    compute()
-  
-}
-
-# conditions (any time in history)
-for(i in seq_along(disease_cohorts$cohort_definition_id)){
-  
-  working_name <- glue::glue("{disease_cohorts$cohort_name[[i]]}")
-  working_id <- disease_cohorts$cohort_definition_id[[i]]
-  PopPrev <- 
-    PopPrev %>% 
-    left_join(
-      PopPrev %>% 
-        select("person_id", "outcome_start_date") %>% 
-        inner_join(cdm[[feature_disease_table_name]] %>% 
-                     rename("feature_start_date"="cohort_start_date") %>% 
-                     filter(cohort_definition_id== working_id ) %>% 
-                     select(!c(cohort_definition_id,
-                               cohort_end_date)),
-                   by=c("person_id" = "subject_id"), copy = TRUE) %>% 
-        filter(feature_start_date < outcome_start_date) %>% 
-        select(person_id) %>% 
-        distinct() %>% 
-        mutate(!!working_name:=1),
-      by="person_id")  %>% 
-    compute()
-  
-}
-
-# get GP number of visits the year prior to diagnosis
-PopPrev <- PopPrev %>%
-  left_join(
-    PopPrev %>% 
-      select("person_id", "outcome_start_date") %>% 
-      inner_join(cdm$visit_occurrence %>% 
-                   filter(!visit_concept_id %in% ip.codes.w.desc) %>% 
-                   filter(visit_start_date > (as.Date(studyStartDate) - lubridate::days(365))) %>%
-                   select("person_id", "visit_start_date") %>% 
-                   compute(),
-                 by=c("person_id"), copy = TRUE, multiple = "all") %>% 
-      filter(visit_start_date < outcome_start_date &
-               visit_start_date >= (outcome_start_date- lubridate::days(365))) %>% 
-      select("person_id") %>% 
-      group_by(person_id) %>% 
-      tally(name = "outpatient_vist") %>% 
-      mutate(outpatient_vist = as.numeric(outpatient_vist)), 
-    by="person_id") %>% 
-  compute()
-PopPrev <- PopPrev %>% 
-  mutate(outpatient_vist=ifelse(is.na(outpatient_vist), 0, outpatient_vist))
-
-# Prior history from date of diagnosis from start of observation period
-PopPrev <- PopPrev %>% 
-  mutate(Prior_history_days = as.numeric(outcome_start_date - observation_period_start_date ))
-
-# Prior history from date of diagnosis (from 1 jan 2001)
-PopPrev <- PopPrev %>% 
-  mutate(Prior_history_days_study_start = as.numeric(as.Date(cohort_start_date) - observation_period_start_date ))
-
-# calculate Follow up - calculate end of observation period
-PopPrev <- PopPrev %>%
-  mutate(endOfObservation = ifelse(observation_period_end_date >= studyEndDate, studyEndDate, NA)) %>%
-  mutate(endOfObservation = as.Date(endOfObservation) ) %>%
-  mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
-
-# calculate follow up in years and days
-PopPrev <-PopPrev %>%
-  mutate(time_days=as.numeric(difftime(endOfObservation,
-                                       outcome_start_date,
-                                       units="days"))) %>%
-  mutate(time_years=time_days/365.25)
-
-# binary death outcome (for survival) ---
-# need to take into account follow up
-# if death date is > database end data set death to 0
-PopPrev <-PopPrev %>%
-  mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
-  mutate(status= ifelse(death_date > endOfObservation , 1, status )) %>%
-  mutate(status= ifelse(is.na(status), 1, status )) %>%
-  mutate(Death = recode(status, 
-                        "1" = "Alive", 
-                        "2" = "Dead"))
-
-# get a list to put results into
-table1CharacteristicsPrev <- list()
-
-#create a loop that puts table 1 for each outcome
-for(j in seq_along(outcome_cohorts$cohort_definition_id)){
-  
-  
-  table1CharacteristicsPrev[[j]] <- get_summary_characteristics(PopPrev %>% 
-                                                              filter(outcome_cohort_name==outcome_cohorts$cohort_name[[j]])) %>%
-    mutate(Cancer = outcome_cohorts$cohort_name[[j]])
-  
-  print(paste0("Getting table 1 for ", outcome_cohorts$cohort_name[[j]], " (" , j , " of ", length(outcome_cohorts$cohort_name), ")")) 
-  
-}
-
-#bind all results together
-table1Characteristics_all_prev <- bind_rows(table1CharacteristicsPrev) %>%
-  mutate(Database = db.name)
-
-#save the results
-write_csv(table1Characteristics_all_prev, here::here(paste0("Results/",db.name,"/Table1Prev",db.name,".csv")))
-
+# # the numbers are not the same as achieved in annual prev
+# settings_surv_prev <- settings(prev_period_participants)
+#
+# popsprev <- list()
+#
+# for (i in 1:length(settings_surv_prev$analysis_id)){
+#   #extract the participants for each cancer
+#
+#   popsprev[[i]] <-cdm$person %>%
+#     inner_join(participants(prev_period_participants, analysisId = as.numeric(settings_surv_prev$analysis_id[i])) %>% filter(!is.na(outcome_start_date)),
+#                by = c("person_id" = "subject_id" ), copy = TRUE) %>%
+#     select(person_id,gender_concept_id,
+#            year_of_birth, month_of_birth, day_of_birth,
+#            cohort_start_date,
+#            cohort_end_date,
+#            outcome_start_date) %>%
+#     left_join(cdm$observation_period %>%
+#                 select("person_id",  "observation_period_start_date", "observation_period_end_date") %>%
+#                 distinct(),
+#               by = "person_id") %>%
+#     left_join(cdm$death %>%
+#                 select("person_id",  "death_date") %>%
+#                 distinct(),
+#               by = "person_id") %>%
+#     collect()
+#
+#   popsprev[[i]] <- popsprev[[i]]  %>%
+#     mutate(outcome_cohort_name = settings_surv_prev$outcome_cohort_name[i]) %>%
+#     mutate(outcome_cohort_id = settings_surv_prev$outcome_cohort_id[i])
+#
+# }
+#
+# PopPrev <- dplyr::bind_rows(popsprev)
+#
+# # format data -----
+# #add age -----
+# PopPrev$age<- NA
+# if(sum(is.na(PopPrev$day_of_birth))==0 & sum(is.na(PopPrev$month_of_birth))==0){
+#   # if we have day and month
+#   PopPrev <-PopPrev %>%
+#     mutate(age=floor(as.numeric((ymd(outcome_start_date)-
+#                                    ymd(paste(year_of_birth,
+#                                              month_of_birth,
+#                                              day_of_birth, sep="-"))))/365.25))
+# } else {
+#   PopPrev <- PopPrev %>%
+#     mutate(age= lubridate::year(outcome_start_date)-year_of_birth)
+# }
+#
+# # # age age groups ----
+# PopPrev <- PopPrev %>%
+#   mutate(age_gr=ifelse(age<30,  "18-29",
+#                        ifelse(age>=30 &  age<=39,  "30-39",
+#                               ifelse(age>=40 & age<=49,  "40-49",
+#                                      ifelse(age>=50 & age<=59,  "50-59",
+#                                             ifelse(age>=60 & age<=69, "60-69",
+#                                                    ifelse(age>=70 & age<=79, "70-79",
+#                                                           ifelse(age>=80 & age<=89, "80-89",
+#                                                                  ifelse(age>=90, ">=90",
+#                                                                         NA))))))))) %>%
+#   mutate(age_gr= factor(age_gr,
+#                         levels = c("18-29","30-39","40-49", "50-59",
+#                                    "60-69", "70-79","80-89",">=90")))
+# table(PopPrev$age_gr, useNA = "always")
+#
+# # # reformat gender
+# # # add gender -----
+# # #8507 male
+# # #8532 female
+# PopPrev <-PopPrev %>%
+#   mutate(gender= ifelse(gender_concept_id==8507, "Male",
+#                         ifelse(gender_concept_id==8532, "Female", NA ))) %>%
+#   mutate(gender= factor(gender,
+#                         levels = c("Male", "Female")))
+# table(PopPrev$gender, useNA = "always")
+#
+# # # if missing (or unreasonable) age or gender, drop ----
+# PopPrev <-PopPrev %>%
+#   filter(!is.na(age)) %>%
+#   filter(age>=18) %>%
+#   filter(age<=110) %>%
+#   filter(!is.na(gender))
+# #
+# # # create sex:agegp categorical variables
+# PopPrev <- PopPrev %>%
+#   unite('genderAgegp', c(gender,age_gr), remove = FALSE) %>%
+#   mutate(genderAgegp= factor(genderAgegp,
+#                              levels = c("Female_18-29","Female_30-39","Female_40-49", "Female_50-59",
+#                                         "Female_60-69", "Female_70-79","Female_80-89","Female_>=90",
+#                                         "Male_18-29","Male_30-39","Male_40-49", "Male_50-59",
+#                                         "Male_60-69", "Male_70-79","Male_80-89","Male_>=90")))
+#
+# # # drop if missing observation period end date ----
+# PopPrev <-PopPrev %>%
+#   filter(!is.na(observation_period_end_date))
+#
+# # Prior history from date of diagnosis from start of observation period
+# PopPrev <- PopPrev %>%
+#   mutate(Prior_history_days = as.numeric(outcome_start_date - observation_period_start_date ))
+#
+# # Prior history from date of diagnosis (from 1 jan 2001)
+# PopPrev <- PopPrev %>%
+#   mutate(Prior_history_days_study_start = as.numeric(as.Date(cohort_start_date) - observation_period_start_date ))
+#
+# # calculate Follow up - calculate end of observation period
+# PopPrev <- PopPrev %>%
+#   mutate(endOfObservation = ifelse(observation_period_end_date >= studyEndDate, studyEndDate, NA)) %>%
+#   mutate(endOfObservation = as.Date(endOfObservation) ) %>%
+#   mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
+#
+# # calculate follow up in years and days
+# PopPrev <-PopPrev %>%
+#   mutate(time_days=as.numeric(difftime(endOfObservation,
+#                                        outcome_start_date,
+#                                        units="days"))) %>%
+#   mutate(time_years=time_days/365.25)
+#
+# # binary death outcome (for survival) ---
+# # need to take into account follow up
+# # if death date is > database end data set death to 0
+# PopPrev <-PopPrev %>%
+#   mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
+#   mutate(status= ifelse(death_date > endOfObservation , 1, status )) %>%
+#   mutate(status= ifelse(is.na(status), 1, status )) %>%
+#   mutate(Death = recode(status,
+#                         "1" = "Alive",
+#                         "2" = "Dead"))
+#
+# # medications (3 months before index date)
+# for(i in seq_along(medication_cohorts$cohort_name)){
+#   working_name <- glue::glue("{medication_cohorts$cohort_name[[i]]}")
+#   working_id <- medication_cohorts$cohort_definition_id[[i]]
+#   PopPrev <-
+#     PopPrev %>%
+#     left_join(
+#       PopPrev %>%
+#         select("person_id", "outcome_start_date") %>%
+#         inner_join(cdm[[feature_medication_table_name]] %>%
+#                      rename("feature_start_date"="cohort_start_date") %>%
+#                      rename("feature_end_date"="cohort_end_date") %>%
+#                      filter(cohort_definition_id== working_id ) %>%
+#                      select(!cohort_definition_id),
+#                    by=c("person_id" = "subject_id"), copy = TRUE) %>%
+#         filter(
+#           # overlapping
+#           (feature_start_date <= (outcome_start_date-lubridate::days(-1)) &
+#              feature_end_date >= (outcome_start_date-lubridate::days(-1))) |
+#             # ending in window
+#             (feature_end_date >= (outcome_start_date-lubridate::days(90)) &
+#                feature_end_date <= (outcome_start_date-lubridate::days(-1)))) %>%
+#         select(person_id) %>%
+#         distinct() %>%
+#         mutate(!!working_name:=1),
+#       by="person_id") %>%
+#     compute()
+# }
+#
+# # conditions (other cancers)
+# for(i in seq_along(outcome_cohorts$cohort_name)){
+#   working_name <- glue::glue("{outcome_cohorts$cohort_name[[i]]}")
+#   working_id <- outcome_cohorts$cohort_definition_id[[i]]
+#   PopPrev <-
+#     PopPrev %>%
+#     left_join(
+#       PopPrev %>%
+#         select("person_id", "cohort_start_date") %>%
+#         inner_join(cdm[[outcome_table_name]] %>%
+#                      rename("feature_start_date"="cohort_start_date") %>%
+#                      filter(cohort_definition_id== working_id ) %>%
+#                      select(!c(cohort_definition_id,
+#                                cohort_end_date)),
+#                    by=c("person_id" = "subject_id"), copy = TRUE) %>%
+#         filter(feature_start_date < cohort_start_date) %>%
+#         select(person_id) %>%
+#         distinct() %>%
+#         mutate(!!working_name:=1),
+#       by="person_id")  %>%
+#     compute()
+#
+# }
+#
+# # conditions (any time in history)
+# for(i in seq_along(disease_cohorts$cohort_definition_id)){
+#
+#   working_name <- glue::glue("{disease_cohorts$cohort_name[[i]]}")
+#   working_id <- disease_cohorts$cohort_definition_id[[i]]
+#   PopPrev <-
+#     PopPrev %>%
+#     left_join(
+#       PopPrev %>%
+#         select("person_id", "outcome_start_date") %>%
+#         inner_join(cdm[[feature_disease_table_name]] %>%
+#                      rename("feature_start_date"="cohort_start_date") %>%
+#                      filter(cohort_definition_id== working_id ) %>%
+#                      select(!c(cohort_definition_id,
+#                                cohort_end_date)),
+#                    by=c("person_id" = "subject_id"), copy = TRUE) %>%
+#         filter(feature_start_date < outcome_start_date) %>%
+#         select(person_id) %>%
+#         distinct() %>%
+#         mutate(!!working_name:=1),
+#       by="person_id")  %>%
+#     compute()
+#
+# }
+#
+# # get a list to put results into
+# table1CharacteristicsPrev <- list()
+#
+# #create a loop that puts table 1 for each outcome
+# for(j in seq_along(outcome_cohorts$cohort_definition_id)){
+#
+#   table1CharacteristicsPrev[[j]] <- get_summary_characteristics(PopPrev %>%
+#                                                               filter(outcome_cohort_name==outcome_cohorts$cohort_name[[j]])) %>%
+#     mutate(Cancer = outcome_cohorts$cohort_name[[j]])
+#
+#   table1CharacteristicsPrev[[j]]$n <- as.character(table1CharacteristicsPrev[[j]]$n)
+#
+#   print(paste0("Getting table 1 for ", outcome_cohorts$cohort_name[[j]], " (" , j , " of ", length(outcome_cohorts$cohort_name), ")"))
+#
+# }
+#
+# #bind all results together
+# table1Characteristics_all_prev <- bind_rows(table1CharacteristicsPrev) %>%
+#   mutate(Database = db.name)
+#
+# #save the results
+# write_csv(table1Characteristics_all_prev, here::here(paste0("Results/",db.name,"/Table1Prev",db.name,".csv")))
 
 
 # function to extract dataset based on head and neck cancer subtypes
@@ -995,6 +847,37 @@ if (grepl("CPRD", db.name) == TRUE){
   Pophan <-Pophan %>%
     filter(!is.na(observation_period_end_date)) 
   
+  Pophan  <- Pophan %>% 
+    mutate(Prior_history_days = as.numeric(outcome_start_date - observation_period_start_date ))
+  
+  # Prior history from date of diagnosis (from 1 jan 2001)
+  Pophan  <- Pophan %>% 
+    mutate(Prior_history_days_study_start = as.numeric(as.Date(cohort_start_date) - observation_period_start_date ))
+  
+  # calculate Follow up - calculate end of observation period
+  Pophan <- Pophan %>%
+    mutate(endOfObservation = ifelse(observation_period_end_date >= studyEndDate, studyEndDate, NA)) %>%
+    mutate(endOfObservation = as.Date(endOfObservation) ) %>%
+    mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
+  
+  # calculate follow up in years and days
+  Pophan <-Pophan %>%
+    mutate(time_days=as.numeric(difftime(endOfObservation,
+                                         outcome_start_date,
+                                         units="days"))) %>%
+    mutate(time_years=time_days/365.25)
+  
+  # binary death outcome (for survival) ---
+  # need to take into account follow up
+  # if death date is > database end data set death to 0
+  Pophan <- Pophan %>%
+    mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
+    mutate(status= ifelse(death_date > endOfObservation , 1, status )) %>%
+    mutate(status= ifelse(is.na(status), 1, status )) %>%
+    mutate(Death = recode(status, 
+                          "1" = "Alive", 
+                          "2" = "Dead"))
+  
   # get the co morbidites and medication usage for subset of cohort ----
   # medications (3 months before index date)
   for(i in seq_along(medication_cohorts$cohort_definition_id)){
@@ -1075,67 +958,6 @@ if (grepl("CPRD", db.name) == TRUE){
   }
 
   
-  
-# cdm$visit_occurrence2 <- Pophan %>%
-#     select("person_id") %>%
-#     inner_join(cdm$visit_occurrence, by = "person_id", copy = TRUE) %>%
-#     compute()
-  # crashes with AURUM
-  # get GP number of visits the year prior to diagnosis
-  Pophan <- Pophan %>%
-    left_join(
-      Pophan %>% 
-        select("person_id", "outcome_start_date") %>% 
-        inner_join(cdm$visit_occurrence %>% 
-                     filter(visit_concept_id %in% ip.codes.w.desc) %>% 
-                     filter(visit_start_date > (as.Date(studyStartDate) - lubridate::days(365))) %>%
-                     select("person_id", "visit_start_date") %>% 
-                     compute(),
-                   by=c("person_id"), copy = TRUE, multiple = "all") %>% 
-        filter(visit_start_date < outcome_start_date &
-                 visit_start_date >= (outcome_start_date- lubridate::days(365))) %>% 
-        select("person_id") %>% 
-        group_by(person_id) %>% 
-        tally(name = "outpatient_vist") %>% 
-        mutate(outpatient_vist = as.numeric(outpatient_vist)), 
-      by="person_id") %>% 
-    compute()
-  
-  Pophan  <- Pophan %>% 
-    mutate(outpatient_vist=ifelse(is.na(outpatient_vist), 0, outpatient_vist))
-  
-  # Prior history from date of diagnosis from start of observation period
-  Pophan  <- Pophan %>% 
-    mutate(Prior_history_days = as.numeric(outcome_start_date - observation_period_start_date ))
-  
-  # Prior history from date of diagnosis (from 1 jan 2001)
-  Pophan  <- Pophan %>% 
-    mutate(Prior_history_days_study_start = as.numeric(as.Date(cohort_start_date) - observation_period_start_date ))
-  
-  # calculate Follow up - calculate end of observation period
-  Pophan <- Pophan %>%
-    mutate(endOfObservation = ifelse(observation_period_end_date >= studyEndDate, studyEndDate, NA)) %>%
-    mutate(endOfObservation = as.Date(endOfObservation) ) %>%
-    mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
-  
-  # calculate follow up in years and days
-  Pophan <-Pophan %>%
-    mutate(time_days=as.numeric(difftime(endOfObservation,
-                                         outcome_start_date,
-                                         units="days"))) %>%
-    mutate(time_years=time_days/365.25)
-  
-  # binary death outcome (for survival) ---
-  # need to take into account follow up
-  # if death date is > database end data set death to 0
-  Pophan <- Pophan %>%
-    mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
-    mutate(status= ifelse(death_date > endOfObservation , 1, status )) %>%
-    mutate(status= ifelse(is.na(status), 1, status )) %>%
-    mutate(Death = recode(status, 
-                          "1" = "Alive", 
-                          "2" = "Dead"))
-  
   # tidy up results for table 1
   # get a list to put results into
   table1Characteristics_han <- list()
@@ -1146,6 +968,8 @@ if (grepl("CPRD", db.name) == TRUE){
     table1Characteristics_han[[j]] <- get_summary_characteristics(Pophan %>% 
                                                                 filter(outcome_cohort_name==outcome_cohorts_han$cohort_name[[j]])) %>%
       mutate(Cancer = outcome_cohorts_han$cohort_name[[j]])
+    
+    table1Characteristics_han[[j]]$n <- as.character(table1Characteristics_han[[j]]$n)
     
     print(paste0("Getting table 1 for ", outcome_cohorts_han$cohort_name[[j]], " (" , j , " of ", length(outcome_cohorts_han$cohort_name), ")")) 
     
