@@ -21,8 +21,8 @@ library(bshazard)
 
 # database metadata and connection details -----
 # The name/ acronym for the database
-db.name<-"CPRDAurum"
-#db.name<-"CPRDGold"
+#db.name<-"CPRDAurum"
+db.name<-"CPRDGold"
 #db.name<-"CPRDAurumCovid"
 
 # Set output folder location -----
@@ -38,8 +38,8 @@ user<-Sys.getenv("DB_USER")
 password<- Sys.getenv("DB_PASSWORD")
 port<-Sys.getenv("DB_PORT") 
 host<-Sys.getenv("DB_HOST") 
-server_dbi<-Sys.getenv("DB_SERVER_cdm_aurum_202106_dbi") #aurum
-#server_dbi<-Sys.getenv("DB_SERVER_cdmgold202007_dbi") #gold
+#server_dbi<-Sys.getenv("DB_SERVER_cdm_aurum_202106_dbi") #aurum
+server_dbi<-Sys.getenv("DB_SERVER_cdmgold202007_dbi") #gold
 #server_dbi<-Sys.getenv("DB_SERVER_p20_059_cdm_aurum_dbi") #aurum covid
 
 

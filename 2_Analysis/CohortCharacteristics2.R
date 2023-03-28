@@ -470,7 +470,7 @@ print(paste0("Getting table 1 for ", outcome_cohorts$cohort_name[[j]], " (" , j 
 
 #bind all results together
 table1Characteristics_all <- bind_rows(table1Characteristics) %>%
-  mutate(Database = db.name)
+  mutate(Database = db.name, analysis = "Incidence")
 
 #save the results
 write_csv(table1Characteristics_all, here::here(paste0("Results/",db.name,"/Table1",db.name,".csv")))
@@ -495,14 +495,8 @@ prev_period_participants <- estimatePeriodPrevalence(
   verbose = TRUE
 )
 
-# study_results1 <- gatherIncidencePrevalenceResults(cdm =cdm,
-#                                                    resultList=list(prev_period_participants),
-#                                                    databaseName = db.name)
-#
-# #where completeDatabaseIntervals = TRUE
-# studyswd <- study_results1$prevalence_estimates_CPRDGold
 
-# # the numbers are not the same as achieved in annual prev
+# the numbers are not the same as achieved in annual prev
 settings_surv_prev <- settings(prev_period_participants)
 
 popsprev <- list()
@@ -858,7 +852,7 @@ for(j in seq_along(prevalent_cohorts$cohort_definition_id)){
 
 #bind all results together
 table1Characteristics_all_prev <- bind_rows(table1CharacteristicsPrev) %>%
-  mutate(Database = db.name)
+  mutate(Database = db.name, analysis = "Prevalence")
 
 # #save the results
 write_csv(table1Characteristics_all_prev, here::here(paste0("Results/",db.name,"/Table1Prev",db.name,".csv")))
@@ -1109,7 +1103,7 @@ if (grepl("CPRD", db.name) == TRUE){
   
   #bind all results together
   table1Characteristics_all_han <- bind_rows(table1Characteristics_han) %>%
-    mutate(Database = db.name)
+    mutate(Database = db.name, analysis = "Incidence")
   
   #save the results
   write_csv(table1Characteristics_all_han, here::here(paste0("Results/",db.name,"/Table1HanMed",db.name,".csv")))
@@ -1131,14 +1125,7 @@ if (grepl("CPRD", db.name) == TRUE){
     verbose = TRUE
   )
   
-  # study_results1 <- gatherIncidencePrevalenceResults(cdm =cdm,
-  #                                                    resultList=list(prev_period_participants),
-  #                                                    databaseName = db.name)
-  #
-  # #where completeDatabaseIntervals = TRUE
-  # studyswd <- study_results1$prevalence_estimates_CPRDGold
-  
-  # # the numbers are not the same as achieved in annual prev
+  # the numbers are not the same as achieved in annual prev
   settings_surv_prev <- settings(prev_period_han_participants)
   
   popsprev <- list()
@@ -1347,138 +1334,6 @@ if (grepl("CPRD", db.name) == TRUE){
   # get a list to put results into
   table1CharacteristicsPrev <- list()
   
-  get_summary_characteristics_prev<-function(data){
-    
-    summary_characteristics<- bind_rows(
-      data %>% 
-        count() %>% 
-        mutate(var="N"),
-      
-      data %>% 
-        summarise(mean=nice.num(mean(age)),
-                  standard_deviation = nice.num(sd(age)),
-                  median = nice.num(median(age)),
-                  interquartile_range=paste0(nice.num.count(quantile(age,probs=0.25)),  " to ",
-                                             nice.num.count(quantile(age,probs=0.75)))) %>% 
-        mutate(var="age"),
-      
-      data %>% 
-        group_by(age_gr) %>% 
-        summarise(n=n(),
-                  percent=paste0(nice.num((n/nrow(data))*100),  "%")) %>%   
-        rename("var"="age_gr") %>% 
-        mutate(var=paste0("Age group: ", var)),
-      
-      data %>% 
-        mutate(gender=factor(gender, levels=c("Male", "Female"))) %>% 
-        group_by(gender) %>% 
-        summarise(n=n(),
-                  percent=paste0(nice.num((n/nrow(data))*100),  "%")) %>%   
-        rename("var"="gender") %>% 
-        mutate(var=paste0("Sex: ", var)),
-      
-      data %>% 
-        mutate(Death=factor(Death, levels=c("Alive", "Dead"))) %>% 
-        group_by(Death) %>% 
-        summarise(n=n(),
-                  percent=paste0(nice.num((n/nrow(data))*100),  "%")) %>%   
-        rename("var"="Death") %>% 
-        mutate(var=paste0("Death: ", var)),
-      
-      data %>% 
-        summarise(mean=nice.num.count(mean(Prior_history_days)),
-                  standard_deviation = nice.num(sd(Prior_history_days)),
-                  median = nice.num(median(Prior_history_days)),
-                  interquartile_range=paste0(nice.num.count(quantile(Prior_history_days,probs=0.25)),  " to ",
-                                             nice.num.count(quantile(Prior_history_days,probs=0.75)))) %>% 
-        mutate(var="Prior_history_days"),
-      
-      data %>% 
-        summarise(mean=nice.num.count(mean((Prior_history_days/365.25))),
-                  standard_deviation = nice.num(sd((Prior_history_days/365.25))),
-                  median = nice.num(median((Prior_history_days/365.25))),
-                  interquartile_range=paste0(nice.num.count(quantile((Prior_history_days/365.25),probs=0.25)),  " to ",
-                                             nice.num.count(quantile((Prior_history_days/365.25),probs=0.75)))) %>% 
-        mutate(var="Prior_history_years"),
-      
-      data %>% 
-        summarise(mean=nice.num.count(mean(Prior_history_days_study_start)),
-                  standard_deviation = nice.num(sd(Prior_history_days_study_start)),
-                  median = nice.num(median(Prior_history_days_study_start)),
-                  interquartile_range=paste0(nice.num.count(quantile(Prior_history_days_study_start,probs=0.25)),  " to ",
-                                             nice.num.count(quantile(Prior_history_days_study_start,probs=0.75)))) %>% 
-        mutate(var="Prior_history_days_study_start"),
-      
-      data %>% 
-        summarise(mean=nice.num.count(mean((Prior_history_days_study_start/365.25))),
-                  standard_deviation = nice.num(sd((Prior_history_days_study_start/365.25))),
-                  median = nice.num(median((Prior_history_days_study_start/365.25))),
-                  interquartile_range=paste0(nice.num.count(quantile((Prior_history_days_study_start/365.25),probs=0.25)),  " to ",
-                                             nice.num.count(quantile((Prior_history_days_study_start/365.25),probs=0.75)))) %>% 
-        mutate(var="Prior_history_years_start"),
-      
-      
-      data %>% 
-        summarise(mean=nice.num.count(mean(time_days)),
-                  standard_deviation = nice.num(sd(time_days)),
-                  median = nice.num(median(time_days)),
-                  interquartile_range=paste0(nice.num.count(quantile(time_days,probs=0.25)),  " to ",
-                                             nice.num.count(quantile(time_days,probs=0.75)))) %>% 
-        mutate(var="time_days"),
-      
-      data %>% 
-        summarise(mean=nice.num.count(mean((time_years))),
-                  standard_deviation = nice.num(sd((time_years))),
-                  median = nice.num(median((time_years))),
-                  interquartile_range=paste0(nice.num.count(quantile((time_years),probs=0.25)),  " to ",
-                                             nice.num.count(quantile((time_years),probs=0.75)))) %>% 
-        mutate(var="time_years"))
-    
-    for(i in seq_along(disease_cohorts$cohort_name)){
-      working_id_name <- glue::glue("{disease_cohorts$cohort_name[[i]]}")
-      summary_characteristics <- bind_rows(summary_characteristics,
-                                           data %>% 
-                                             summarise(n=sum(!is.na(!!rlang::sym(working_id_name))),
-                                                       percent=paste0(nice.num((n/nrow(data))*100),  "%"))%>% 
-                                             mutate(var=working_id_name)
-      )
-    }
-    
-    for(i in seq_along(prevalent_cohorts$cohort_name)){
-      working_name <- glue::glue("{prevalent_cohorts$cohort_name[[i]]}")
-      summary_characteristics <- bind_rows(summary_characteristics,
-                                           data %>% 
-                                             summarise(n=sum(!is.na(!!rlang::sym(working_name))),
-                                                       percent=paste0(nice.num((n/nrow(data))*100),  "%"))%>% 
-                                             mutate(var=working_name)
-      )
-    }
-    
-    for(i in seq_along(medication_cohorts$cohort_name)){
-      working_id_name <- glue::glue("{medication_cohorts$cohort_name[[i]]}")
-      summary_characteristics <- bind_rows(summary_characteristics,
-                                           data %>% 
-                                             summarise(n=sum(!is.na(!!rlang::sym(working_id_name))),
-                                                       percent=paste0(nice.num((n/nrow(data))*100),  "%"))%>% 
-                                             mutate(var=working_id_name)
-      )
-    }
-    
-    # filter any less than 5
-    summary_characteristics <- summary_characteristics %>% 
-      mutate(mean=ifelse(!is.na(n) & n<5, NA, mean)) %>% 
-      mutate(percent=ifelse(!is.na(n) & n<5, NA, percent)) %>% 
-      mutate(interquartile_range=ifelse(!is.na(n) & n<5, NA, interquartile_range)) %>% 
-      mutate(standard_deviation=ifelse(!is.na(n) & n<5, NA, standard_deviation)) %>% 
-      mutate(n=ifelse(!is.na(n) & n<5, "<5", n))
-    
-    return(summary_characteristics %>% 
-             relocate(any_of(c("var", "n", "percent",
-                               "mean", "standard_deviation",
-                               "median", "interquartile_range"))))
-    
-  }
-  
   # #create a loop that puts table 1 for each outcome
   for(j in seq_along(prevalent_cohorts_han$cohort_definition_id)){
     
@@ -1494,7 +1349,7 @@ if (grepl("CPRD", db.name) == TRUE){
   
   #bind all results together
   table1Characteristics_han_prev <- bind_rows(table1CharacteristicsPrev) %>%
-    mutate(Database = db.name)
+    mutate(Database = db.name, analysis = "Prevalence")
   
   # #save the results
   write_csv(table1Characteristics_han_prev, here::here(paste0("Results/",db.name,"/Table1HanPrev",db.name,".csv")))
