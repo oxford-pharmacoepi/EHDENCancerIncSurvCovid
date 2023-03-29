@@ -25,11 +25,6 @@ cdm <- generateCohortSet(cdm,
                          overwrite = TRUE
 )
 
-# to see numbers in features
-# cdm$cancerincprev7_fdisease %>% 
-# group_by(cohort_definition_id) %>%
-# tally()
-
 info(logger, "- got features for diseases")
 
 # instantiate feature cohorts (medications)
@@ -80,6 +75,22 @@ inc_overall_participants <- estimateIncidence(
   verbose = TRUE
 )
 
+#get participants for prevalence
+prev_period_participants <- estimatePeriodPrevalence(
+  cdm = cdm,
+  denominatorTable = "denominatordemo",
+  outcomeCohortId = prevalent_cohorts$cohort_definition_id,
+  outcomeCohortName = prevalent_cohorts$cohort_name,
+  outcomeLookbackDays = 0,
+  outcomeTable = prevalent_table_name,
+  interval = "years" ,
+  completeDatabaseIntervals = TRUE, # prev only estimate for intervals where db captures all of the interval
+  fullContribution = FALSE , # individuals only required to be present for one day in interval
+  minCellCount = 5,
+  returnParticipants = TRUE,
+  tablePrefix = prevalent_table_name,
+  verbose = TRUE
+)
 
 # #extract settings for survival from incidence results
 settings_surv <- settings(inc_overall_participants) 
@@ -478,25 +489,6 @@ write_csv(table1Characteristics_all, here::here(paste0("Results/",db.name,"/Tabl
 
 # PREVALENCE POPULATION
 # same code but for prev population (already obtained values just need participants)
-
-prev_period_participants <- estimatePeriodPrevalence(
-  cdm = cdm,
-  denominatorTable = "denominatordemo",
-  outcomeCohortId = prevalent_cohorts$cohort_definition_id,
-  outcomeCohortName = prevalent_cohorts$cohort_name,
-  outcomeLookbackDays = 0,
-  outcomeTable = prevalent_table_name,
-  interval = "years" ,
-  completeDatabaseIntervals = TRUE, # prev only estimate for intervals where db captures all of the interval
-  fullContribution = FALSE , # individuals only required to be present for one day in interval
-  minCellCount = 5,
-  returnParticipants = TRUE,
-  tablePrefix = prevalent_table_name,
-  verbose = TRUE
-)
-
-
-# the numbers are not the same as achieved in annual prev
 settings_surv_prev <- settings(prev_period_participants)
 
 popsprev <- list()
@@ -1106,7 +1098,7 @@ if (grepl("CPRD", db.name) == TRUE){
     mutate(Database = db.name, analysis = "Incidence")
   
   #save the results
-  write_csv(table1Characteristics_all_han, here::here(paste0("Results/",db.name,"/Table1HanMed",db.name,".csv")))
+  write_csv(table1Characteristics_all_han, here::here(paste0("Results/",db.name,"/Table1Han",db.name,".csv")))
 
 # PREVALENCE FOR HAN
   prev_period_han_participants <- estimatePeriodPrevalence(
