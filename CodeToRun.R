@@ -1,9 +1,6 @@
 # Load packages ------
 #renv::activate()
 #renv::restore()
-# to install latest version of IncidencePrevalence
-#install.packages("remotes")
-#remotes::install_github("darwin-eu-dev/IncidencePrevalence",force = TRUE)
 
 # load r packages
 library(CirceR)
@@ -24,8 +21,8 @@ library(bshazard)
 
 # database metadata and connection details -----
 # The name/ acronym for the database
-db.name<-"CPRDAurum"
-#db.name<-"CPRDGold"
+#db.name<-"CPRDAurum"
+db.name<-"CPRDGold"
 #db.name<-"CPRDAurumCovid"
 
 # Set output folder location -----
@@ -41,8 +38,8 @@ user<-Sys.getenv("DB_USER")
 password<- Sys.getenv("DB_PASSWORD")
 port<-Sys.getenv("DB_PORT") 
 host<-Sys.getenv("DB_HOST") 
-server_dbi<-Sys.getenv("DB_SERVER_cdm_aurum_202106_dbi") #aurum
-#server_dbi<-Sys.getenv("DB_SERVER_cdmgold202007_dbi") #gold
+#server_dbi<-Sys.getenv("DB_SERVER_cdm_aurum_202106_dbi") #aurum
+server_dbi<-Sys.getenv("DB_SERVER_cdmgold202007_dbi") #gold
 #server_dbi<-Sys.getenv("DB_SERVER_p20_059_cdm_aurum_dbi") #aurum covid
 
 
@@ -93,7 +90,7 @@ studyEndDate <- "2019-12-31"
 runSurvial <- FALSE
 
 # Run the study ------
-source(here("RunStudy.R"))
+#source(here("RunStudy.R"))
 # after the study is run you should have a zip folder in your output folder to share
 
 # disconnect from the database (only do this after you have run all analysis)
