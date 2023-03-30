@@ -59,7 +59,8 @@ survival_rates_table_cy <- readRDS(here("data","survival_rates_table.rds")) %>%
   rename(CalendarYearGp = CalenderYearGp) %>%
   filter(CalendarYearGp != "2000 to 2019") %>%
   droplevels() %>%
-  filter(time != 10)
+  filter(time != 10) %>%
+  mutate(time = as.character(time))
 
 table_one_results <- readRDS(here("data","table1_results.rds")) 
 

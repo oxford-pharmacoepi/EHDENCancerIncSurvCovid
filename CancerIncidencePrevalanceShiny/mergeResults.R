@@ -66,7 +66,7 @@ prepare_output<-function(result){
   
   result <- result %>%
     mutate(database_name = replace(database_name, database_name == "CPRDAurum", "CPRD Aurum")) %>%
-    mutate(database_name = replace(database_name, database_name == "CPRDGold", "CPRD Gold")) 
+    mutate(database_name = replace(database_name, database_name == "CPRDGold", "CPRD GOLD")) 
   
   #filter out the results for both genders for prostate cancer (as cohort only in male)
   result <- result %>%
@@ -121,7 +121,7 @@ prepare_output_survival <- function(result){
   
   result <- result %>%
     mutate(Database = replace(Database, Database == "CPRDAurum", "CPRD Aurum")) %>%
-    mutate(Database = replace(Database, Database == "CPRDGold", "CPRD Gold")) 
+    mutate(Database = replace(Database, Database == "CPRDGold", "CPRD GOLD")) 
   
   result <- result %>%
     mutate(Gender=replace(Gender, Cancer=="Prostate", "Male"))
@@ -129,19 +129,56 @@ prepare_output_survival <- function(result){
   return(result)
 } 
 
-
+##preparation the output for table 1
+prepare_output_table1 <- function(result){
+  result <- result %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerHypopharynx", "Hypopharynx")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerLarynx", "Larynx")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerNasalCavitySinus", "Nasal Cavity & Sinus")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerNasopharynx", "Nasopharynx")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerOralCavityPrevalent", "Oral Cavity")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerOropharynx", "Oropharynx")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerSalivaryGland", "Salivary Gland")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerTonguePrevalent", "Tongue")) %>% 
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerOralCavityIncidence", "Oral Cavity")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerTongueIncidence", "Tongue")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentProstateCancer", "Prostate")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentLungCancer", "Lung")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentBreastCancer", "Breast")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentColorectalCancer", "Colorectal")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentHeadNeckCancer", "Head & Neck")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentLiverCancer", "Liver")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentPancreaticCancer", "Pancreas")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentStomachCancer", "Stomach")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentEsophagealCancer", "Esophagus")) %>%    
+    mutate(Cancer = replace(Cancer, Cancer == "PrevalentProstateCancer", "Prostate")) %>%
+  mutate(Cancer = replace(Cancer, Cancer == "PrevalentBreastCancer", "Breast")) %>%
+  mutate(Cancer = replace(Cancer, Cancer == "PrevalentColorectalCancer", "Colorectal")) %>%
+  mutate(Cancer = replace(Cancer, Cancer == "PrevalentEsophagealCancer", "Esophagus")) %>%
+  mutate(Cancer = replace(Cancer, Cancer == "PrevalentHeadNeckCancer", "Head & Neck")) %>%
+  mutate(Cancer = replace(Cancer, Cancer == "PrevalentLiverCancer", "Liver")) %>%
+  mutate(Cancer = replace(Cancer, Cancer == "PrevalentLungCancer", "Lung")) %>%
+  mutate(Cancer = replace(Cancer, Cancer == "PrevalentPancreaticCancer", "Pancreas")) %>%
+  mutate(Cancer = replace(Cancer, Cancer == "PrevalentStomachCancer", "Stomach")) 
+  
+  
+  
+  
+  
+  result <- result %>%
+    mutate(Database = replace(Database, Database == "CPRDAurum", "CPRD Aurum")) %>%
+    mutate(Database = replace(Database, Database == "CPRDGold", "CPRD GOLD")) 
+  
+  
+  
+  return(result)
+} 
 
 # Load, prepare, and merge results -----
 results <-list.files(here("networkResults"), full.names = TRUE,
                      recursive = TRUE,
                      include.dirs = TRUE,
                      pattern = ".zip")
-
-#load the table 1 for the i/p results
-resultstb1 <-list.files(here("networkResults"), full.names = TRUE,
-                     recursive = TRUE,
-                     include.dirs = TRUE,
-                     pattern = ".csv")
 
 #unzip data
 for (i in (1:length(results))) {
@@ -285,6 +322,8 @@ for(i in seq_along(survival_median_files)){
 }
 survival_median_table <- dplyr::bind_rows(survival_median_table)
 survival_median_table <- prepare_output_survival(survival_median_table)
+survival_median_table <- survival_median_table 
+
 saveRDS(survival_median_table,
         here("shiny", "data", "/survival_median_table.rds"))
 
@@ -305,50 +344,20 @@ saveRDS(survival_rates_table,
 
 
 # table 1 
-
-##preparation the output for table 1
-prepare_output_table1 <- function(result){
-  result <- result %>%
-    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerHypopharynx", "Hypopharynx")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerLarynx", "Larynx")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerNasalCavitySinus", "Nasal Cavity & Sinus")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerNasopharynx", "Nasopharynx")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerOralCavityPrevalent", "Oral Cavity")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerOropharynx", "Oropharynx")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerSalivaryGland", "Salivary Gland")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerTonguePrevalent", "Tongue")) %>% 
-    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerOralCavityIncidence", "Oral Cavity")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerTongueIncidence", "Tongue")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "IncidentProstateCancer", "Prostate")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "IncidentLungCancer", "Lung")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "IncidentBreastCancer", "Breast")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "IncidentColorectalCancer", "Colorectal")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "IncidentHeadNeckCancer", "Head & Neck")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "IncidentLiverCancer", "Liver")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "IncidentPancreaticCancer", "Pancreas")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "IncidentStomachCancer", "Stomach")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "IncidentEsophagealCancer", "Esophagus")) %>%    
-    mutate(Cancer = replace(Cancer, Cancer == "PrevalentProstateCancer", "Prostate")) 
-  
-  result <- result %>%
-    mutate(Database = replace(Database, Database == "CPRDAurum", "CPRD Aurum")) %>%
-    mutate(Database = replace(Database, Database == "CPRDGold", "CPRD GOLD")) 
-  
-
-  
-  return(result)
-} 
+table1_files<-results[stringr::str_detect(results, ".csv")]
+table1_files<-results[stringr::str_detect(results, "Table1")]
 
 table1_results <- list()
-for(i in seq_along(resultstb1)){
-  table1_results[[i]]<-readr::read_csv(resultstb1[[i]], 
+for(i in seq_along(table1_files)){
+  table1_results[[i]]<-readr::read_csv(table1_files[[i]], 
                                              show_col_types = FALSE)  
 }
 table1_results <- dplyr::bind_rows(table1_results)
 
-
-
 table1_results <- prepare_output_table1(table1_results)
+
+table1_results <- table1_results %>% 
+  distinct()
 
 
 table1_results <- table1_results %>% 
@@ -377,7 +386,38 @@ table1_results <- table1_results %>%
   filter(!grepl("Death: Alive",var)) %>%
   filter(!grepl("Prior_history_days_study_start",var))%>%
   filter(!grepl("Prior_history_years_start",var)) %>%
-  select(c(var, Variable, Cancer, Database ))
+  select(c(var, Variable, Cancer, Database, analysis ))
+
+# make into wider format for results
+table1_results <- table1_results %>% 
+  tidyr::pivot_wider(names_from = Database,
+                     values_from = Variable
+  )
+
+# remove drugs for CPRD
+table1_results <- table1_results %>% 
+  filter(!grepl("AgentsReninAngiotensinSystem",var)) %>%
+  filter(!grepl("Antidepressants",var)) %>%
+  filter(!grepl("Antiepileptics",var))%>%
+  filter(!grepl("AntiinflammatoryAntirheumatic",var)) %>%
+  filter(!grepl("Antineoplastics",var)) %>%
+  filter(!grepl("Antipsoriatics",var)) %>%
+  filter(!grepl("Antipsychotics",var)) %>%
+  filter(!grepl("Antithrombotics",var)) %>%
+  filter(!grepl("Anxiolytics",var)) %>%
+  filter(!grepl("BetaBlockers",var)) %>%
+  filter(!grepl("CalciumChannelBlockers",var)) %>%
+  filter(!grepl("Diuretics",var))%>%
+  filter(!grepl("DrugsAcidRelatedDisorders",var)) %>%
+  filter(!grepl("DrugsDiabetes",var)) %>%
+  filter(!grepl("DrugsObstructiveAirwayDiseases",var)) %>%
+  filter(!grepl("HypnoticsSedatives",var)) %>%
+  filter(!grepl("Immunosuppressants",var)) %>%
+  filter(!grepl("LipidModifyingAgents",var)) %>%
+  filter(!grepl("Opioids",var)) %>%
+  filter(!grepl("Psychostimulants",var)) 
+
+
 
 saveRDS(table1_results, 
         here("shiny", "data", "table1_results.rds"))

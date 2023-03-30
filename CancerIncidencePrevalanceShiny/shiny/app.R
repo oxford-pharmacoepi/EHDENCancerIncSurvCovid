@@ -21,7 +21,6 @@ library(ggalt)
 # devtools::install_github("hrbrmstr/ggalt", ref = "noproj")
 
 
-
 #### UI -----
 ui <-  fluidPage(theme = shinytheme("spacelab"),
                  
