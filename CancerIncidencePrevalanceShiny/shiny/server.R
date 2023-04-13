@@ -43,7 +43,7 @@ server <-	function(input, output, session) {
                 "denominator_strata_cohort_definition_id",
                 "denominator_strata_cohort_name")) %>%
       relocate(result_id, .after = prevalence_end_date) %>%
-    relocate(`Prevalence (95% CI)`, .before = outcome_cohort_name)
+    relocate(`Prevalence (95% CI)`, .before = outcome_cohort_name) 
 
     
     
@@ -697,7 +697,7 @@ server <-	function(input, output, session) {
       mutate(median=nice.num3(median)) %>%
       mutate(`0.95LCL`=nice.num3(`0.95LCL`)) %>%
       mutate(`0.95UCL`=nice.num3(`0.95UCL`)) %>%
-      relocate(Cancer) 
+      relocate(Cancer)
       
     datatable(table,
               rownames= FALSE,
@@ -740,7 +740,11 @@ server <-	function(input, output, session) {
       mutate(`0.95LCL`=nice.num3(`0.95LCL`)) %>%
       mutate(`0.95UCL`=nice.num3(`0.95UCL`)) %>%
       relocate(Cancer) 
-    
+    # 
+    # table <- table %>%
+    #   mutate(across(everything(), as.character)) %>%
+    #   mutate(across(everything(), ~replace_na(.x, " ")))
+    # 
     datatable(table,
               rownames= FALSE,
               extensions = 'Buttons',
@@ -857,7 +861,8 @@ server <-	function(input, output, session) {
   get_table_one <-reactive({
     
     table<-table_one_results %>% 
-      filter(Cancer %in% input$table1_outcome_cohort_name_selector)
+      filter(Cancer %in% input$table1_outcome_cohort_name_selector) %>%
+      filter(analysis %in% input$table1_analysis_selector)  
 
     
     table
@@ -880,5 +885,100 @@ server <-	function(input, output, session) {
                                                  filename = "tableOne"))
               ))
   } )
+
+# plot for survival probabilities over calender year
+  output$plot_survival_probs_cy<- renderPlotly({
+    
+    table<-get_survival_rates_table_cy()
+    validate(need(ncol(table)>1,
+                  "No results for selected inputs"))
+    
+
+    if(is.null(input$survival_rate_plot_group)){
+      if(!is.null(input$survival_rate_facet_cy)){
+        p <-table %>%
+          unite("facet_var",
+                c(all_of(input$survival_rate_facet_cy)), remove = FALSE, sep = "; ") %>%
+          ggplot(aes_string(x="CalendarYearGp", y="surv", colour = input$time)) +
+          geom_point() +
+          geom_line() +
+          facet_wrap(vars(facet_var),ncol = 2)+
+          scale_y_continuous(limits = c(NA, 1) ) +
+          theme_bw()
+      } else{
+        p <-table %>%
+          ggplot(aes_string(x="CalendarYearGp", y="surv",  colour = input$time)) +
+          geom_point() +
+          geom_line() +
+          scale_y_continuous(
+            limits = c(NA, 1)
+          ) +
+          theme_bw()
+      }
+    }
+    
+    
+    if(!is.null(input$survival_rate_plot_group) ){
+      
+      if(is.null(input$survival_rate_facet_cy) ){
+        p<-table %>%
+          unite("Group",
+                c(all_of(input$survival_rate_plot_group)), remove = FALSE, sep = "; ") %>%
+          ggplot(aes_string(x="CalendarYearGp", y="surv",
+                            group="Group",
+                            colour="Group")) +
+          geom_line() +
+          theme_bw()
+      }
+      
+      if(!is.null(input$survival_rate_facet_cy) ){
+        if(!is.null(input$survival_rate_plot_group) ){
+          p<-table %>%
+            unite("Group",
+                  c(all_of(input$survival_rate_plot_group)), remove = FALSE, sep = "; ") %>%
+            unite("facet_var",
+                  c(all_of(input$survival_rate_facet_cy)), remove = FALSE, sep = "; ") %>%
+            ggplot(aes_string(x="CalendarYearGp", y="surv",
+                              group="Group",
+                              colour="Group")) +
+            geom_line() +
+            facet_wrap(vars(facet_var),ncol = 2)+
+            scale_y_continuous(limits = c(NA, 1) )  +
+            theme_bw()
+        }
+      }
+      
+    } 
+    
+    
+    
+    
+    
+    
+      # if(!is.null(input$survival_rate_facet_cy)){
+      #   p <-table %>%
+      #     unite("facet_var",
+      #           c(all_of(input$survival_rate_facet_cy)), remove = FALSE, sep = "; ") %>%
+      #     ggplot(aes_string(x="CalendarYearGp", y="surv", colour = input$time)) +
+      #     geom_point() +
+      #     geom_line() +
+      #     facet_wrap(vars(facet_var),ncol = 2)+
+      #     scale_y_continuous(limits = c(NA, 1) ) +
+      #     theme_bw()
+      # } else {
+      #   p <-table %>%
+      #     ggplot(aes_string(x="CalendarYearGp", y="surv",  colour = input$time)) +
+      #     geom_point() +
+      #     geom_line() +
+      #     scale_y_continuous(
+      #       limits = c(NA, 1)
+      #     ) +
+      #     theme_bw()
+      # }
+
+    
+    p
+    
+  })    
    
 }

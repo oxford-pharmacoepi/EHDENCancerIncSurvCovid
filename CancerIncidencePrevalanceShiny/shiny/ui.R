@@ -445,7 +445,6 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                                  DTOutput('tbl_survival_risk_table') %>% withSpinner()),
                                         tabPanel("Median survival estimates", 
                                                  tags$hr(),
-                                                 tags$h5("Bug with age groups to fix...."),
                                                  DTOutput('tbl_survival_median_table') %>% withSpinner()),
                                         tabPanel("Survival Probabilities", 
                                                  DTOutput('tbl_survival_rates_table') %>% withSpinner()),
@@ -563,10 +562,44 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                                  DTOutput('tbl_survival_risk_table_cy') %>% withSpinner()),
                                         tabPanel("Median survival estimates", 
                                                  tags$hr(),
-                                                 tags$h5("Bug with age groups to fix...."),
                                                  DTOutput('tbl_survival_median_table_cy') %>% withSpinner()),
                                         tabPanel("Survival Probabilities", 
                                                  DTOutput('tbl_survival_rates_table_cy') %>% withSpinner()),
+                                        tabPanel("Plots of 1 and 5 year survival",
+                                                 tags$hr(),
+                                                 tags$h5("Plotting Options"),
+                                                 div(style="display: inline-block;vertical-align:top; width: 150px;",
+                                                     pickerInput(inputId = "survival_rate_plot_group",
+                                                                 label = "Colour by",
+                                                                 choices = c("Gender",
+                                                                             "Age",
+                                                                             "Cancer",
+                                                                             "Database",
+                                                                             "time"),
+                                                                 selected = c("time", "Database"),
+                                                                 options = list(
+                                                                   `actions-box` = TRUE,
+                                                                   size = 10,
+                                                                   `selected-text-format` = "count > 3"),
+                                                                 multiple = TRUE,)    
+                                                 ),
+                                                 div(style="display: inline-block;vertical-align:top; width: 150px;",
+                                                     pickerInput(inputId = "survival_rate_facet_cy",
+                                                                 label = "Facet by",
+                                                                 choices = c("Cancer",
+                                                                             "Database",
+                                                                             "Gender",
+                                                                             "Age"
+                                                                 ),
+                                                                 selected = c("Cancer","Database"),
+                                                                 options = list(
+                                                                   `actions-box` = TRUE,
+                                                                   size = 10,
+                                                                   `selected-text-format` = "count > 3"),
+                                                                 multiple = TRUE)
+                                                 ),
+                                                 plotlyOutput('plot_survival_probs_cy', height = "800px") %>% withSpinner() ),
+                                        
                                         tabPanel("Table of estimates", 
                                                  DTOutput('tbl_survival_estimates_cy') %>% withSpinner())
                                         
@@ -579,7 +612,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                    ## Population characteristics ------ 
                    tabPanel("Population Characteristics",	  
                             tags$h3("Study Population Characteristics"),
-                            tags$h5("The population characteristics are shown below....Just GOLD at the moment"),
+                            tags$h5("The population characteristics are shown below..."),
                             tags$hr(),
                             tags$h5("Study outcome") ,
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
@@ -596,6 +629,21 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
 
 
                             ),
+                            
+                            
+                            div(style="display: inline-block;vertical-align:top; width: 150px;",
+                                pickerInput(inputId = "table1_analysis_selector",
+                                            label = "Analysis Type",
+                                            choices = sort(unique(table_one_results$analysis)),
+                                            selected = c("Incidence"),
+                                            options = list(
+                                              `actions-box` = TRUE,
+                                              size = 10,
+                                              `selected-text-format` = "count > 3"),
+                                            multiple = TRUE)
+                            ),
+                            
+                            
                             tabsetPanel(type = "tabs",
                                         tabPanel("Study Population Characteristics", 
                                                  DTOutput('tbl_table_one') %>% withSpinner()
