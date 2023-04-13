@@ -177,7 +177,7 @@ risktableskm <- dplyr::bind_rows(observedrisktableKM) %>%
   mutate(across(everything(), as.character)) %>%
   mutate(Stratification = "None")
 
-#generate 1,5,10 probabilities
+#generate 1,2,3,4,5,10 probabilities
 sprobkmcombined <- dplyr::bind_rows(observedsurprobsKM) %>%
   mutate(Stratification = "None")
 
@@ -575,7 +575,7 @@ for(j in 1:nrow(outcomeCohort)) {
              strata = str_replace(strata, "genderAgegp=", "") ) %>%
       rename("GenderAge" = "strata")
     
-    print(paste0("survival probabilites for 1,5,10 years from KM from observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
+    print(paste0("survival probabilites for 1, 5,10 years from KM from observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
     
   } else {
     
@@ -603,7 +603,7 @@ risktableskm_age_gender <- risktableskm_age_gender %>%
   mutate(across(everything(), as.character))  %>%
   mutate(Stratification = "Age*Gender")
 
-#generate 1,5,10 probabilities
+#generate 1,2,3,4,5,10 probabilities
 sprobkmcombined_age_gender <- dplyr::bind_rows(observedsurprobsKM_age_gender) %>%
   mutate(Stratification = "Age*Gender")
 
