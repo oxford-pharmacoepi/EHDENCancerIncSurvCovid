@@ -92,7 +92,7 @@ info(logger, 'INCIDENCE RATE ANALYSIS RAN')
 # 
 # Run cohort characterisation analysis ----
 info(logger, 'RUNNING COHORT CHARACTERISATION ANALYSIS')
-source(here("2_Analysis","CohortCharacteristics.R"))
+source(here("2_Analysis","CohortCharacteristics2.R"))
 info(logger, 'COHORT CHARACTERISATION ANALYSIS RAN')
 
 if(runSurvial == TRUE){
