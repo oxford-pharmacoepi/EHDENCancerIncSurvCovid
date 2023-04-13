@@ -2,7 +2,6 @@
 
 # This code extracts the participants from the incidence analysis overall and calculates their baseline characteristics (table 1 for papers)
 # This code also generates the data that is inputted into the survival analysis
-start <-Sys.time()
 
 # INCIDENCE POPULATION
 print(paste0("- Getting cohort characteristics: cancer populations"))
@@ -1349,4 +1348,3 @@ if (grepl("CPRD", db.name) == TRUE){
   
 }
   
-Sys.time()-start
