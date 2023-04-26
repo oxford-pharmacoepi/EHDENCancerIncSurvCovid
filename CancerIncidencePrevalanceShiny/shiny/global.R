@@ -62,7 +62,9 @@ survival_rates_table_cy <- readRDS(here("data","survival_rates_table.rds")) %>%
   filter(time != 10) %>%
   mutate(time = as.character(time))
 
-table_one_results <- readRDS(here("data","table1_results.rds")) 
+table_one_results <- readRDS(here("data","table1_results.rds")) %>%
+  filter(analysis == "Incidence")
+  
 
 
 

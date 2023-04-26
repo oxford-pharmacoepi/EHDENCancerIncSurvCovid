@@ -209,9 +209,9 @@ server <-	function(input, output, session) {
                   "No results for selected inputs"))
     
     table <- table %>% 
-      mutate(incidence_100000_pys=nice.num.count(incidence_100000_pys)) %>% 
-      mutate(incidence_100000_pys_95CI_lower=nice.num.count(incidence_100000_pys_95CI_lower)) %>% 
-      mutate(incidence_100000_pys_95CI_upper=nice.num.count(incidence_100000_pys_95CI_upper)) %>% 
+      mutate(incidence_100000_pys=nice.num2(incidence_100000_pys)) %>% 
+      mutate(incidence_100000_pys_95CI_lower=nice.num2(incidence_100000_pys_95CI_lower)) %>% 
+      mutate(incidence_100000_pys_95CI_upper=nice.num2(incidence_100000_pys_95CI_upper)) %>% 
       mutate(incidence_100000_pys= ifelse(!is.na(incidence_100000_pys),
                paste0(incidence_100000_pys, " (",
                                 incidence_100000_pys_95CI_lower," to ", 

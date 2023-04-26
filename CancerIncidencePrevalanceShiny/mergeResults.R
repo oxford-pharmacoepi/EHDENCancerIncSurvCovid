@@ -11,6 +11,10 @@ nice.num3<-function(x) {
   trimws(format(round(x,3),
                 big.mark=",", nsmall = 3, digits=3, scientific=FALSE))}
 
+nice.num2<-function(x) {
+  trimws(format(round(x,2),
+                big.mark=",", nsmall = 2, digits=2, scientific=FALSE))}
+
 #preparing the output and renaming numbers for incidence and prevalence
 prepare_output<-function(result){
   result <- result %>%
@@ -324,6 +328,33 @@ survival_median_table <- dplyr::bind_rows(survival_median_table)
 survival_median_table <- prepare_output_survival(survival_median_table)
 survival_median_table <- survival_median_table 
 
+#if events less than 5 turn the result into NA
+survival_median_table <-  
+  survival_median_table %>% 
+mutate(events = ifelse(events <= 5, NA, events)) %>% 
+mutate(median = ifelse(is.na(events) == TRUE, NA, median)) %>% 
+mutate(records = ifelse(is.na(events) == TRUE, NA, records)) %>% 
+mutate(n.max = ifelse(is.na(events) == TRUE, NA, n.max)) %>% 
+mutate(n.start = ifelse(is.na(events) == TRUE, NA, n.start)) %>% 
+mutate(rmean = ifelse(is.na(events) == TRUE, NA, rmean)) %>% 
+mutate(`se(rmean)` = ifelse(is.na(events) == TRUE, NA, `se(rmean)`)) %>% 
+mutate(`0.95LCL` = ifelse(is.na(events) == TRUE, NA, `0.95LCL`)) %>% 
+mutate(`0.95UCL` = ifelse(is.na(events) == TRUE, NA,`0.95UCL`)) 
+
+# remove those results with do not have a upper confidence interval
+survival_median_table <-  
+  survival_median_table %>% 
+  mutate(events = ifelse(is.na(`0.95UCL`) == TRUE, NA, events)) %>% 
+  mutate(median = ifelse(is.na(`0.95UCL`) == TRUE, NA, median)) %>% 
+  mutate(records = ifelse(is.na(`0.95UCL`) == TRUE, NA, records)) %>% 
+  mutate(n.max = ifelse(is.na(`0.95UCL`) == TRUE, NA, n.max)) %>% 
+  mutate(n.start = ifelse(is.na(`0.95UCL`) == TRUE, NA, n.start)) %>% 
+  mutate(rmean = ifelse(is.na(`0.95UCL`) == TRUE, NA, rmean)) %>% 
+  mutate(`se(rmean)` = ifelse(is.na(`0.95UCL`) == TRUE, NA, `se(rmean)`)) %>% 
+  mutate(`0.95LCL` = ifelse(is.na(`0.95UCL`) == TRUE, NA, `0.95LCL`)) %>% 
+  mutate(`0.95UCL` = ifelse(is.na(`0.95UCL`) == TRUE, NA,`0.95UCL`)) 
+
+
 saveRDS(survival_median_table,
         here("shiny", "data", "/survival_median_table.rds"))
 
@@ -339,6 +370,25 @@ for(i in seq_along(survival_rates_files)){
 }
 survival_rates_table <- dplyr::bind_rows(survival_rates_table)
 survival_rates_table <- prepare_output_survival(survival_rates_table)
+
+
+survival_rates_table  <-  
+  survival_rates_table  %>% 
+  mutate(n.event = ifelse(n.event <= 5, NA, n.event)) %>% 
+  mutate(n.risk = ifelse(is.na(n.event) == TRUE, NA, n.risk)) %>% 
+  mutate(n.censor = ifelse(is.na(n.event) == TRUE, NA, n.censor)) %>% 
+  mutate(surv = ifelse(is.na(n.event) == TRUE, NA, surv)) %>% 
+  mutate(std.err = ifelse(is.na(n.event) == TRUE, NA, std.err)) %>% 
+  mutate(cumhaz = ifelse(is.na(n.event) == TRUE, NA, cumhaz)) %>% 
+  mutate(std.chaz = ifelse(is.na(n.event) == TRUE, NA, std.chaz)) %>% 
+  mutate(type = ifelse(is.na(n.event) == TRUE, NA, type)) %>% 
+  mutate(logse = ifelse(is.na(n.event) == TRUE, NA,logse)) %>% 
+  mutate(conf.int = ifelse(is.na(n.event) == TRUE, NA, conf.int)) %>% 
+  mutate(conf.type = ifelse(is.na(n.event) == TRUE, NA, conf.type)) %>% 
+  mutate(lower = ifelse(is.na(n.event) == TRUE, NA, lower)) %>% 
+  mutate(upper = ifelse(is.na(n.event) == TRUE, NA, upper))
+
+
 saveRDS(survival_rates_table,
         here("shiny", "data", "/survival_rates_table.rds"))
 
@@ -358,7 +408,6 @@ table1_results <- prepare_output_table1(table1_results)
 
 table1_results <- table1_results %>% 
   distinct()
-
 
 table1_results <- table1_results %>% 
   mutate("Variable"= ifelse(!is.na(percent),
@@ -386,6 +435,9 @@ table1_results <- table1_results %>%
   filter(!grepl("Death: Alive",var)) %>%
   filter(!grepl("Prior_history_days_study_start",var))%>%
   filter(!grepl("Prior_history_years_start",var)) %>%
+  filter(!grepl("Death: Dead",var)) %>%
+  filter(!grepl("time_days",var)) %>%
+  filter(!grepl("time_years",var)) %>%
   select(c(var, Variable, Cancer, Database, analysis ))
 
 # make into wider format for results

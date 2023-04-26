@@ -447,9 +447,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                                  tags$hr(),
                                                  DTOutput('tbl_survival_median_table') %>% withSpinner()),
                                         tabPanel("Survival Probabilities", 
-                                                 DTOutput('tbl_survival_rates_table') %>% withSpinner()),
-                                        tabPanel("Table of estimates", 
-                                                 DTOutput('tbl_survival_estimates') %>% withSpinner())
+                                                 DTOutput('tbl_survival_rates_table') %>% withSpinner())
                                         
                                         
                                                
@@ -598,10 +596,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                                                    `selected-text-format` = "count > 3"),
                                                                  multiple = TRUE)
                                                  ),
-                                                 plotlyOutput('plot_survival_probs_cy', height = "800px") %>% withSpinner() ),
-                                        
-                                        tabPanel("Table of estimates", 
-                                                 DTOutput('tbl_survival_estimates_cy') %>% withSpinner())
+                                                 plotlyOutput('plot_survival_probs_cy', height = "800px") %>% withSpinner() )
                                         
                                         
                                         
