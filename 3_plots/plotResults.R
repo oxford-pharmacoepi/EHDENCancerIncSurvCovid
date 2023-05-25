@@ -1411,10 +1411,21 @@ png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units =
 print(plot1, newpage = FALSE)
 dev.off()
 
+# prevalance
+prevalence_estimates_pancreas <- prevalence_estimates %>%
+  filter(outcome_cohort_name == "Pancreas") %>%
+  filter(denominator_age_group != "18 to 29" )
+
+plot1 <- prevalenceFigure3a(prevalence_estimates_pancreas)
+
+plotname <- paste0("FIGURE4_PrevalenceAgeStrat_pancreas_updated.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
 
 
 #incidence rates age*gender strat
-
 incidence_estimates_pancreas1 <- incidence_estimates %>%
   filter(outcome_cohort_name == "Pancreas" & analysis_interval == "years") %>%
   filter(denominator_age_group != "18 to 29" & denominator_age_group != "30 to 39"  )
