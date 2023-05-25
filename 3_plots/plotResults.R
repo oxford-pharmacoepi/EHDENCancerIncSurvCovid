@@ -1392,6 +1392,65 @@ png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units =
 print(plot1, newpage = FALSE)
 dev.off()
 
+
+
+##########################################################
+# pancreatic cancer 
+# INCIDENCE AGE PLOT
+
+#incidence rates age strat
+incidence_estimates_pancreas <- incidence_estimates %>%
+  filter(outcome_cohort_name == "Pancreas" & analysis_interval == "years") %>%
+  filter(denominator_age_group != "18 to 29" & denominator_age_group != "30 to 39"  )
+
+plot1 <- incidenceFigure3a(incidence_estimates_pancreas)
+
+plotname <- paste0("FIGURE2_IncidenceAgeStrat_pancreas_updated.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+
+
+#incidence rates age*gender strat
+
+incidence_estimates_pancreas1 <- incidence_estimates %>%
+  filter(outcome_cohort_name == "Pancreas" & analysis_interval == "years") %>%
+  filter(denominator_age_group != "18 to 29" & denominator_age_group != "30 to 39"  )
+
+plot1 <- incidenceFigure5(incidence_estimates_pancreas1)
+
+plotname <- paste0("FIGURES1_IncidenceAgeSexStrat_pancreas.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # head and neck cancers
 # age plots per 
 
