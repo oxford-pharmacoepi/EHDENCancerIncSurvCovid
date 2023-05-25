@@ -803,7 +803,7 @@ survivalFigure4 <- function(survivalData) {
   
 }
 
-# survival figure 5 whole population and gender strat with calender year strat
+# survival figure 5 whole population and gender strat with calender year strat (puts gender as column and database as rows)
 survivalFigure5 <- function(survivalData) {
   
   survivalFigureData <- survivalData %>%
@@ -829,6 +829,38 @@ survivalFigure5 <- function(survivalData) {
           panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
           legend.key = element_rect(fill = "transparent", colour = "transparent")) +
     ggh4x::facet_grid2(cols = vars(Gender), vars(Database), scales="free", independent = "y") 
+  
+  
+  return(survivalFigureData)
+  
+}
+
+# survival figure 6 whole population and gender strat with calender year strat BUT puts database as columns and gender as rows
+survivalFigure6 <- function(survivalData) {
+  
+  survivalFigureData <- survivalData %>%
+    filter(Stratification == "None"| Stratification == "Gender") %>%
+    filter(CalenderYearGp != "2000 to 2019") %>%
+    ggplot(aes(x = time,
+               y = est,
+               group = CalenderYearGp,
+               col = CalenderYearGp )) +
+    scale_y_continuous( labels = label_percent() ) +
+    scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
+    scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+    geom_line(aes(linetype = CalenderYearGp),size = 0.5) +
+    scale_linetype_manual(values = c("dotted","dashed", "dotdash", "solid")) +
+    labs(x = "Time (Years)",
+         y = "Survival Probability",
+         col = "Calender Year Group",
+         linetype = "Calender Year Group") +
+    theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+          strip.background = element_rect(color = "black", size = 0.6) ,
+          panel.background = element_blank() ,
+          axis.line = element_line(colour = "black", size = 0.6) ,
+          panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+          legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+    ggh4x::facet_grid2(cols = vars(Database) ,vars(Gender), scales="free", independent = "y") 
   
   
   return(survivalFigureData)
@@ -1452,12 +1484,16 @@ dev.off()
 
 
 
+survival_estimates_CRC <- survival_estimates %>%
+  filter(Cancer == names(table(survival_estimates$Cancer)[13]) )
 
+plot1 <- survivalFigure6(survival_estimates_CRC)
 
+plotname <- paste0("Test_pancreas.png")
 
-
-
-
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 10, height = 8, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
 
 
 
