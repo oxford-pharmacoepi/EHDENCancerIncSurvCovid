@@ -221,7 +221,7 @@ prevalence_estimates <- prevalence_estimates %>%
                                        NA
   ))
 saveRDS(prevalence_estimates, 
-        here("shiny", "data", "prevalence_estimates.rds"))
+        here("CancerIncidencePrevalanceShiny", "shiny", "data", "prevalence_estimates.rds"))
 
 
 # prevalence attrition
@@ -235,7 +235,7 @@ for(i in seq_along(prevalence_attrition_files)){
 prevalence_attrition <- dplyr::bind_rows(prevalence_attrition)
 prevalence_attrition <- prepare_output(prevalence_attrition)
 saveRDS(prevalence_attrition, 
-        here("shiny", "data", "/prevalence_attrition.rds"))
+        here("CancerIncidencePrevalanceShiny","shiny", "data", "/prevalence_attrition.rds"))
 
 
 #merge incidence results together
@@ -250,7 +250,7 @@ for(i in seq_along(incidence_estimates_files)){
 incidence_estimates <- dplyr::bind_rows(incidence_estimates)
 incidence_estimates <- prepare_output(incidence_estimates)
 saveRDS(incidence_estimates, 
-        here("shiny", "data", "/incidence_estimates.rds"))
+        here("CancerIncidencePrevalanceShiny","shiny", "data", "/incidence_estimates.rds"))
 
 # incidence attrition
 incidence_attrition_files<-results[stringr::str_detect(results, ".csv")]
@@ -263,7 +263,7 @@ for(i in seq_along(incidence_attrition_files)){
 incidence_attrition <- dplyr::bind_rows(incidence_attrition)
 incidence_attrition <- prepare_output(incidence_attrition)
 saveRDS(incidence_attrition, 
-        here("shiny", "data", "/incidence_attrition.rds"))
+        here("CancerIncidencePrevalanceShiny","shiny", "data", "/incidence_attrition.rds"))
 
 
 # merge the survival results together
@@ -277,7 +277,7 @@ for(i in seq_along(survival_estimates_files)){
 survival_estimates <- dplyr::bind_rows(survival_estimates)
 survival_estimates <- prepare_output_survival(survival_estimates)
 saveRDS(survival_estimates,
-        here("shiny", "data", "/survival_estimates.rds"))
+        here("CancerIncidencePrevalanceShiny","shiny", "data", "/survival_estimates.rds"))
 
 
 
@@ -297,7 +297,7 @@ for(i in seq_along(survival_risk_table_files)){
 survival_risk_table <- dplyr::bind_rows(survival_risk_table)
 survival_risk_table <- prepare_output_survival(survival_risk_table)
 saveRDS(survival_risk_table,
-        here("shiny", "data", "/survival_risk_table.rds"))
+        here("CancerIncidencePrevalanceShiny","shiny", "data", "/survival_risk_table.rds"))
 
 
 
@@ -313,7 +313,7 @@ for(i in seq_along(survival_risk_table_cy_files)){
 survival_risk_cy_table <- dplyr::bind_rows(survival_risk_cy_table)
 survival_risk_cy_table <- prepare_output_survival(survival_risk_cy_table)
 saveRDS(survival_risk_cy_table,
-        here("shiny", "data", "/survival_risk_table_cy.rds"))
+        here("CancerIncidencePrevalanceShiny","shiny", "data", "/survival_risk_table_cy.rds"))
 
 
 # merge the median results together
@@ -356,7 +356,7 @@ survival_median_table <-
 
 
 saveRDS(survival_median_table,
-        here("shiny", "data", "/survival_median_table.rds"))
+        here("CancerIncidencePrevalanceShiny","shiny", "data", "/survival_median_table.rds"))
 
 
 
@@ -390,7 +390,7 @@ survival_rates_table  <-
 
 
 saveRDS(survival_rates_table,
-        here("shiny", "data", "/survival_rates_table.rds"))
+        here("CancerIncidencePrevalanceShiny","shiny", "data", "/survival_rates_table.rds"))
 
 
 # table 1 
@@ -472,5 +472,5 @@ table1_results <- table1_results %>%
 
 
 saveRDS(table1_results, 
-        here("shiny", "data", "table1_results.rds"))
+        here("CancerIncidencePrevalanceShiny","shiny", "data", "table1_results.rds"))
 
