@@ -447,7 +447,11 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                                  tags$hr(),
                                                  DTOutput('tbl_survival_median_table') %>% withSpinner()),
                                         tabPanel("Survival Probabilities", 
-                                                 DTOutput('tbl_survival_rates_table') %>% withSpinner())
+                                                 DTOutput('tbl_survival_rates_table') %>% withSpinner()),
+                                        
+                                        tabPanel("Survival Years Follow Up", 
+                                                 DTOutput('tbl_survival_followup_table') %>% withSpinner())
+                                        
                                         
                                         
                                                

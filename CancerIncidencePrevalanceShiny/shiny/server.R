@@ -979,6 +979,56 @@ server <-	function(input, output, session) {
     
     p
     
-  })    
+  })  
+  
+# table for median and mean follow up
+  get_survival_followup_table<-reactive({
+    
+    table<-survival_followup_table %>% 
+      # first deselect settings which did not vary for this study
+      #select(!c(CalendarYearGp)) %>% 
+      #select(!c(GenderAge, Method)) %>% 
+      filter(Database %in% input$survival_database_name_selector)  %>% 
+      filter(Age %in% input$survival_age_group_selector)     %>% 
+      filter(Gender %in% input$survival_sex_selector)     %>% 
+      filter(Cancer %in% input$survival_outcome_cohort_name_selector) 
+    
+    table
+  }) 
+  output$tbl_survival_followup_table<-  DT::renderDataTable({
+    
+    table<-get_survival_followup_table()
+    
+    validate(need(ncol(table)>1,
+                  "No results for selected inputs"))
+    
+    table <- table %>%
+      mutate(median_followup=nice.num3(median_followup)) %>%
+      mutate(lower_IQR=nice.num3(lower_IQR)) %>%
+      mutate(upper_IQR=nice.num3(upper_IQR)) %>%
+      mutate(mean_followup=nice.num3(mean_followup)) %>%
+      mutate(sd_followup=nice.num3(sd_followup)) %>%
+      relocate(Cancer)
+    # 
+    # table <- table %>%
+    #   mutate(across(everything(), as.character)) %>%
+    #   mutate(across(everything(), ~replace_na(.x, " ")))
+    # 
+    datatable(table,
+              rownames= FALSE,
+              extensions = 'Buttons',
+              options = list(lengthChange = FALSE,
+                             dom = 'tB',
+                             pageLength = 100000000,
+                             buttons = list(list(extend = "csv", 
+                                                 text = "Download results as csv",
+                                                 filename = "survival_followup_survival"))
+              ))
+  } )
+  
+  
+  
+  
+  
    
 }
