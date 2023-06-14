@@ -280,6 +280,43 @@ saveRDS(survival_estimates,
         here("CancerIncidencePrevalanceShiny","shiny", "data", "/survival_estimates.rds"))
 
 
+# calculate follow up time from survival estimates
+
+
+# add together number of people with an event or censored
+
+
+
+# - only include whole study period - loop over each database each cancer, whole population and sex and age
+
+#filter out calender year results and age*sex stratification
+# #add together total number of people censored (event or left the database) and calculate the time so time * number of people with that time
+test <- survival_estimates %>% 
+  filter(CalenderYearGp == "2000 to 2019") %>% 
+  filter(Stratification != "Age*Gender" ) %>% 
+  mutate(totalnp = n.event + n.censor) %>% 
+  mutate(folup_agg = time * totalnp )
+
+
+# create a new dataframe which expands each value of time by number censored = so if there were 4 people censored at time 0.5 there will be 4 rows with 0.5
+test1 <- test %>% 
+  uncount(totalnp)
+
+survival_median_mean_follow_up <-  test1 %>% 
+  group_by(Cancer, Database, Age, Gender, Stratification) %>%
+  summarise(across(time, c(median, 
+                           Q1=~quantile(., probs = 0.25),
+                           Q3=~quantile(., probs = 0.75),
+                           mean,
+                           sd))) %>% 
+  rename(median_followup = time_1) %>% 
+  rename(mean_followup = time_4) %>% 
+  rename(sd_followup = time_5) %>% 
+  rename(lower_IQR = time_Q1) %>% 
+  rename(upper_IQR = time_Q3)
+
+saveRDS(survival_median_mean_follow_up,
+        here("CancerIncidencePrevalanceShiny","shiny", "data", "/survival_median_mean_follow_up.rds"))
 
 # merge the risk table results together (whole dataset)
 survival_risk_table_files<-results[stringr::str_detect(results, ".csv")]
