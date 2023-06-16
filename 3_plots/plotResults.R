@@ -1181,48 +1181,48 @@ for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
   #incidence rates
   incidence_estimates_i <- incidence_estimates %>%
     filter(outcome_cohort_name == names(table(incidence_estimates$outcome_cohort_name)[i]) & analysis_interval == "years")
-  
+
   plot1 <- incidenceFigure4(incidence_estimates_i)
-  
+
   plotname <- paste0("FIGURE1_IncidenceGenderAllStrat_", names(table(incidence_estimates$outcome_cohort_name)[i]),".png")
-  
+
   if(names(table(incidence_estimates$outcome_cohort_name)[i]) == "Prostate") {
-  
+
   png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 7, height = 5, units = "in", res = 1200)
-    
+
   } else {
-    
+
   png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 10, height = 5, units = "in", res = 1200)
-    
+
   }
-  
+
   print(plot1, newpage = FALSE)
   dev.off()
 
   #prevalence
   prevalence_estimates_i <- prevalence_estimates %>%
     filter(outcome_cohort_name == names(table(prevalence_estimates$outcome_cohort_name)[i]) & analysis_interval == "years")
-  
+
   plot1 <- prevalenceFigure4(prevalence_estimates_i)
-  
+
   plotname <- paste0("FIGURE3_PrevalenceGenderAllStrat_", names(table(prevalence_estimates$outcome_cohort_name)[i]),".png")
-  
-  
+
+
   if(names(table(prevalence_estimates$outcome_cohort_name)[i]) == "Prostate") {
-    
+
   png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 7, height = 5, units = "in", res = 1200)
   print(plot1, newpage = FALSE)
   dev.off()
-  
+
   } else {
-    
+
     png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 10, height = 5, units = "in", res = 1200)
     print(plot1, newpage = FALSE)
-    dev.off() 
-    
+    dev.off()
+
   }
-  
-  
+
+
   #survival for whole study period
   survival_estimates_i <- survival_estimates %>%
     filter(Cancer == names(table(survival_estimates$Cancer)[i]) )
@@ -1232,14 +1232,14 @@ for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
   plotname <- paste0("FIGURE5_KMGenderAllStrat_", names(table(survival_estimates$Cancer)[i]),".png")
 
   if(names(table(survival_estimates$Cancer)[i]) == "Prostate") {
-    
+
     png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 7, height = 5, units = "in", res = 1200)
     print(plot1, newpage = FALSE)
     dev.off()
-    
-    
+
+
   } else {
-    
+
     png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 10, height = 5, units = "in", res = 1200)
     print(plot1, newpage = FALSE)
     dev.off()
@@ -1251,7 +1251,7 @@ for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
   
   plot1 <- survivalFigure5(survival_estimates_i)
   
-  plotname <- paste0("FIGURE6_KMCalenderYr_", names(table(survival_estimates$Cancer)[i]),".png")
+  plotname <- paste0("FIGURE6_KMCalendarYr_", names(table(survival_estimates$Cancer)[i]),".png")
   
   if(names(table(survival_estimates$Cancer)[i]) == "Prostate") {
   
@@ -2025,8 +2025,8 @@ survivalFigureData <- survival_estimates %>%
   scale_linetype_manual(values = c("dotted","dashed", "dotdash", "solid")) +
   labs(x = "Time (Years)",
        y = "Survival Probability",
-       col = "Calender Year Group",
-       linetype = "Calender Year Group") +
+       col = "Calendar Year Group",
+       linetype = "Calendar Year Group") +
   theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
         strip.background = element_rect(color = "black", size = 0.6) ,
         panel.background = element_blank() ,
