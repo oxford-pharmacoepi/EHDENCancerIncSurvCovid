@@ -2082,6 +2082,108 @@ png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 6 , units =
 print(survivalFigureData , newpage = FALSE)
 dev.off()
 
+###############################################################################################
+# liver cancer
+#incidence rates age strat
+incidence_estimates_liver <- incidence_estimates %>%
+  filter(outcome_cohort_name == "Liver" & analysis_interval == "years") %>%
+  filter(denominator_age_group != "18 to 29" & denominator_age_group != "30 to 39"  )
+
+plot1 <- incidenceFigure3a(incidence_estimates_liver)
+plotname <- paste0("FIGURE2_IncidenceAgeStrat_liver.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+
+#incidence rates age*gender strat
+incidence_estimates_liver1 <- incidence_estimates %>%
+  filter(outcome_cohort_name == "Liver" & analysis_interval == "years") %>%
+  filter(denominator_age_group != "18 to 29" & denominator_age_group != "30 to 39" &
+           denominator_age_group != "90 +" )
+
+plot1 <- incidenceFigure5(incidence_estimates_liver1)
+plotname <- paste0("FIGURES1_IncidenceAgeSexStrat_liver.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+###############################################################################################
+# lung cancer
+#incidence rates age strat
+incidence_estimates_lung <- incidence_estimates %>%
+  filter(outcome_cohort_name == "Lung" & analysis_interval == "years") %>%
+  filter(denominator_age_group != "18 to 29"  )
+
+plot1 <- incidenceFigure3a(incidence_estimates_lung)
+plotname <- paste0("FIGURE2_IncidenceAgeStrat_lung.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+
+#incidence rates age*gender strat
+incidence_estimates_lung1 <- incidence_estimates %>%
+  filter(outcome_cohort_name == "Lung" & analysis_interval == "years") %>%
+  filter(denominator_age_group != "18 to 29"  )
+
+plot1 <- incidenceFigure5(incidence_estimates_lung1)
+plotname <- paste0("FIGURES1_IncidenceAgeSexStrat_lung.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+
+##############################################################################################
+
+# Oesophageal cancer
+#incidence rates age strat
+incidence_estimates_Oesophageal <- incidence_estimates %>%
+  filter(outcome_cohort_name == "Esophagus" & analysis_interval == "years") %>%
+  filter(denominator_age_group != "18 to 29" &
+           denominator_age_group != "30 to 39" 
+           )
+
+plot1 <- incidenceFigure3a(incidence_estimates_Oesophageal)
+plotname <- paste0("FIGURE2_IncidenceAgeStrat_Esophagus.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+
+#incidence rates age*gender strat
+incidence_estimates_Oesophageal1 <- incidence_estimates %>%
+  filter(outcome_cohort_name == "Esophagus" & analysis_interval == "years") %>%
+  filter(denominator_age_group != "18 to 29" &
+           denominator_age_group != "30 to 39" )
+
+plot1 <- incidenceFigure5(incidence_estimates_Oesophageal1)
+plotname <- paste0("FIGURES1_IncidenceAgeSexStrat_Esophagus.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+# PP for age* sex strat
+prevalence_estimates_Oesophageal1 <- prevalence_estimates %>%
+  filter(outcome_cohort_name == "Esophagus" & analysis_interval == "years") %>%
+  filter(denominator_age_group != "18 to 29"  )
+
+plot1 <- prevalenceFigure5(prevalence_estimates_Oesophageal1)
+plotname <- paste0("FIGURES1_prevalenceAgeSexStrat_Esophagus.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+
+
+
 
 
 ##############################################################################################
