@@ -1836,7 +1836,7 @@ incidenceFigureData <- incidence_estimates %>%
         panel.background = element_blank() ,
         #axis.line = element_line(colour = "black", size = 0.6) ,
         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        panel.border = element_rect(colour = "black", fill=NA, size=0.6),
         legend.key = element_rect(fill = "transparent", colour = "transparent")) +
   labs(x = "Calendar year",
        y = "Incidence rate per 100000 person-years",
@@ -1873,7 +1873,7 @@ prevalenceFigureData <- prevalence_estimates %>%
   theme(axis.text.x = element_text(angle = 45, hjust=1),
         panel.background = element_blank() ,
         #axis.line = element_line(colour = "black", size = 0.6) ,
-        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        panel.border = element_rect(colour = "black", fill=NA, size=0.6),
         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
         legend.key = element_rect(fill = "transparent", colour = "transparent")) +
   labs(x = "Calendar year",
@@ -1890,7 +1890,197 @@ png(paste0(pathResults ,"/WholePop/", plotname), width = 6, height = 5 , units =
 print(prevalenceFigureData, newpage = FALSE)
 dev.off()
 
+# KM for prostate cancer
+survivalFigureData <- survival_estimates %>%
+  filter(Stratification == "None") %>%
+  filter(CalenderYearGp == "2000 to 2019") %>%
+  filter(Cancer == "Prostate") %>%
+  filter(Age == "All") %>%
+  ggplot(aes(x = time,
+             y = est,
+             group = Database,
+             col = Database )) +
+  scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_ribbon(aes(ymin = lcl, 
+                  ymax = ucl, 
+                  fill = Database), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_line(aes(linetype = Database),size = 0.5) +
+  scale_linetype_manual(values = c("solid", "dashed", "twodash","dotted")) +
+  labs(x = "Time (Years)",
+       y = "Survival Probability",
+       col = "Database name",
+       linetype = "Database name") +
+  theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  scale_x_continuous(breaks=seq(0, 20, 2))
 
+plotname <- paste0("FIGURE5_KM_Males_Prostate.png")
+png(paste0(pathResults ,"/WholePop/", plotname), width = 6, height = 5 , units = "in", res = 1200)
+print(survivalFigureData, newpage = FALSE)
+dev.off()
+
+# prostate cancer IR for different age groups
+incidenceFigureData <- incidence_estimates %>%
+  filter(denominator_sex == "Male",
+         analysis_interval == "years" ,
+         denominator_age_group != "All", 
+         denominator_age_group != "18 to 29", 
+         denominator_age_group != "30 to 39", 
+        outcome_cohort_name == "Prostate") %>%
+  ggplot(aes(x = incidence_start_date,
+             y = incidence_100000_pys,
+             group = database_name)) +
+  geom_line(color = "black", size = 0.25) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, 
+                  ymax = incidence_100000_pys_95CI_upper, 
+                  fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_point(aes(shape = database_name, fill = database_name),size = 1.5) +
+  scale_shape_manual(values = c(24,21)) +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  labs(x = "Calendar year",
+       y = "Incidence rate per 100000 person-years",
+       col = "Database name",
+       shape = "Database name",
+       fill = "Database name") +
+  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("4 years"),
+               expand = c(0.06,1)) +
+  facet_wrap(~ denominator_age_group, scales = "free", ncol = 2)
+
+plotname <- paste0("FIGURE2_Incidence_AgeStrat_Males_Prostate.png")
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 7 , units = "in", res = 1200)
+print(incidenceFigureData , newpage = FALSE)
+dev.off()
+
+
+# prostate cancer IR for different age groups
+
+prevalenceFigureData <- prevalence_estimates %>%
+  filter(denominator_sex == "Male",
+         denominator_age_group != "All", 
+         denominator_age_group != "18 to 29", 
+         denominator_age_group != "30 to 39", 
+         outcome_cohort_name == "Prostate") %>%
+  ggplot(aes(x = prevalence_start_date,
+             y = prevalence,
+             group = database_name)) +
+  geom_line(color = "black", size = 0.25) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_ribbon(aes(ymin = prevalence_95CI_lower, 
+                  ymax = prevalence_95CI_upper, 
+                  fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_point(aes(shape = database_name, fill = database_name ),size = 1.5) +
+  scale_shape_manual(values = c(24,21)) +
+  scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  labs(x = "Calendar year",
+       y = "Prevalence",
+       col = "Database name",
+       shape = "Database name",
+       fill = "Database name") +
+  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("4 years"),
+               expand = c(0.06,1)) +
+  facet_wrap(~ denominator_age_group, scales = "free", ncol = 2)
+
+plotname <- paste0("FIGURE4_Prevalence_AgeStrat_Males_Prostate.png")
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 7 , units = "in", res = 1200)
+print(prevalenceFigureData , newpage = FALSE)
+dev.off()
+
+
+# survival over calender time prostate 
+
+survivalFigureData <- survival_estimates %>%
+  filter(Age == "All") %>%
+  filter(Cancer == "Prostate") %>% 
+  filter(CalenderYearGp != "2000 to 2019") %>%
+  ggplot(aes(x = time,
+             y = est,
+             group = CalenderYearGp,
+             col = CalenderYearGp )) +
+  scale_y_continuous( labels = label_percent() ) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_line(aes(linetype = CalenderYearGp),size = 0.5) +
+  scale_linetype_manual(values = c("dotted","dashed", "dotdash", "solid")) +
+  labs(x = "Time (Years)",
+       y = "Survival Probability",
+       col = "Calender Year Group",
+       linetype = "Calender Year Group") +
+  theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        #axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  ggh4x::facet_grid2(cols = vars(Database), scales="free", independent = "y") 
+
+
+plotname <- paste0("FIGURE6_KM_CY_Males_Prostate.png")
+png(paste0(pathResults ,"/WholePop/", plotname), width = 8, height = 4 , units = "in", res = 1200)
+print(survivalFigureData , newpage = FALSE)
+dev.off()
+
+
+# age effects KM for prostate cancer
+
+survivalFigureData <- survival_estimates %>%
+  filter(Age != "All") %>%
+  filter(Age != "18 to 29", 
+         Age != "30 to 39") %>%
+  filter(CalenderYearGp == "2000 to 2019") %>%
+  filter(Cancer == "Prostate") %>%
+  ggplot(aes(x = time,
+             y = est,
+             group = Database,
+             col = Database )) +
+  scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_ribbon(aes(ymin = lcl, 
+                  ymax = ucl, 
+                  fill = Database), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_line(aes(linetype = Database),size = 0.5) +
+  scale_linetype_manual(values = c("solid", "dashed", "twodash","dotted")) +
+  labs(x = "Time (Years)",
+       y = "Survival Probability",
+       col = "Database name",
+       linetype = "Database name") +
+  theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  scale_x_continuous(breaks=seq(0, 20, 2)) +
+ # ggh4x::facet_grid2(rows = vars(Age), scales="free", independent = "y") 
+    facet_wrap(~ Age, ncol = 2, scales = "free_y") +
+    coord_cartesian(xlim = c(0, 20))
+
+plotname <- paste0("FIGURE7_KM_ageStrat_Males_Prostate.png")
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 6 , units = "in", res = 1200)
+print(survivalFigureData , newpage = FALSE)
+dev.off()
 
 
 
