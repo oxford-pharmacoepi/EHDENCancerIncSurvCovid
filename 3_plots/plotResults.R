@@ -388,10 +388,6 @@ incidenceFigure5 <- function(incidenceData) {
   return(incidenceFigureData)
 }
 
-
-
-
-
 # PREVALENCE
 #prevalence figure1 whole population stratified by database updated
 prevalenceFigure1 <- function(prevalenceData) {
@@ -653,12 +649,6 @@ prevalenceFigure5 <- function(prevalenceData) {
   
   return(prevalenceFigureData)
 }
-
-
-
-
-
-
 
 # SURVIVAL
 #survival figure1 whole population and stratified by database
@@ -1279,7 +1269,12 @@ for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
   
 }
 
+##########################################################################################################
+### specific updated plots for papers ####
+#########################################################################################################
 
+
+##########################################################################################################
 # HEAD AND NECK CANCER SUBTYPES
 # INCIDENCE
 #plot for all head and neck cancers in one plot
@@ -1335,7 +1330,6 @@ dev.off()
 
 
 #PREVALENCE
-
 #plot for all head and neck cancers in one plot
 prevalenceDatahan <- prevalence_estimates %>%
   filter(outcome_cohort_name == "Oral Cavity" |
@@ -1389,12 +1383,518 @@ print(prevalenceFigureData, newpage = FALSE)
 dev.off()
 
 
+# prevalence stratified by sex and database for all subsites
+prevalenceFigureData <- prevalenceDatahan %>%
+    filter(denominator_age_group == "All") %>%
+    filter(denominator_sex != "Both") %>%
+    filter(analysis_interval != "overall") %>% 
+    unite(Database_Sex, 
+          "database_name", "denominator_sex",
+          sep=": ", remove = FALSE) %>% 
+    ggplot(aes(x = prevalence_start_date,
+               y = prevalence,
+               group = Database_Sex)) +
+    geom_line(color = "black", size = 0.2) +
+    scale_colour_manual(values = c("#ED0000FF", "#00468BFF", "#ED0000FF", "#00468BFF")) + #blue, #red #blue, #red 
+    scale_fill_manual(values = c("#ED0000FF", "#00468BFF", "#ED0000FF", "#00468BFF")) +
+    geom_ribbon(aes(ymin = prevalence_95CI_lower,
+                    ymax = prevalence_95CI_upper,
+                    fill = Database_Sex), alpha = .15, color = NA, show.legend = FALSE) +
+    geom_point(aes(shape = Database_Sex, fill = Database_Sex),size = 1.5) +
+    scale_shape_manual(values = c(24,22,21,25)) +
+    scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
+    theme(axis.text.x = element_text(angle = 45, hjust=1),
+          panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+          strip.background = element_rect(color = "black", size = 0.6) ,
+          panel.background = element_blank() ,
+          axis.line = element_line(colour = "black", size = 0.6) ,
+          panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+          legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+    labs(x = "Calendar year",
+         y = "Prevalence",
+         col = "Database & Sex",
+         shape = "Database & Sex" ,
+         fill = "Database & Sex" ) +
+    scale_x_date(labels = date_format("%Y"), breaks = date_breaks("4 years"),
+                 expand = c(0.06,1)) +
+    facet_wrap(~ outcome_cohort_name, scales = "free", ncol = 2)
+  
+plotname <- paste0("FIGURE_S8_PrevalencGender_hansubsites.png")
+
+png(paste0(pathResults ,"/GenderStrat/", plotname),
+    width = 8, height = 11, units = "in", res = 1200)
+print(prevalenceFigureData, newpage = FALSE)
+dev.off()
+
+
+#############
+# incidence by age for each subsite
+# removing empty facets
+
+# Hypopharynx
+incidence_estimates_hypop <- incidenceDatahan %>%
+  filter(outcome_cohort_name == "Hypopharynx" & analysis_interval == "years") %>%
+  filter(denominator_age_group != "18 to 29" & 
+           denominator_age_group != "30 to 39" &
+           denominator_age_group != "40 to 49" &
+           denominator_age_group != "90 +" 
+         )
+
+plot1 <- incidenceFigure3a(incidence_estimates_hypop)
+plotname <- paste0("FIGURE_S2_IncidenceAgeStrat_hypopharynx.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 8, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+# tongue
+incidence_estimates_tongue <- incidenceDatahan %>%
+  filter(outcome_cohort_name == "Tongue" & analysis_interval == "years") %>%
+  filter(denominator_age_group != "18 to 29" & 
+           denominator_age_group != "90 +" 
+  )
+
+plot1 <- incidenceFigure3a(incidence_estimates_tongue)
+plotname <- paste0("FIGURE_S7_IncidenceAgeStrat_tongue.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+
+
+incidenceDatahan_subset <- incidence_estimates %>%
+  filter(outcome_cohort_name == "Oral Cavity" |
+           outcome_cohort_name == "Salivary Gland" |          
+           outcome_cohort_name == "Larynx" |
+           outcome_cohort_name == "Oropharynx"  ) %>% 
+  filter(analysis_interval == "years") %>% 
+  filter(denominator_age_group != "18 to 29" & 
+           denominator_age_group != "30 to 39" &
+           denominator_age_group != "90 +" )
+
+
+for(i in 1:length(table(incidenceDatahan_subset$outcome_cohort_name))) {
+  
+incidenceDatahan_subset1 <- incidenceDatahan_subset %>% 
+  filter(outcome_cohort_name == names(table(incidenceDatahan_subset$outcome_cohort_name))[i])
+  
+plot1 <- incidenceFigure3a(incidenceDatahan_subset1)
+  plotname <- paste0("FIGURE_SX_IncidenceAgeStrat_",
+                     names(table(incidenceDatahan_subset$outcome_cohort_name))[i],".png")
+  
+  png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+  print(plot1, newpage = FALSE)
+  dev.off()
+
+}
+
+# # prevalence by age for each subsite
+prevalenceDatahan_subset <- prevalence_estimates %>%
+  filter( outcome_cohort_name == "Nasal Cavity & Sinus" |
+           outcome_cohort_name == "Larynx" |
+           outcome_cohort_name == "Hypopharynx"  ) %>% 
+  filter(denominator_age_group != "18 to 29" & 
+           denominator_age_group != "30 to 39"  )
+
+for(i in 1:length(table(prevalenceDatahan_subset$outcome_cohort_name))) {
+  
+  prevalenceDatahan_subset1 <- prevalenceDatahan_subset %>% 
+    filter(outcome_cohort_name == names(table(prevalenceDatahan_subset$outcome_cohort_name)[i]))
+  
+  plot1 <- prevalenceFigure3a(prevalenceDatahan_subset1)
+  plotname <- paste0("FIGURE_SX_PrevalenceAgeStra_",
+                     names(table(prevalenceDatahan_subset$outcome_cohort_name))[i],".png")
+  
+  png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+  print(plot1, newpage = FALSE)
+  dev.off()
+  
+}
+
+
+prevalenceDatahan_subset <- prevalenceDatahan %>% 
+  filter(outcome_cohort_name == "Nasopharynx" ) %>% 
+  filter(denominator_age_group != "90 +"  )
+
+plot1 <- prevalenceFigure3a(prevalenceDatahan_subset)
+plotname <- paste0("FIGURE_S13_PrevalenceAgeStra_nasopharynx.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+
+
+prevalenceDatahan_subset <- prevalenceDatahan %>% 
+  filter(outcome_cohort_name == "Oropharynx" ) %>% 
+  filter(denominator_age_group != "18 to 29")
+
+plot1 <- prevalenceFigure3a(prevalenceDatahan_subset)
+plotname <- paste0("FIGURE_S15_PrevalenceAgeStra_oropharynx.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+
+
+#############################################################################################
+# breast cancer - make the axis non fixed so can see the IR/prev of the males
+
+#incidence rates
+incidence_estimates_i <- incidence_estimates %>%
+  filter(outcome_cohort_name == "Breast" & 
+           analysis_interval == "years" &
+         denominator_age_group == "All"
+         )
+
+# INCDIDENCE
+
+incidenceFigureData <- incidence_estimates_i %>%
+  ggplot(aes(x = incidence_start_date,
+             y = incidence_100000_pys,
+             group = database_name )) +
+  geom_line(color = "black", size = 0.25) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, 
+                  ymax = incidence_100000_pys_95CI_upper, 
+                  fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_point(aes(shape = database_name, fill = database_name),size = 2.5) +
+  scale_shape_manual(values = c(24,21)) +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        #panel.spacing.x = unit(0.1,"line"),
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  labs(x = "Calendar year",
+       y = "Incidence rate per 100000 person-years",
+       col = "Database name",
+       shape = "Database name",
+       fill = "Database name") +
+  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("2 years"),
+               expand = c(0.06,1)) +
+ggh4x::facet_grid2(cols = vars(denominator_sex), scales="free", independent = "y") 
+
+plotname <- paste0("FIGURE1_IncidenceGenderAllStrat_Breast.png")
+
+png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 10, height = 5, units = "in", res = 1200)
+
+print(incidenceFigureData, newpage = FALSE)
+dev.off()
+
+# PREVALENCE
+
+prevalence_estimates_i <- prevalence_estimates %>%
+  filter(outcome_cohort_name == "Breast" & 
+           denominator_age_group == "All"
+  )
+
+prevalenceFigureData <- prevalence_estimates_i %>%
+  ggplot(aes(x = prevalence_start_date,
+             y = prevalence,
+             group = database_name)) +
+  geom_line(color = "black", size = 0.25) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_ribbon(aes(ymin = prevalence_95CI_lower,
+                  ymax = prevalence_95CI_upper,
+                  fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_point(aes(shape = database_name, fill = database_name),size = 2.5) +
+  scale_shape_manual(values = c(24,21)) +
+  scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  labs(x = "Calendar year",
+       y = "Prevalence",
+       col = "Database name",
+       shape = "Database name",
+       fill = "Database name" ) +
+  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("2 years"),
+               expand = c(0.06,1)) +
+  ggh4x::facet_grid2(cols = vars(denominator_sex), scales="free", independent = "y") 
+
+plotname <- paste0("FIGURE4_PrevalenceGenderAllStrat_Breast.png")
+
+png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 10, height = 5, units = "in", res = 1200)
+
+print(prevalenceFigureData , newpage = FALSE)
+dev.off() 
+
+
+#breast cancer age effects split by gender - 2 plots created
+# females incidence
+incidence_estimates_breast_F <- incidence_estimates %>%
+  filter(outcome_cohort_name == "Breast" & 
+           analysis_interval == "years" &
+           denominator_age_group != "All" &
+           denominator_sex == "Female"
+  )
+
+incidenceFigureData <- incidence_estimates_breast_F %>%
+  ggplot(aes(x = incidence_start_date,
+             y = incidence_100000_pys,
+             group = database_name)) +
+  geom_line(color = "black", size = 0.25) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, 
+                  ymax = incidence_100000_pys_95CI_upper, 
+                  fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_point(aes(shape = database_name, fill = database_name),size = 1.5) +
+  scale_shape_manual(values = c(24,21)) +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  labs(x = "Calendar year",
+       y = "Incidence rate per 100000 person-years",
+       col = "Database name",
+       shape = "Database name",
+       fill = "Database name") +
+  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("4 years"),
+               expand = c(0.06,1)) +
+  facet_wrap(~ denominator_age_group, scales = "free", ncol = 2)
+
+plotname <- paste0("FIGURE2_IncidenceAgeStrat_Breast_Females.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 6, height = 8, units = "in", res = 1200)
+print(incidenceFigureData, newpage = FALSE)
+dev.off()
+
+
+# males
+incidence_estimates_breast_M <- incidence_estimates %>%
+  filter(outcome_cohort_name == "Breast" & 
+           analysis_interval == "years" &
+           denominator_age_group != "All" &
+           denominator_sex == "Male"
+  ) %>% 
+  filter(denominator_age_group != "18 to 29" & 
+           denominator_age_group != "30 to 39" &
+           denominator_age_group != "40 to 49" &
+           denominator_age_group != "90 +" )
+
+incidenceFigureData <- incidence_estimates_breast_M %>%
+  ggplot(aes(x = incidence_start_date,
+             y = incidence_100000_pys,
+             group = database_name)) +
+  geom_line(color = "black", size = 0.25) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, 
+                  ymax = incidence_100000_pys_95CI_upper, 
+                  fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_point(aes(shape = database_name, fill = database_name),size = 1.5) +
+  scale_shape_manual(values = c(24,21)) +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  labs(x = "Calendar year",
+       y = "Incidence rate per 100000 person-years",
+       col = "Database name",
+       shape = "Database name",
+       fill = "Database name") +
+  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("4 years"),
+               expand = c(0.06,1)) +
+  facet_wrap(~ denominator_age_group, scales = "free", ncol = 2)
+
+plotname <- paste0("FIGURE3_IncidenceAgeStrat_Breast_Males.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 6, height = 6 , units = "in", res = 1200)
+print(incidenceFigureData, newpage = FALSE)
+dev.off()
+
+# prevalence for different age groups FEMALES
+prevalence_estimates_breast_F <- prevalence_estimates %>%
+  filter(outcome_cohort_name == "Breast" & 
+           denominator_age_group != "All" &
+           denominator_sex == "Female"
+  )
+
+
+prevalenceFigureData <- prevalence_estimates_breast_F %>%
+  ggplot(aes(x = prevalence_start_date,
+             y = prevalence,
+             group = database_name)) +
+  geom_line(color = "black", size = 0.25) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_ribbon(aes(ymin = prevalence_95CI_lower, 
+                  ymax = prevalence_95CI_upper, 
+                  fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_point(aes(shape = database_name, fill = database_name ),size = 1.5) +
+  scale_shape_manual(values = c(24,21)) +
+  scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  labs(x = "Calendar year",
+       y = "Prevalence",
+       col = "Database name",
+       shape = "Database name",
+       fill = "Database name") +
+  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("4 years"),
+               expand = c(0.06,1)) +
+  facet_wrap(~ denominator_age_group, scales = "free", ncol = 2)
+
+plotname <- paste0("FIGURE5_PrevalenceAgeStrat_Breast_Females.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 6, height = 7 , units = "in", res = 1200)
+print(prevalenceFigureData, newpage = FALSE)
+dev.off()
 
 
 
 
-### specific plots for papers ####
 
+prevalence_estimates_breast_M <- prevalence_estimates %>%
+  filter(outcome_cohort_name == "Breast" & 
+           denominator_age_group != "All" &
+           denominator_sex == "Male"
+  )  %>% 
+  filter(denominator_age_group != "18 to 29"  )
+
+
+prevalenceFigureData <- prevalence_estimates_breast_M %>%
+  ggplot(aes(x = prevalence_start_date,
+             y = prevalence,
+             group = database_name)) +
+  geom_line(color = "black", size = 0.25) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_ribbon(aes(ymin = prevalence_95CI_lower, 
+                  ymax = prevalence_95CI_upper, 
+                  fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_point(aes(shape = database_name, fill = database_name ),size = 1.5) +
+  scale_shape_manual(values = c(24,21)) +
+  scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  labs(x = "Calendar year",
+       y = "Prevalence",
+       col = "Database name",
+       shape = "Database name",
+       fill = "Database name") +
+  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("4 years"),
+               expand = c(0.06,1)) +
+  facet_wrap(~ denominator_age_group, scales = "free", ncol = 2)
+
+plotname <- paste0("FIGURE6_PrevalenceAgeStrat_Breast_Males.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 6, height = 7 , units = "in", res = 1200)
+print(prevalenceFigureData, newpage = FALSE)
+dev.off()
+
+
+######################################################################################
+# Prostate cancer - removing gender facet labels and removing age facets with no data
+
+# incidence whole population
+incidenceFigureData <- incidence_estimates %>%
+  filter(denominator_sex == "Male",
+         denominator_age_group == "All",
+         analysis_interval == "years" ,
+         outcome_cohort_name == "Prostate") %>%
+  ggplot(aes(x = incidence_start_date,
+             y = incidence_100000_pys,
+             group = database_name)) +
+  geom_line(color = "black", size = 0.25) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, 
+                  ymax = incidence_100000_pys_95CI_upper, 
+                  fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_point(aes(shape = database_name, fill = database_name),size = 3.5) +
+  scale_shape_manual(values = c(24,21)) +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.background = element_blank() ,
+        #axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  labs(x = "Calendar year",
+       y = "Incidence rate per 100000 person-years",
+       col = "Database name",
+       shape = "Database name",
+       fill = "Database name" ) +
+  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("2 years"),
+               expand = c(0.06,1))
+
+
+plotname <- paste0("FIGURE1_Incidence_Males_Prostate.png")
+png(paste0(pathResults ,"/WholePop/", plotname), width = 6, height = 5 , units = "in", res = 1200)
+print(incidenceFigureData, newpage = FALSE)
+dev.off()
+
+# prevalence whole population
+
+prevalenceFigureData <- prevalence_estimates %>%
+  filter(denominator_sex == "Male",
+         denominator_age_group == "All",
+         outcome_cohort_name == "Prostate") %>%
+  ggplot(aes(x = prevalence_start_date,
+             y = prevalence,
+             group = database_name)) +
+  geom_line(color = "black", size = 0.25) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_ribbon(aes(ymin = prevalence_95CI_lower, 
+                  ymax = prevalence_95CI_upper, 
+                  fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_point(aes(shape = database_name, fill = database_name),size = 3.5) +
+  scale_shape_manual(values = c(24,21)) +
+  scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.background = element_blank() ,
+        #axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.border = element_rect(colour = "black", fill=NA, size=1),
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  labs(x = "Calendar year",
+       y = "Prevalence",
+       col = "Database name",
+       shape = "Database name",
+       fill = "Database name" ) +
+  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("2 years"),
+               expand = c(0.06,1))
+
+
+plotname <- paste0("FIGURE3_Prevalence_Males_Prostate.png")
+png(paste0(pathResults ,"/WholePop/", plotname), width = 6, height = 5 , units = "in", res = 1200)
+print(prevalenceFigureData, newpage = FALSE)
+dev.off()
+
+
+
+
+
+##############################################################################################
 #GASTRIC CANCER
 
 #incidence rates age strat
@@ -1403,21 +1903,18 @@ incidence_estimates_gastric <- incidence_estimates %>%
   filter(denominator_age_group != "18 to 29" & denominator_age_group != "30 to 39"  )
 
 plot1 <- incidenceFigure3a(incidence_estimates_gastric)
-
-plotname <- paste0("FIGURE2_IncidenceAgeStrat_stomach_updated.png")
+plotname <- paste0("FIGURE2_IncidenceAgeStrat_stomach.png")
 
 png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
 print(plot1, newpage = FALSE)
 dev.off()
 
 #incidence rates age*gender strat
-
 incidence_estimates_gastric1 <- incidence_estimates %>%
   filter(outcome_cohort_name == "Stomach" & analysis_interval == "years") %>%
   filter(denominator_age_group != "18 to 29" & denominator_age_group != "30 to 39"  )
 
 plot1 <- incidenceFigure5(incidence_estimates_gastric1)
-
 plotname <- paste0("FIGURES1_IncidenceAgeSexStrat_stomach.png")
 
 png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
@@ -1436,7 +1933,6 @@ incidence_estimates_pancreas <- incidence_estimates %>%
   filter(denominator_age_group != "18 to 29" & denominator_age_group != "30 to 39"  )
 
 plot1 <- incidenceFigure3a(incidence_estimates_pancreas)
-
 plotname <- paste0("FIGURE2_IncidenceAgeStrat_pancreas_updated.png")
 
 png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
@@ -1449,7 +1945,6 @@ prevalence_estimates_pancreas <- prevalence_estimates %>%
   filter(denominator_age_group != "18 to 29" )
 
 plot1 <- prevalenceFigure3a(prevalence_estimates_pancreas)
-
 plotname <- paste0("FIGURE4_PrevalenceAgeStrat_pancreas_updated.png")
 
 png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
@@ -1463,26 +1958,16 @@ incidence_estimates_pancreas1 <- incidence_estimates %>%
   filter(denominator_age_group != "18 to 29" & denominator_age_group != "30 to 39"  )
 
 plot1 <- incidenceFigure5(incidence_estimates_pancreas1)
-
 plotname <- paste0("FIGURES1_IncidenceAgeSexStrat_pancreas.png")
 
 png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
 print(plot1, newpage = FALSE)
 dev.off()
 
+##############################################################################
+# other plots
 
-
-
-
-
-
-
-
-# head and neck cancers
-# age plots per 
-
-
-## lee placito fellowship colorectal cancer incidence removing age groups not needed
+## colorectal cancer incidence removing age groups not needed
 incidence_estimates_crc<- incidence_estimates %>%
   filter(outcome_cohort_name == "Colorectal" & analysis_interval == "years") %>%
   filter(denominator_age_group != "18 to 29" & denominator_age_group != "90 +"  )
@@ -1796,18 +2281,18 @@ incidence_estimates_han <- incidence_estimates %>%
 
 for(i in 1:length(table(incidence_estimates_han$outcome_cohort_name))) {
   
-  #incidence rates
-  incidence_estimates_i <- incidence_estimates_han %>%
-    filter(outcome_cohort_name == names(table(incidence_estimates_han$outcome_cohort_name)[i]) & analysis_interval == "years")
-  
-  plot1 <- incidenceFigure4(incidence_estimates_i)
-  
-  plotname <- paste0("IncidenceGenderAllStrat_", names(table(incidence_estimates$outcome_cohort_name)[i]),".png")
-  png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 10, height = 5, units = "in", res = 1200)
-  
-  print(plot1, newpage = FALSE)
-  dev.off()
-  
+  # #incidence rates
+  # incidence_estimates_i <- incidence_estimates_han %>%
+  #   filter(outcome_cohort_name == names(table(incidence_estimates_han$outcome_cohort_name)[i]) & analysis_interval == "years")
+  # 
+  # plot1 <- incidenceFigure4(incidence_estimates_i)
+  # 
+  # plotname <- paste0("IncidenceGenderAllStrat_", names(table(incidence_estimates$outcome_cohort_name)[i]),".png")
+  # png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 10, height = 5, units = "in", res = 1200)
+  # 
+  # print(plot1, newpage = FALSE)
+  # dev.off()
+  # 
   #prevalence
   # prevalence_estimates_i <- prevalence_estimates %>%
   #   filter(outcome_cohort_name == names(table(prevalence_estimates$outcome_cohort_name)[i]) & analysis_interval == "years")
