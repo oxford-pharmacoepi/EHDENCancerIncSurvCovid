@@ -109,14 +109,14 @@ datapath <- "C:/Users/dnewby/Documents/GitHub/EHDENCancerIncidencePrevalence/Can
 #   
 #   result<- result %>% 
 #     mutate(Age= stringr::str_replace(Age, "-", " to ")) %>% 
-#     mutate(CalenderYearGp= stringr::str_replace(CalenderYearGp, "-", " to ")) %>% 
+#     mutate(CalendarYearGp= stringr::str_replace(CalendarYearGp, "-", " to ")) %>% 
 #     mutate(Age = replace(Age, Age == ">=90", "90 +")) %>% 
 #     mutate(Age = factor(Age,
 #                                           levels = c("All",
 #                                                      "18 to 29", "30 to 39", "40 to 49",
 #                                                      "50 to 59", "60 to 69", "70 to 79",
 #                                                      "80 to 89", "90 +" ))) %>%
-#   mutate(CalenderYearGp = factor(CalenderYearGp,
+#   mutate(CalendarYearGp = factor(CalendarYearGp,
 #                       levels = c("2000 to 2019",
 #                                  "2000 to 2004", 
 #                                  "2005 to 2009", 
@@ -656,7 +656,7 @@ survivalFigure1 <- function(survivalData) {
   
   survivalFigureData <- survivalData %>%
     filter(Stratification == "None") %>%
-    filter(CalenderYearGp == "2000 to 2019") %>%
+    filter(CalendarYearGp == "2000 to 2019") %>%
     ggplot(aes(x = time,
                y = est,
                group = Database,
@@ -690,7 +690,7 @@ survivalFigure3a <- function(survivalData) {
   
   survivalFigureData <- survivalData %>%
     filter(Age != "All") %>%
-    filter(CalenderYearGp == "2000 to 2019") %>%
+    filter(CalendarYearGp == "2000 to 2019") %>%
     filter(Gender == "Both") %>%
     ggplot(aes(x = time,
                y = est,
@@ -727,7 +727,7 @@ survivalFigure3b <- function(survivalData) {
   
   survivalFigureData <- survivalData %>%
     filter(Age != "All") %>%
-    filter(CalenderYearGp == "2000 to 2019") %>%
+    filter(CalendarYearGp == "2000 to 2019") %>%
     ggplot(aes(x = time,
                y = est,
                group = Database,
@@ -763,7 +763,7 @@ survivalFigure4 <- function(survivalData) {
   
   survivalFigureData <- survivalData %>%
     filter(Age == "All") %>%
-    filter(CalenderYearGp == "2000 to 2019") %>%
+    filter(CalendarYearGp == "2000 to 2019") %>%
     ggplot(aes(x = time,
                y = est,
                group = Database,
@@ -793,25 +793,25 @@ survivalFigure4 <- function(survivalData) {
   
 }
 
-# survival figure 5 whole population and gender strat with calender year strat (puts gender as column and database as rows)
+# survival figure 5 whole population and gender strat with calendar year strat (puts gender as column and database as rows)
 survivalFigure5 <- function(survivalData) {
   
   survivalFigureData <- survivalData %>%
     filter(Stratification == "None"| Stratification == "Gender") %>%
-    filter(CalenderYearGp != "2000 to 2019") %>%
+    filter(CalendarYearGp != "2000 to 2019") %>%
     ggplot(aes(x = time,
                y = est,
-               group = CalenderYearGp,
-               col = CalenderYearGp )) +
+               group = CalendarYearGp,
+               col = CalendarYearGp )) +
     scale_y_continuous( labels = label_percent() ) +
     scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
     scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
-    geom_line(aes(linetype = CalenderYearGp),size = 0.5) +
+    geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
     scale_linetype_manual(values = c("dotted","dashed", "dotdash", "solid")) +
      labs(x = "Time (Years)",
          y = "Survival Probability",
-         col = "Calender Year Group",
-         linetype = "Calender Year Group") +
+         col = "Calendar Year Group",
+         linetype = "Calendar Year Group") +
     theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
           strip.background = element_rect(color = "black", size = 0.6) ,
           panel.background = element_blank() ,
@@ -825,25 +825,25 @@ survivalFigure5 <- function(survivalData) {
   
 }
 
-# survival figure 6 whole population and gender strat with calender year strat BUT puts database as columns and gender as rows
+# survival figure 6 whole population and gender strat with calendar year strat BUT puts database as columns and gender as rows
 survivalFigure6 <- function(survivalData) {
   
   survivalFigureData <- survivalData %>%
     filter(Stratification == "None"| Stratification == "Gender") %>%
-    filter(CalenderYearGp != "2000 to 2019") %>%
+    filter(CalendarYearGp != "2000 to 2019") %>%
     ggplot(aes(x = time,
                y = est,
-               group = CalenderYearGp,
-               col = CalenderYearGp )) +
+               group = CalendarYearGp,
+               col = CalendarYearGp )) +
     scale_y_continuous( labels = label_percent() ) +
     scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
     scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
-    geom_line(aes(linetype = CalenderYearGp),size = 0.5) +
+    geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
     scale_linetype_manual(values = c("dotted","dashed", "dotdash", "solid")) +
     labs(x = "Time (Years)",
          y = "Survival Probability",
-         col = "Calender Year Group",
-         linetype = "Calender Year Group") +
+         col = "Calendar Year Group",
+         linetype = "Calendar Year Group") +
     theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
           strip.background = element_rect(color = "black", size = 0.6) ,
           panel.background = element_blank() ,
@@ -864,8 +864,8 @@ prevalence_estimates <- readRDS(paste0(datapath ,"/prevalence_estimates.rds"))
 prevalence_attrition <- readRDS(paste0(datapath ,"/prevalence_attrition.rds"))
 incidence_estimates <- readRDS(paste0(datapath ,"/incidence_estimates.rds"))
 incidence_attrition <- readRDS(paste0(datapath ,"/incidence_attrition.rds"))
-survival_estimates <- readRDS(paste0(datapath ,"/survival_estimates.rds"))         
-
+survival_estimates <- readRDS(paste0(datapath ,"/survival_estimates.rds"))%>% 
+  rename(CalendarYearGp = CalenderYearGp )
 
 # CREATING PLOTS ----
 #plot per cancer stratified by database for incidence and prevalence WHOLE POPULATION
@@ -1893,7 +1893,7 @@ dev.off()
 # KM for prostate cancer
 survivalFigureData <- survival_estimates %>%
   filter(Stratification == "None") %>%
-  filter(CalenderYearGp == "2000 to 2019") %>%
+  filter(CalendarYearGp == "2000 to 2019") %>%
   filter(Cancer == "Prostate") %>%
   filter(Age == "All") %>%
   ggplot(aes(x = time,
@@ -2013,15 +2013,15 @@ dev.off()
 survivalFigureData <- survival_estimates %>%
   filter(Age == "All") %>%
   filter(Cancer == "Prostate") %>% 
-  filter(CalenderYearGp != "2000 to 2019") %>%
+  filter(CalendarYearGp != "2000 to 2019") %>%
   ggplot(aes(x = time,
              y = est,
-             group = CalenderYearGp,
-             col = CalenderYearGp )) +
+             group = CalendarYearGp,
+             col = CalendarYearGp )) +
   scale_y_continuous( labels = label_percent() ) +
   scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
-  geom_line(aes(linetype = CalenderYearGp),size = 0.5) +
+  geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
   scale_linetype_manual(values = c("dotted","dashed", "dotdash", "solid")) +
   labs(x = "Time (Years)",
        y = "Survival Probability",
@@ -2048,7 +2048,7 @@ survivalFigureData <- survival_estimates %>%
   filter(Age != "All") %>%
   filter(Age != "18 to 29", 
          Age != "30 to 39") %>%
-  filter(CalenderYearGp == "2000 to 2019") %>%
+  filter(CalendarYearGp == "2000 to 2019") %>%
   filter(Cancer == "Prostate") %>%
   ggplot(aes(x = time,
              y = est,
