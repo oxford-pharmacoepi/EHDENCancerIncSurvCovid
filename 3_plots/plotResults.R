@@ -2175,7 +2175,7 @@ prevalence_estimates_Oesophageal1 <- prevalence_estimates %>%
   filter(denominator_age_group != "18 to 29"  )
 
 plot1 <- prevalenceFigure5(prevalence_estimates_Oesophageal1)
-plotname <- paste0("FIGURES1_prevalenceAgeSexStrat_Esophagus.png")
+plotname <- paste0("FIGURES2_prevalenceAgeSexStrat_Esophagus.png")
 
 png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
 print(plot1, newpage = FALSE)
