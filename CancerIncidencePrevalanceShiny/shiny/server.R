@@ -369,7 +369,8 @@ server <-	function(input, output, session) {
       select(!c(GenderAge, Method)) %>% 
       filter(Database %in% input$survival_database_name_selector)  %>% 
       filter(Age %in% input$survival_age_group_selector)     %>% 
-      filter(Gender %in% input$survival_sex_selector)     %>% 
+      #rename(Sex = Gender) %>% 
+      filter(Sex %in% input$survival_sex_selector)     %>% 
       filter(Cancer %in% input$survival_outcome_cohort_name_selector) %>%
       filter(CalendarYearGp %in% input$calendar_year_selector) 
     
@@ -497,7 +498,7 @@ server <-	function(input, output, session) {
       select(!c(GenderAge, Method)) %>% 
       filter(Database %in% input$survival_database_name_selector_cy)  %>% 
       filter(Age %in% input$survival_age_group_selector_cy)     %>% 
-      filter(Gender %in% input$survival_sex_selector_cy)     %>% 
+      filter(Sex %in% input$survival_sex_selector_cy)     %>% 
       filter(Cancer %in% input$survival_outcome_cohort_name_selector_cy)  %>%
       filter(CalendarYearGp %in% input$calendar_year_selector_cy) 
     
@@ -695,11 +696,6 @@ server <-	function(input, output, session) {
 
     table <- table %>%
       select(!c("Stratification", "n.max", "n.start")) %>%
-      # mutate(rmean=nice.num3(rmean)) %>%
-      # mutate(`se(rmean)`=nice.num3(`se(rmean)`)) %>%
-      # mutate(median=nice.num3(median)) %>%
-      # mutate(`0.95LCL`=nice.num3(`0.95LCL`)) %>%
-      # mutate(`0.95UCL`=nice.num3(`0.95UCL`)) %>%
     relocate(Cancer) %>% 
       rename(Sex = Gender) %>% 
       rename(`Records (n)` = records) %>% 
@@ -746,11 +742,6 @@ server <-	function(input, output, session) {
     
     table <- table %>%
       select(!c("Stratification", "n.max", "n.start")) %>%
-      # mutate(rmean=nice.num3(rmean)) %>%
-      # mutate(`se(rmean)`=nice.num3(`se(rmean)`)) %>%
-      # mutate(median=nice.num3(median)) %>%
-      # mutate(`0.95LCL`=nice.num3(`0.95LCL`)) %>%
-      # mutate(`0.95UCL`=nice.num3(`0.95UCL`)) %>%
       relocate(Cancer) %>% 
       rename(Sex = Gender) %>% 
       rename(`Records (n)` = records) %>% 
@@ -787,7 +778,7 @@ server <-	function(input, output, session) {
       select(!c(GenderAge, Method)) %>%
       filter(Database %in% input$survival_database_name_selector_cy)  %>%
       filter(Age %in% input$survival_age_group_selector_cy)     %>%
-      filter(Gender %in% input$survival_sex_selector_cy)     %>%
+      filter(Sex %in% input$survival_sex_selector_cy)     %>%
       filter(Cancer %in% input$survival_outcome_cohort_name_selector_cy)  %>%
       filter(CalendarYearGp %in% input$calendar_year_selector_cy)
     
@@ -824,7 +815,6 @@ server <-	function(input, output, session) {
       relocate(surv, .after = time) %>%
       relocate(lower, .after = surv) %>%
       relocate(upper, .after = lower) %>% 
-      rename(Sex = Gender) %>% 
       rename(`Time (years)` = time) %>% 
       mutate(surv= ifelse(!is.na(surv),paste0(surv, " (",lower," - ",  upper, ")"))) %>% 
       rename(`% Survival (95% CI)` = surv,
@@ -954,6 +944,7 @@ server <-	function(input, output, session) {
   output$plot_survival_probs_cy<- renderPlotly({
     
     table<-get_survival_rates_table_cy()
+    
     validate(need(ncol(table)>1,
                   "No results for selected inputs"))
     

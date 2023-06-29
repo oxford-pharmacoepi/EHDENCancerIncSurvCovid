@@ -32,7 +32,9 @@ incidence_attrition <- readRDS(here("data","incidence_attrition.rds"))
 survival_estimates_whole <- readRDS(here("data","survival_estimates.rds")) %>%
   rename(CalendarYearGp = CalenderYearGp) %>%
   filter(CalendarYearGp == "2000 to 2019") %>%
-  droplevels()
+  droplevels() %>% 
+  rename(Sex = Gender)
+
 survival_risk_table <- readRDS(here("data","survival_risk_table.rds")) %>%
   rename(CalendarYearGp = CalenderYearGp)
 survival_median_table <- readRDS(here("data","survival_median_table.rds")) %>%
@@ -48,7 +50,9 @@ survival_rates_table <- readRDS(here("data","survival_rates_table.rds")) %>%
 survival_estimates_calendar <- readRDS(here("data","survival_estimates.rds")) %>%
   rename(CalendarYearGp = CalenderYearGp) %>%
   filter(CalendarYearGp != "2000 to 2019") %>%
-  droplevels()
+  droplevels() %>% 
+  rename(Sex = Gender)
+
 survival_risk_table_cy <- readRDS(here("data","survival_risk_table_cy.rds")) %>%
   rename(CalendarYearGp = CalenderYearGp)
 survival_median_table_cy <- readRDS(here("data","survival_median_table.rds")) %>%
@@ -60,10 +64,12 @@ survival_rates_table_cy <- readRDS(here("data","survival_rates_table.rds")) %>%
   filter(CalendarYearGp != "2000 to 2019") %>%
   droplevels() %>%
   filter(time != 10) %>%
-  mutate(time = as.character(time))
+  mutate(time = as.character(time)) %>% 
+  rename(Sex = Gender)
 
 table_one_results <- readRDS(here("data","table1_results.rds")) %>%
-  filter(analysis == "Incidence")
+  filter(analysis == "Incidence") %>% 
+  filter(!grepl("Prior_history_years",var))
   
 survival_followup_table <- readRDS(here("data","survival_median_mean_follow_up.rds")) 
 
