@@ -221,7 +221,7 @@ prevalence_estimates <- prevalence_estimates %>%
                                        NA
   ))
 saveRDS(prevalence_estimates, 
-        here("CancerIncidencePrevalanceShiny", "shiny", "data", "prevalence_estimates.rds"))
+        here("shiny", "data", "prevalence_estimates.rds"))
 
 
 # prevalence attrition
@@ -235,7 +235,7 @@ for(i in seq_along(prevalence_attrition_files)){
 prevalence_attrition <- dplyr::bind_rows(prevalence_attrition)
 prevalence_attrition <- prepare_output(prevalence_attrition)
 saveRDS(prevalence_attrition, 
-        here("CancerIncidencePrevalanceShiny","shiny", "data", "/prevalence_attrition.rds"))
+        here("shiny", "data", "/prevalence_attrition.rds"))
 
 
 #merge incidence results together
@@ -250,7 +250,7 @@ for(i in seq_along(incidence_estimates_files)){
 incidence_estimates <- dplyr::bind_rows(incidence_estimates)
 incidence_estimates <- prepare_output(incidence_estimates)
 saveRDS(incidence_estimates, 
-        here("CancerIncidencePrevalanceShiny","shiny", "data", "/incidence_estimates.rds"))
+        here("shiny", "data", "/incidence_estimates.rds"))
 
 # incidence attrition
 incidence_attrition_files<-results[stringr::str_detect(results, ".csv")]
@@ -263,7 +263,7 @@ for(i in seq_along(incidence_attrition_files)){
 incidence_attrition <- dplyr::bind_rows(incidence_attrition)
 incidence_attrition <- prepare_output(incidence_attrition)
 saveRDS(incidence_attrition, 
-        here("CancerIncidencePrevalanceShiny","shiny", "data", "/incidence_attrition.rds"))
+        here("shiny", "data", "/incidence_attrition.rds"))
 
 
 # merge the survival results together
@@ -277,18 +277,12 @@ for(i in seq_along(survival_estimates_files)){
 survival_estimates <- dplyr::bind_rows(survival_estimates)
 survival_estimates <- prepare_output_survival(survival_estimates)
 saveRDS(survival_estimates,
-        here("CancerIncidencePrevalanceShiny","shiny", "data", "/survival_estimates.rds"))
+        here("shiny", "data", "/survival_estimates.rds"))
 
 
 # calculate follow up time from survival estimates
 
-
-# add together number of people with an event or censored
-
-
-
 # - only include whole study period - loop over each database each cancer, whole population and sex and age
-
 #filter out calender year results and age*sex stratification
 # #add together total number of people censored (event or left the database) and calculate the time so time * number of people with that time
 test <- survival_estimates %>% 
@@ -316,7 +310,7 @@ survival_median_mean_follow_up <-  test1 %>%
   rename(upper_IQR = time_Q3)
 
 saveRDS(survival_median_mean_follow_up,
-        here("CancerIncidencePrevalanceShiny","shiny", "data", "/survival_median_mean_follow_up.rds"))
+        here("shiny", "data", "/survival_median_mean_follow_up.rds"))
 
 # merge the risk table results together (whole dataset)
 survival_risk_table_files<-results[stringr::str_detect(results, ".csv")]
@@ -334,7 +328,7 @@ for(i in seq_along(survival_risk_table_files)){
 survival_risk_table <- dplyr::bind_rows(survival_risk_table)
 survival_risk_table <- prepare_output_survival(survival_risk_table)
 saveRDS(survival_risk_table,
-        here("CancerIncidencePrevalanceShiny","shiny", "data", "/survival_risk_table.rds"))
+        here("shiny", "data", "/survival_risk_table.rds"))
 
 
 
@@ -350,7 +344,7 @@ for(i in seq_along(survival_risk_table_cy_files)){
 survival_risk_cy_table <- dplyr::bind_rows(survival_risk_cy_table)
 survival_risk_cy_table <- prepare_output_survival(survival_risk_cy_table)
 saveRDS(survival_risk_cy_table,
-        here("CancerIncidencePrevalanceShiny","shiny", "data", "/survival_risk_table_cy.rds"))
+        here("shiny", "data", "/survival_risk_table_cy.rds"))
 
 
 # merge the median results together
@@ -365,35 +359,49 @@ survival_median_table <- dplyr::bind_rows(survival_median_table)
 survival_median_table <- prepare_output_survival(survival_median_table)
 survival_median_table <- survival_median_table 
 
+# round the values before turning them into characters
+survival_median_table <-  survival_median_table %>% 
+  mutate(rmean = nice.num3(rmean)) %>% 
+  mutate(`se(rmean)` = nice.num3(`se(rmean)`)) %>%
+  mutate(median = nice.num3(median)) %>%
+  mutate(`0.95LCL` = nice.num3(`0.95LCL`)) %>%
+  mutate(`0.95UCL` = nice.num3(`0.95UCL`)) %>% 
+  mutate(median = ifelse(median == "NA", NA, median)) %>% 
+  mutate(`0.95LCL` = ifelse(`0.95LCL` == "NA", NA, `0.95LCL`)) %>% 
+  mutate(`0.95UCL` = ifelse(`0.95UCL` == "NA", NA, `0.95UCL`)) 
+  
+  
+
+
 #if events less than 5 turn the result into NA
 survival_median_table <-  
   survival_median_table %>% 
-mutate(events = ifelse(events <= 5, NA, events)) %>% 
-mutate(median = ifelse(is.na(events) == TRUE, NA, median)) %>% 
-mutate(records = ifelse(is.na(events) == TRUE, NA, records)) %>% 
-mutate(n.max = ifelse(is.na(events) == TRUE, NA, n.max)) %>% 
-mutate(n.start = ifelse(is.na(events) == TRUE, NA, n.start)) %>% 
-mutate(rmean = ifelse(is.na(events) == TRUE, NA, rmean)) %>% 
-mutate(`se(rmean)` = ifelse(is.na(events) == TRUE, NA, `se(rmean)`)) %>% 
-mutate(`0.95LCL` = ifelse(is.na(events) == TRUE, NA, `0.95LCL`)) %>% 
-mutate(`0.95UCL` = ifelse(is.na(events) == TRUE, NA,`0.95UCL`)) 
+mutate(events = ifelse(events <= 5, "<5", events)) %>% 
+mutate(median = ifelse(events == "<5", " ", median)) %>% 
+mutate(records = ifelse(events == "<5", " ", records)) %>% 
+mutate(n.max = ifelse(events == "<5", " ", n.max)) %>% 
+mutate(n.start = ifelse(events == "<5", " ", n.start)) %>% 
+mutate(rmean = ifelse(events == "<5", " ", rmean)) %>% 
+mutate(`se(rmean)` = ifelse(events == "<5", " ", `se(rmean)`)) %>% 
+mutate(`0.95LCL` = ifelse(events == "<5", " ", `0.95LCL`)) %>% 
+mutate(`0.95UCL` = ifelse(events == "<5", " ",`0.95UCL`)) 
 
-# remove those results with do not have a upper confidence interval
+# put reason for obscuring i.e. median not achieved
+
 survival_median_table <-  
   survival_median_table %>% 
-  mutate(events = ifelse(is.na(`0.95UCL`) == TRUE, NA, events)) %>% 
-  mutate(median = ifelse(is.na(`0.95UCL`) == TRUE, NA, median)) %>% 
-  mutate(records = ifelse(is.na(`0.95UCL`) == TRUE, NA, records)) %>% 
-  mutate(n.max = ifelse(is.na(`0.95UCL`) == TRUE, NA, n.max)) %>% 
-  mutate(n.start = ifelse(is.na(`0.95UCL`) == TRUE, NA, n.start)) %>% 
-  mutate(rmean = ifelse(is.na(`0.95UCL`) == TRUE, NA, rmean)) %>% 
-  mutate(`se(rmean)` = ifelse(is.na(`0.95UCL`) == TRUE, NA, `se(rmean)`)) %>% 
-  mutate(`0.95LCL` = ifelse(is.na(`0.95UCL`) == TRUE, NA, `0.95LCL`)) %>% 
-  mutate(`0.95UCL` = ifelse(is.na(`0.95UCL`) == TRUE, NA,`0.95UCL`)) 
-
+  mutate(median = ifelse(is.na(`0.95UCL`) == TRUE, "Not achieved", median)) %>% 
+  mutate(`0.95LCL` = ifelse(is.na(`0.95LCL`) == TRUE, "Not calculated", `0.95LCL`)) %>% 
+  mutate(`0.95UCL` = ifelse(is.na(`0.95UCL`) == TRUE, "Not calculated",`0.95UCL`)) %>% 
+  mutate(`0.95LCL` = ifelse(median == "Not achieved", "Not calculated",`0.95LCL`)) %>% 
+  mutate(`0.95LCL` = ifelse(events == "<5", "Result obscured",`0.95LCL`))%>% 
+  mutate(`0.95UCL` = ifelse(events == "<5", "Result obscured",`0.95UCL`)) %>% 
+  mutate(median = ifelse(events == "<5", "Result obscured",median))%>% 
+  mutate(rmean = ifelse(events == "<5", "Result obscured", rmean)) %>% 
+  mutate(`se(rmean)` = ifelse(events == "<5", "Result obscured", `se(rmean)`)) 
 
 saveRDS(survival_median_table,
-        here("CancerIncidencePrevalanceShiny","shiny", "data", "/survival_median_table.rds"))
+        here("shiny", "data", "/survival_median_table.rds"))
 
 
 
@@ -408,26 +416,47 @@ for(i in seq_along(survival_rates_files)){
 survival_rates_table <- dplyr::bind_rows(survival_rates_table)
 survival_rates_table <- prepare_output_survival(survival_rates_table)
 
-
+# obscure those with n.event and n.censor both less than 5
 survival_rates_table  <-  
   survival_rates_table  %>% 
-  mutate(n.event = ifelse(n.event <= 5, NA, n.event)) %>% 
-  mutate(n.risk = ifelse(is.na(n.event) == TRUE, NA, n.risk)) %>% 
-  mutate(n.censor = ifelse(is.na(n.event) == TRUE, NA, n.censor)) %>% 
-  mutate(surv = ifelse(is.na(n.event) == TRUE, NA, surv)) %>% 
-  mutate(std.err = ifelse(is.na(n.event) == TRUE, NA, std.err)) %>% 
-  mutate(cumhaz = ifelse(is.na(n.event) == TRUE, NA, cumhaz)) %>% 
-  mutate(std.chaz = ifelse(is.na(n.event) == TRUE, NA, std.chaz)) %>% 
-  mutate(type = ifelse(is.na(n.event) == TRUE, NA, type)) %>% 
-  mutate(logse = ifelse(is.na(n.event) == TRUE, NA,logse)) %>% 
-  mutate(conf.int = ifelse(is.na(n.event) == TRUE, NA, conf.int)) %>% 
-  mutate(conf.type = ifelse(is.na(n.event) == TRUE, NA, conf.type)) %>% 
-  mutate(lower = ifelse(is.na(n.event) == TRUE, NA, lower)) %>% 
-  mutate(upper = ifelse(is.na(n.event) == TRUE, NA, upper))
-
-
+  mutate(n.event = ifelse(n.event <= 5, "<5", n.event)) %>% 
+  mutate(n.risk = ifelse(n.risk <= 5, "<5", n.risk)) %>% 
+  mutate(n.censor = ifelse(n.censor <= 5, "<5", n.censor)) %>% 
+  mutate(n.risk = ifelse(n.risk == "<5" & time == 5 & CalenderYearGp != "2000 to 2019", "-", n.risk)) %>% 
+  mutate(n.censor = ifelse(n.risk == "<5" & n.event == "<5" & time == 10 & CalenderYearGp != "2000 to 2019"
+                       , "<5", n.censor)) %>% 
+  mutate(surv = ifelse(n.risk == "<5" & n.event == "<5" & n.censor == "<5"
+                       , NA, surv)) %>% 
+  mutate(lower = ifelse(n.risk == "<5" & n.event == "<5" & n.censor == "<5"
+                       , NA, lower)) %>%   
+  mutate(upper = ifelse(n.risk == "<5" & n.event == "<5" & n.censor == "<5"
+                       , NA, upper)) %>% 
+  mutate(std.err = ifelse(n.risk == "<5" & n.event == "<5" & n.censor == "<5"
+                        , NA, std.err)) %>%  
+  mutate(cumhaz = ifelse(n.risk == "<5" & n.event == "<5" & n.censor == "<5"
+                        , NA, cumhaz)) %>% 
+  mutate(std.chaz = ifelse(n.risk == "<5" & n.event == "<5" & n.censor == "<5"
+                        , NA, std.chaz)) %>% 
+  mutate(surv = ifelse(n.risk == "-" & n.event == "<5" & n.censor == "<5"
+                       , NA, surv)) %>% 
+  mutate(lower = ifelse(n.risk == "-" & n.event == "<5" & n.censor == "<5"
+                        , NA, lower)) %>%   
+  mutate(upper = ifelse(n.risk == "-" & n.event == "<5" & n.censor == "<5"
+                        , NA, upper)) %>% 
+  mutate(std.err = ifelse(n.risk == "-" & n.event == "<5" & n.censor == "<5"
+                          , NA, std.err)) %>%  
+  mutate(cumhaz = ifelse(n.risk == "-" & n.event == "<5" & n.censor == "<5"
+                         , NA, cumhaz)) %>% 
+  mutate(std.chaz = ifelse(n.risk == "-" & n.event == "<5" & n.censor == "<5"
+                           , NA, std.chaz)) %>% 
+  mutate(surv = ifelse(is.na(std.err), NA, surv)) %>% 
+  mutate(lower = ifelse(is.na(std.err), NA, lower)) %>% 
+  mutate(upper = ifelse(is.na(std.err), NA, upper)) %>% 
+  mutate(cumhaz = ifelse(is.na(std.err), NA, cumhaz)) %>%  
+  mutate(std.chaz = ifelse(is.na(std.err), NA, std.chaz)) 
+  
 saveRDS(survival_rates_table,
-        here("CancerIncidencePrevalanceShiny","shiny", "data", "/survival_rates_table.rds"))
+        here("shiny", "data", "/survival_rates_table.rds"))
 
 
 # table 1 
@@ -504,10 +533,12 @@ table1_results <- table1_results %>%
   filter(!grepl("Immunosuppressants",var)) %>%
   filter(!grepl("LipidModifyingAgents",var)) %>%
   filter(!grepl("Opioids",var)) %>%
-  filter(!grepl("Psychostimulants",var)) 
+  filter(!grepl("Psychostimulants",var)) %>% 
+  filter(!grepl("HpyloriGIInfection",var))
+  
 
 
 
 saveRDS(table1_results, 
-        here("CancerIncidencePrevalanceShiny","shiny", "data", "table1_results.rds"))
+        here("shiny", "data", "table1_results.rds"))
 

@@ -619,7 +619,8 @@ server <-	function(input, output, session) {
                   "No results for selected inputs"))
     
     table <- table %>%
-      select(!c("Stratification"))
+      select(!c("Stratification")) %>% 
+      rename(Sex = Gender, `Calendar Year` = CalendarYearGp)
 
     datatable(table,
               rownames= FALSE,
@@ -655,7 +656,9 @@ server <-	function(input, output, session) {
                   "No results for selected inputs"))
     
     table <- table %>%
-      select(!c("Stratification"))
+      select(!c("Stratification")) %>% 
+      rename(Sex = Gender, 
+             `Calendar Year` = CalendarYearGp )
     
     datatable(table,
               rownames= FALSE,
@@ -692,12 +695,21 @@ server <-	function(input, output, session) {
 
     table <- table %>%
       select(!c("Stratification", "n.max", "n.start")) %>%
-      mutate(rmean=nice.num3(rmean)) %>%
-      mutate(`se(rmean)`=nice.num3(`se(rmean)`)) %>%
-      mutate(median=nice.num3(median)) %>%
-      mutate(`0.95LCL`=nice.num3(`0.95LCL`)) %>%
-      mutate(`0.95UCL`=nice.num3(`0.95UCL`)) %>%
-      relocate(Cancer)
+      # mutate(rmean=nice.num3(rmean)) %>%
+      # mutate(`se(rmean)`=nice.num3(`se(rmean)`)) %>%
+      # mutate(median=nice.num3(median)) %>%
+      # mutate(`0.95LCL`=nice.num3(`0.95LCL`)) %>%
+      # mutate(`0.95UCL`=nice.num3(`0.95UCL`)) %>%
+    relocate(Cancer) %>% 
+      rename(Sex = Gender) %>% 
+      rename(`Records (n)` = records) %>% 
+      mutate(median= ifelse(!is.na(median),paste0(median, " (",`0.95LCL`," - ",  `0.95UCL`, ")"))) %>% 
+      rename(`Median Survival in Years (95% CI)` = median) %>% 
+      mutate(rmean= ifelse(!is.na(rmean),paste0(rmean, " (",`se(rmean)`,")"))) %>% 
+      rename(`rmean in Years (SE)` = rmean,
+             `Events (n)` = events,
+             `Calendar Year` = CalendarYearGp) %>% 
+      select(!c("0.95LCL", "0.95UCL", "se(rmean)")) 
       
     datatable(table,
               rownames= FALSE,
@@ -734,12 +746,22 @@ server <-	function(input, output, session) {
     
     table <- table %>%
       select(!c("Stratification", "n.max", "n.start")) %>%
-      mutate(rmean=nice.num3(rmean)) %>%
-      mutate(`se(rmean)`=nice.num3(`se(rmean)`)) %>%
-      mutate(median=nice.num3(median)) %>%
-      mutate(`0.95LCL`=nice.num3(`0.95LCL`)) %>%
-      mutate(`0.95UCL`=nice.num3(`0.95UCL`)) %>%
-      relocate(Cancer) 
+      # mutate(rmean=nice.num3(rmean)) %>%
+      # mutate(`se(rmean)`=nice.num3(`se(rmean)`)) %>%
+      # mutate(median=nice.num3(median)) %>%
+      # mutate(`0.95LCL`=nice.num3(`0.95LCL`)) %>%
+      # mutate(`0.95UCL`=nice.num3(`0.95UCL`)) %>%
+      relocate(Cancer) %>% 
+      rename(Sex = Gender) %>% 
+      rename(`Records (n)` = records) %>% 
+      mutate(median= ifelse(!is.na(median),paste0(median, " (",`0.95LCL`," - ",  `0.95UCL`, ")"))) %>% 
+      rename(`Median Survival in Years (95% CI)` = median) %>% 
+      mutate(rmean= ifelse(!is.na(rmean),paste0(rmean, " (",`se(rmean)`,")"))) %>% 
+      rename(`rmean in Years (SE)` = rmean,
+             `Events (n)` = events,
+             `Calendar Year` = CalendarYearGp) %>% 
+      select(!c("0.95LCL", "0.95UCL", "se(rmean)")) 
+      
     # 
     # table <- table %>%
     #   mutate(across(everything(), as.character)) %>%
@@ -783,17 +805,34 @@ server <-	function(input, output, session) {
                 "type",
                 "logse",
                 "conf.int",
-                "conf.type")) %>%
-      mutate(surv=nice.num3(surv)) %>%
+                "conf.type",
+                "n.risk",
+                "n.event",
+                "n.censor"
+                
+      )) %>%
+      mutate(surv = surv * 100) %>% 
+      mutate(lower = lower * 100) %>% 
+      mutate(upper = upper * 100) %>% 
+      mutate(surv=nice.num2(surv)) %>%
       mutate(std.err=nice.num3(std.err)) %>%
       mutate(cumhaz=nice.num3(cumhaz)) %>%
       mutate(std.chaz=nice.num3(std.chaz)) %>%      
-      mutate(lower=nice.num3(lower)) %>%
-      mutate(upper=nice.num3(upper)) %>%
+      mutate(lower=nice.num2(lower)) %>%
+      mutate(upper=nice.num2(upper)) %>%
       relocate(Cancer) %>%
       relocate(surv, .after = time) %>%
       relocate(lower, .after = surv) %>%
-      relocate(upper, .after = lower)
+      relocate(upper, .after = lower) %>% 
+      rename(Sex = Gender) %>% 
+      rename(`Time (years)` = time) %>% 
+      mutate(surv= ifelse(!is.na(surv),paste0(surv, " (",lower," - ",  upper, ")"))) %>% 
+      rename(`% Survival (95% CI)` = surv,
+             `Calendar Year` = CalendarYearGp) %>% 
+      select(!c("lower", "upper",
+                "std.err",
+                "cumhaz",
+                "std.chaz"))
     
     datatable(table,
               rownames= FALSE,
@@ -821,6 +860,7 @@ server <-	function(input, output, session) {
     
     table
   })
+  
   output$tbl_survival_rates_table <-  DT::renderDataTable({
     
     table<-get_survival_rates_table()
@@ -833,17 +873,36 @@ server <-	function(input, output, session) {
                 "type",
                 "logse",
                 "conf.int",
-                "conf.type")) %>%
-      mutate(surv=nice.num3(surv)) %>%
+                "conf.type",
+                "n.risk",
+                "n.event",
+                "n.censor"
+                
+                )) %>%
+      mutate(surv = surv * 100) %>% 
+      mutate(lower = lower * 100) %>% 
+      mutate(upper = upper * 100) %>% 
+      mutate(surv=nice.num2(surv)) %>%
       mutate(std.err=nice.num3(std.err)) %>%
       mutate(cumhaz=nice.num3(cumhaz)) %>%
       mutate(std.chaz=nice.num3(std.chaz)) %>%      
-      mutate(lower=nice.num3(lower)) %>%
-      mutate(upper=nice.num3(upper)) %>%
+      mutate(lower=nice.num2(lower)) %>%
+      mutate(upper=nice.num2(upper)) %>%
       relocate(Cancer) %>%
       relocate(surv, .after = time) %>%
       relocate(lower, .after = surv) %>%
-      relocate(upper, .after = lower)
+      relocate(upper, .after = lower) %>% 
+      rename(Sex = Gender) %>% 
+      rename(`Time (years)` = time) %>% 
+      mutate(surv= ifelse(!is.na(surv),paste0(surv, " (",lower," - ",  upper, ")"))) %>% 
+      rename(`% Survival (95% CI)` = surv,
+             `Calendar Year` = CalendarYearGp) %>% 
+      select(!c("lower", "upper",
+                "std.err",
+                "cumhaz",
+                "std.chaz"))
+                
+                
     
     datatable(table,
               rownames= FALSE,
@@ -861,18 +920,23 @@ server <-	function(input, output, session) {
   get_table_one <-reactive({
     
     table<-table_one_results %>% 
-      filter(Cancer %in% input$table1_outcome_cohort_name_selector) %>%
-      filter(analysis %in% input$table1_analysis_selector)  
+      filter(Cancer %in% input$table1_outcome_cohort_name_selector)
 
-    
     table
   }) 
+  
+  
   output$tbl_table_one<-  DT::renderDataTable({
     
     table<-get_table_one()
     
     validate(need(ncol(table)>1,
                   "No results for selected inputs"))
+    
+    table <- table %>% 
+      select(!c("analysis" )) %>% 
+      relocate(Cancer, .after = `CPRD GOLD`) %>% 
+      rename(Database = var)
 
     datatable(table,
               rownames= FALSE,
@@ -1003,17 +1067,24 @@ server <-	function(input, output, session) {
                   "No results for selected inputs"))
     
     table <- table %>%
+      select(!c("Stratification")) %>% 
       mutate(median_followup=nice.num3(median_followup)) %>%
       mutate(lower_IQR=nice.num3(lower_IQR)) %>%
       mutate(upper_IQR=nice.num3(upper_IQR)) %>%
       mutate(mean_followup=nice.num3(mean_followup)) %>%
       mutate(sd_followup=nice.num3(sd_followup)) %>%
-      relocate(Cancer)
-    # 
-    # table <- table %>%
-    #   mutate(across(everything(), as.character)) %>%
-    #   mutate(across(everything(), ~replace_na(.x, " ")))
-    # 
+      relocate(Cancer) %>%
+      relocate(Age, .after = sd_followup) %>%
+      relocate(Gender, .after = Age) %>%
+      relocate(Database, .after = Gender) %>% 
+      mutate(median_followup= ifelse(!is.na(median_followup),paste0(median_followup, " (",lower_IQR," - ",  upper_IQR, ")"))) %>%
+      mutate(mean_followup= ifelse(!is.na(mean_followup),paste0(mean_followup, " (",sd_followup, ")"))) %>% 
+      rename(Sex = Gender,
+             `Median Follow up in Years (95%CI)` = median_followup,
+             `Mean Follow up in Years (SD)` = mean_followup) %>% 
+      select(!c("lower_IQR", "upper_IQR",
+                "sd_followup"))
+
     datatable(table,
               rownames= FALSE,
               extensions = 'Buttons',

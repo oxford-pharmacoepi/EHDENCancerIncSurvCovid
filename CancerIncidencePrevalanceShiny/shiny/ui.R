@@ -630,17 +630,17 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                             ),
                             
                             
-                            div(style="display: inline-block;vertical-align:top; width: 150px;",
-                                pickerInput(inputId = "table1_analysis_selector",
-                                            label = "Analysis Type",
-                                            choices = sort(unique(table_one_results$analysis)),
-                                            selected = c("Incidence"),
-                                            options = list(
-                                              `actions-box` = TRUE,
-                                              size = 10,
-                                              `selected-text-format` = "count > 3"),
-                                            multiple = TRUE)
-                            ),
+                            # div(style="display: inline-block;vertical-align:top; width: 150px;",
+                            #     pickerInput(inputId = "table1_analysis_selector",
+                            #                 label = "Analysis Type",
+                            #                 choices = sort(unique(table_one_results$analysis)),
+                            #                 selected = c("Incidence"),
+                            #                 options = list(
+                            #                   `actions-box` = TRUE,
+                            #                   size = 10,
+                            #                   `selected-text-format` = "count > 3"),
+                            #                 multiple = TRUE)
+                            # ),
                             
                             
                             tabsetPanel(type = "tabs",
