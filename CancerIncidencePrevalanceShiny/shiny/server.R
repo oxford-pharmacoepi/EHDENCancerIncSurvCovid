@@ -5,18 +5,21 @@ server <-	function(input, output, session) {
     
     table<-prevalence_estimates %>% 
       # first deselect settings which did not vary for this study
-      select(!c(analysis_id, analysis_outcome_lookback_days,
+      select(!c(analysis_id, 
+                analysis_outcome_lookback_days,
                 analysis_interval,
                 analysis_time_point,
+                denominator_days_prior_history,
                 analysis_complete_database_intervals,
                 denominator_start_date,
+                result_id,
                 denominator_end_date,
                 analysis_type, analysis_full_contribution)) %>% 
       filter(database_name %in% input$prevalence_database_name_selector)  %>% 
       filter(as.character(prevalence_start_date) %in% input$prevalence_start_date_selector)  %>% 
       filter(denominator_age_group %in% input$prevalence_denominator_age_group_selector)     %>% 
       filter(denominator_sex %in% input$prevalence_denominator_sex_selector)     %>% 
-      filter(denominator_days_prior_history %in% input$prevalence_denominator_days_prior_history_selector)   %>% 
+      #filter(denominator_days_prior_history %in% input$prevalence_denominator_days_prior_history_selector)   %>% 
       filter(outcome_cohort_name %in% input$prevalence_outcome_cohort_name_selector)  
 
     table
@@ -42,8 +45,16 @@ server <-	function(input, output, session) {
                 "denominator_cohort_id", "outcome_cohort_id","prevalence",
                 "denominator_strata_cohort_definition_id",
                 "denominator_strata_cohort_name")) %>%
-      relocate(result_id, .after = prevalence_end_date) %>%
-    relocate(`Prevalence (95% CI)`, .before = outcome_cohort_name) 
+     # relocate(result_id, .after = prevalence_end_date) %>%
+    relocate(`Prevalence (95% CI)`, .before = outcome_cohort_name) %>% 
+      rename(`Start Date` = prevalence_start_date,
+             `End Date` = prevalence_end_date,
+             `Population (n)` = n_population,
+             `Cases (n)` = n_cases,
+             Cancer = outcome_cohort_name,
+             Age = denominator_age_group,
+             Sex = denominator_sex,
+             Database = database_name)
 
     
     
@@ -147,13 +158,17 @@ server <-	function(input, output, session) {
       select(!c(analysis_id, analysis_outcome_lookback_days,
                 analysis_interval,
                 analysis_time_point,
+                result_id,
+                denominator_strata_cohort_definition_id,
+                denominator_days_prior_history,
+                denominator_strata_cohort_name,
                 analysis_complete_database_intervals,
                 denominator_start_date,
                 denominator_end_date)) %>% 
       filter(database_name %in% input$prevalence_database_name_selector)    %>% 
       filter(denominator_age_group %in% input$prevalence_denominator_age_group_selector)     %>% 
       filter(denominator_sex %in% input$prevalence_denominator_sex_selector)     %>% 
-      filter(denominator_days_prior_history %in% input$prevalence_denominator_days_prior_history_selector)     %>% 
+      #filter(denominator_days_prior_history %in% input$prevalence_denominator_days_prior_history_selector)     %>% 
       filter(outcome_cohort_name %in% input$prevalence_outcome_cohort_name_selector)  
     
     table
@@ -166,8 +181,19 @@ server <-	function(input, output, session) {
                   "No results for selected inputs"))
     
     table <- table %>% 
-      select(!c("analysis_full_contribution","analysis_min_cell_count",
-                "denominator_cohort_id", "outcome_cohort_id")) 
+      select(!c("analysis_full_contribution",
+                "analysis_min_cell_count",
+                "denominator_cohort_id", 
+                "outcome_cohort_id")) %>% 
+      rename(n = current_n,
+             `Excluded (n)`= excluded,
+             Reason = reason,
+             Cancer = outcome_cohort_name,
+             Age = denominator_age_group,
+             Sex = denominator_sex,
+             Database = database_name,
+             `Analysis Type` = analysis_type,
+             Step = step )
     
     datatable(table,
               rownames= FALSE,
@@ -187,15 +213,16 @@ server <-	function(input, output, session) {
     table<-incidence_estimates %>% 
       # first deselect settings which did not vary for this study
       select(!c(analysis_id, 
-                #analysis_interval,
                 analysis_complete_database_intervals,
                 denominator_start_date,
+                result_id,
+                denominator_days_prior_history,
                 denominator_end_date)) %>% 
       filter(database_name %in% input$incidence_database_name_selector)  %>% 
       filter(as.character(incidence_start_date) %in% input$incidence_start_date_selector)  %>% 
       filter(denominator_age_group %in% input$incidence_denominator_age_group_selector)     %>% 
       filter(denominator_sex %in% input$incidence_denominator_sex_selector)     %>% 
-      filter(denominator_days_prior_history %in% input$incidence_denominator_days_prior_history_selector)   %>% 
+      #filter(denominator_days_prior_history %in% input$incidence_denominator_days_prior_history_selector)   %>% 
       filter(outcome_cohort_name %in% input$incidence_outcome_cohort_name_selector)  %>%
       filter(analysis_interval %in% input$incidence_denominator_analysis_interval_selector) 
 
@@ -228,7 +255,21 @@ server <-	function(input, output, session) {
       mutate(person_years=nice.num.count(person_years)) %>% 
       relocate(incidence_start_date) %>% 
       relocate(incidence_end_date, .after = incidence_start_date) %>% 
-      relocate(person_years, .after = n_persons)
+      relocate(person_years, .after = n_persons) %>% 
+    rename(`Start Date` = incidence_start_date,
+           `End Date` = incidence_end_date,
+           `Persons (n)` = n_persons,
+           `Person Years`= person_years,
+           `Events (n)` = n_events,
+           `Incidence (100000 pys)` = incidence_100000_pys,
+           Cancer = outcome_cohort_name,
+           `Time Interval` = analysis_interval,
+           Age = denominator_age_group,
+           Sex = denominator_sex,
+           Database = database_name)
+    
+    
+    
     datatable(table,
               rownames= FALSE,
               extensions = 'Buttons',
@@ -325,14 +366,19 @@ server <-	function(input, output, session) {
       # first deselect settings which did not vary for this study
       select(!c(analysis_id, 
                 #analysis_interval,
-                analysis_repeated_events,analysis_outcome_washout,
+                analysis_repeated_events,
+                analysis_outcome_washout,
                 analysis_complete_database_intervals,
+                result_id,
+                denominator_days_prior_history,
+                denominator_strata_cohort_definition_id,
+                denominator_strata_cohort_name,
                 denominator_start_date,
                 denominator_end_date)) %>% 
       filter(database_name %in% input$incidence_database_name_selector)    %>% 
       filter(denominator_age_group %in% input$incidence_denominator_age_group_selector)     %>% 
       filter(denominator_sex %in% input$incidence_denominator_sex_selector)     %>% 
-      filter(denominator_days_prior_history %in% input$incidence_denominator_days_prior_history_selector)     %>% 
+      #filter(denominator_days_prior_history %in% input$incidence_denominator_days_prior_history_selector)     %>% 
       filter(outcome_cohort_name %in% input$incidence_outcome_cohort_name_selector) %>%
     filter(analysis_interval %in% input$incidence_denominator_analysis_interval_selector) 
     table
@@ -346,7 +392,16 @@ server <-	function(input, output, session) {
     
     table <- table %>% 
       select(!c("analysis_min_cell_count",
-                "denominator_cohort_id", "outcome_cohort_id")) 
+                "denominator_cohort_id", "outcome_cohort_id"))  %>% 
+      rename(n = current_n,
+             `Excluded (n)`= excluded,
+             Reason = reason,
+             Cancer = outcome_cohort_name,
+             Age = denominator_age_group,
+             Sex = denominator_sex,
+             `Time Interval` = analysis_interval,
+             Database = database_name,
+             Step = step )
     
     datatable(table,
               rownames= FALSE,

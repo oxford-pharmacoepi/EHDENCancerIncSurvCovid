@@ -33,11 +33,53 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                             tags$h4(tags$strong("Please note, the results presented here should be considered as 
                        preliminary and subject to change.")),
                             tags$hr(),
-                            tags$h5("This app is a companion to the study focussing on determining the incidence,prevalence and survival for a variety of different cancers. 
-    We will focus on the 9 cancers (Breast, Colorectal, Lung, Liver, Stomach, Head/neck, Prostate, Oesophagus, and Pancreas). 
-    We have used CPRD Aurum and GOLD databases from 2000-2019 for people 18 and over with at least one year of prior observation."),
-                            HTML('<br>'),
+                            tags$h5(
+ "This app is a companion to the study focussing on determining the incidence,prevalence and survival for 9 different cancers
+ (Breast, Colorectal, Lung, Liver, Stomach, Head & Neck (including subsites), Prostate, Oesophagus, and Pancreas) between 2000 to 2019 using Primary care GP records
+ from the United Kingdom (", tags$a(href="https://cprd.com/", "Clinical Practice Research Datalink"), "(CPRD) GOLD & CPRD Aurum)."), 
+ 
+ tags$h5(
+ "In the following pages you can find information on annual period prevalence, annual and overall incidence, 
+ survival for the whole population, calendar year survival and a description of the characteristics of the study populations 
+of patients with an cancer outcome. All results have been stratified by age group and sex."),
+
+                           # HTML('<br>'),
+
+                        tags$h5("The results for each cancer are now published in the following journals:"
+                                ),
+ tags$ol(
+   tags$li(strong("TBC"),"(",tags$a(href="https://www.ndorms.ox.ac.uk/research/research-groups/Musculoskeletal-Pharmacoepidemiology","Paper Link"),")" ), 
+   tags$li(strong("TBC"),"(",tags$a(href="https://www.ndorms.ox.ac.uk/research/research-groups/Musculoskeletal-Pharmacoepidemiology","Paper Link"),")" ),
+   tags$li(strong("TBC"),"(",tags$a(href="https://www.ndorms.ox.ac.uk/research/research-groups/Musculoskeletal-Pharmacoepidemiology","Paper Link"),")" ),
+   tags$li(strong("TBC"),"(",tags$a(href="https://www.ndorms.ox.ac.uk/research/research-groups/Musculoskeletal-Pharmacoepidemiology","Paper Link"),")" ),
+   tags$li(strong("TBC"),"(",tags$a(href="https://www.ndorms.ox.ac.uk/research/research-groups/Musculoskeletal-Pharmacoepidemiology","Paper Link"),")" ),
+   tags$li(strong("TBC"),"(",tags$a(href="https://www.ndorms.ox.ac.uk/research/research-groups/Musculoskeletal-Pharmacoepidemiology","Paper Link"),")" ),
+   tags$li(strong("TBC"),"(",tags$a(href="https://www.ndorms.ox.ac.uk/research/research-groups/Musculoskeletal-Pharmacoepidemiology","Paper Link"),")" ),
+   tags$li(strong("TBC"),"(",tags$a(href="https://www.ndorms.ox.ac.uk/research/research-groups/Musculoskeletal-Pharmacoepidemiology","Paper Link"),")" ),
+   tags$li(strong("TBC"),"(",tags$a(href="https://www.ndorms.ox.ac.uk/research/research-groups/Musculoskeletal-Pharmacoepidemiology","Paper Link"),")" )),
+ 
+ tags$h5("The analysis code used to generate these results can be found",
+         tags$a(href="https://github.com/oxford-pharmacoepi", "here"),
+         ".The cohort diagnostics including the clinical codelists for each of the 9 cancers can be found",
+         tags$a(href="https://dpa-pde-oxford.shinyapps.io/EHDENCancerIncPrevCohortDiagShiny/", "here")
+         
+         ),
+ 
+ tags$h5("Any questions regarding these studies or problems with the app please contact",
+         tags$a(href="mailto:danielle.newby@ndorms.ox.ac.uk", "Danielle Newby")
+         
+ ),
+ 
+ # tags$h5("Any questions or problems with the app
+ #         regarding these studies please contact",
+ #         tags$a(href="mailto:danielle.newby@ndorms.ox.ac.uk","Danielle Newby") )
+ # 
+ # 
+ #                   ),
+ 
                             tags$hr()
+ 
+ 
                    ), 
                    ## Prevalence ------ 
                    tabPanel("Population Prevalence",	  
@@ -90,17 +132,17 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                               size = 10,
                                               `selected-text-format` = "count > 3"),
                                             multiple = TRUE)
-                            ),
-                            div(style="display: inline-block;vertical-align:top; width: 150px;",
-                                pickerInput(inputId = "prevalence_denominator_days_prior_history_selector",
-                                            label = "Days Prior History",
-                                            choices = unique(prevalence_estimates$denominator_days_prior_history),
-                                            selected = 365,
-                                            options = list(
-                                              `actions-box` = TRUE,
-                                              size = 10,
-                                              `selected-text-format` = "count > 3"),
-                                            multiple = TRUE)
+                            # ),
+                            # div(style="display: inline-block;vertical-align:top; width: 150px;",
+                            #     pickerInput(inputId = "prevalence_denominator_days_prior_history_selector",
+                            #                 label = "Days Prior History",
+                            #                 choices = unique(prevalence_estimates$denominator_days_prior_history),
+                            #                 selected = 365,
+                            #                 options = list(
+                            #                   `actions-box` = TRUE,
+                            #                   size = 10,
+                            #                   `selected-text-format` = "count > 3"),
+                            #                 multiple = TRUE)
                             ),
                             tags$hr(),
                             tags$h5("Analysis Settings"),
@@ -126,7 +168,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                                                  label = "X axis",
                                                                  choices = c("denominator_age_group", 
                                                                              "denominator_sex",
-                                                                             "denominator_days_prior_history",
+                                                                             #"denominator_days_prior_history",
                                                                              "outcome_cohort_name",
                                                                              "database_name",
                                                                              "prevalence_start_date"),
@@ -142,7 +184,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                                                  label = "Facet by",
                                                                  choices = c("denominator_age_group", 
                                                                              "denominator_sex",
-                                                                             "denominator_days_prior_history",
+                                                                            # "denominator_days_prior_history",
                                                                              "outcome_cohort_name",
                                                                              "database_name",
                                                                              "prevalence_start_date"),
@@ -159,7 +201,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                                                  label = "Colour by",
                                                                  choices = c("denominator_age_group", 
                                                                              "denominator_sex",
-                                                                             "denominator_days_prior_history",
+                                                                            # "denominator_days_prior_history",
                                                                              "outcome_cohort_name",
                                                                              "database_name",
                                                                              "prevalence_start_date"),
@@ -227,17 +269,17 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                               size = 10,
                                               `selected-text-format` = "count > 3"),
                                             multiple = TRUE)
-                            ),
-                            div(style="display: inline-block;vertical-align:top; width: 150px;",
-                                pickerInput(inputId = "incidence_denominator_days_prior_history_selector",
-                                            label = "Days Prior History",
-                                            choices = unique(incidence_estimates$denominator_days_prior_history),
-                                            selected = 365,
-                                            options = list(
-                                              `actions-box` = TRUE,
-                                              size = 10,
-                                              `selected-text-format` = "count > 3"),
-                                            multiple = TRUE)
+                            # ),
+                            # div(style="display: inline-block;vertical-align:top; width: 150px;",
+                            #     pickerInput(inputId = "incidence_denominator_days_prior_history_selector",
+                            #                 label = "Days Prior History",
+                            #                 choices = unique(incidence_estimates$denominator_days_prior_history),
+                            #                 selected = 365,
+                            #                 options = list(
+                            #                   `actions-box` = TRUE,
+                            #                   size = 10,
+                            #                   `selected-text-format` = "count > 3"),
+                            #                 multiple = TRUE)
                          
                             ),
                             tags$hr(),
@@ -277,7 +319,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                                                  label = "X axis",
                                                                  choices = c("denominator_age_group", 
                                                                              "denominator_sex",
-                                                                             "denominator_days_prior_history",
+                                                                            # "denominator_days_prior_history",
                                                                              "outcome_cohort_name",
                                                                              "database_name",
                                                                              "incidence_start_date"),
@@ -293,7 +335,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                                                  label = "Facet by",
                                                                  choices = c("denominator_age_group", 
                                                                              "denominator_sex",
-                                                                             "denominator_days_prior_history",
+                                                                             #"denominator_days_prior_history",
                                                                              "outcome_cohort_name",
                                                                              "database_name",
                                                                              "incidence_start_date"),
@@ -310,7 +352,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                                                                  label = "Colour by",
                                                                  choices = c("denominator_age_group", 
                                                                              "denominator_sex",
-                                                                             "denominator_days_prior_history",
+                                                                             #"denominator_days_prior_history",
                                                                              "outcome_cohort_name",
                                                                              "database_name",
                                                                              "incidence_start_date"),
