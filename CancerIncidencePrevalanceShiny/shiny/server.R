@@ -1126,7 +1126,7 @@ server <-	function(input, output, session) {
       mutate(median_followup= ifelse(!is.na(median_followup),paste0(median_followup, " (",lower_IQR," - ",  upper_IQR, ")"))) %>%
       mutate(mean_followup= ifelse(!is.na(mean_followup),paste0(mean_followup, " (",sd_followup, ")"))) %>% 
       rename(Sex = Gender,
-             `Median Follow up in Years (95%CI)` = median_followup,
+             `Median Follow up in Years (IQR)` = median_followup,
              `Mean Follow up in Years (SD)` = mean_followup) %>% 
       select(!c("lower_IQR", "upper_IQR",
                 "sd_followup"))

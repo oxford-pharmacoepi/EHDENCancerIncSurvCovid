@@ -70,12 +70,6 @@ of patients with an cancer outcome. All results have been stratified by age grou
          
  ),
  
- # tags$h5("Any questions or problems with the app
- #         regarding these studies please contact",
- #         tags$a(href="mailto:danielle.newby@ndorms.ox.ac.uk","Danielle Newby") )
- # 
- # 
- #                   ),
  
                             tags$hr()
  

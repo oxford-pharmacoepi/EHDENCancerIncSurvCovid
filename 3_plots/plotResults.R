@@ -1541,12 +1541,13 @@ dev.off()
 
 #############################################################################################
 # breast cancer - make the axis non fixed so can see the IR/prev of the males
-
+# create one removing both results only include males and females as 99% are females
 #incidence rates
 incidence_estimates_i <- incidence_estimates %>%
   filter(outcome_cohort_name == "Breast" & 
            analysis_interval == "years" &
-         denominator_age_group == "All"
+         denominator_age_group == "All" &
+           denominator_sex != "Both"
          )
 
 # INCDIDENCE
@@ -1591,7 +1592,8 @@ dev.off()
 
 prevalence_estimates_i <- prevalence_estimates %>%
   filter(outcome_cohort_name == "Breast" & 
-           denominator_age_group == "All"
+           denominator_age_group == "All" &
+           denominator_sex != "Both"
   )
 
 prevalenceFigureData <- prevalence_estimates_i %>%
@@ -1623,7 +1625,7 @@ prevalenceFigureData <- prevalence_estimates_i %>%
                expand = c(0.06,1)) +
   ggh4x::facet_grid2(cols = vars(denominator_sex), scales="free", independent = "y") 
 
-plotname <- paste0("FIGURE4_PrevalenceGenderAllStrat_Breast.png")
+plotname <- paste0("FIGURE3_PrevalenceGenderAllStrat_Breast.png")
 
 png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 10, height = 5, units = "in", res = 1200)
 
@@ -1715,7 +1717,7 @@ incidenceFigureData <- incidence_estimates_breast_M %>%
                expand = c(0.06,1)) +
   facet_wrap(~ denominator_age_group, scales = "free", ncol = 2)
 
-plotname <- paste0("FIGURE3_IncidenceAgeStrat_Breast_Males.png")
+plotname <- paste0("FIGURES3_IncidenceAgeStrat_Breast_Males.png")
 
 png(paste0(pathResults ,"/AgeStrat/", plotname), width = 6, height = 6 , units = "in", res = 1200)
 print(incidenceFigureData, newpage = FALSE)
@@ -1758,7 +1760,7 @@ prevalenceFigureData <- prevalence_estimates_breast_F %>%
                expand = c(0.06,1)) +
   facet_wrap(~ denominator_age_group, scales = "free", ncol = 2)
 
-plotname <- paste0("FIGURE5_PrevalenceAgeStrat_Breast_Females.png")
+plotname <- paste0("FIGURE4_PrevalenceAgeStrat_Breast_Females.png")
 
 png(paste0(pathResults ,"/AgeStrat/", plotname), width = 6, height = 7 , units = "in", res = 1200)
 print(prevalenceFigureData, newpage = FALSE)
@@ -1805,12 +1807,93 @@ prevalenceFigureData <- prevalence_estimates_breast_M %>%
                expand = c(0.06,1)) +
   facet_wrap(~ denominator_age_group, scales = "free", ncol = 2)
 
-plotname <- paste0("FIGURE6_PrevalenceAgeStrat_Breast_Males.png")
+plotname <- paste0("FIGURE5_PrevalenceAgeStrat_Breast_Males.png")
 
 png(paste0(pathResults ,"/AgeStrat/", plotname), width = 6, height = 7 , units = "in", res = 1200)
 print(prevalenceFigureData, newpage = FALSE)
 dev.off()
 
+# survival plots for females and males
+survival_estimates_breast <- survival_estimates %>%
+  filter(Cancer == "Breast" & 
+           Age == "All" &
+           Gender != "Both" &
+           CalendarYearGp == "2000 to 2019"
+  )  
+
+
+survivalFigureData <- survival_estimates_breast %>%
+  filter(Age == "All") %>%
+  filter(CalendarYearGp == "2000 to 2019") %>%
+  ggplot(aes(x = time,
+             y = est,
+             group = Database,
+             col = Database )) +
+  scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_ribbon(aes(ymin = lcl, 
+                  ymax = ucl, 
+                  fill = Database), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_line(aes(linetype = Database),size = 0.5) +
+  scale_linetype_manual(values = c("solid", "dashed", "twodash","dotted")) +
+  labs(x = "Time (Years)",
+       y = "Survival Probability",
+       col = "Database name",
+       linetype = "Database name") +
+  theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  scale_x_continuous(breaks=seq(0, 20, 2)) +
+  facet_grid(cols = vars(Gender)) 
+
+plotname <- paste0("FIGURE6_KMGenderAllStrat_Breast.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 5 , units = "in", res = 1200)
+print(survivalFigureData, newpage = FALSE)
+dev.off()
+
+
+#calendar time - remove both population
+survival_estimates_breast1 <- survival_estimates %>%
+  filter(Cancer == "Breast" & 
+           Age == "All" &
+           Gender != "Both" &
+           CalendarYearGp != "2000 to 2019"
+  ) 
+
+survivalFigureData <- survival_estimates_breast1 %>%
+  filter(Stratification == "None"| Stratification == "Gender") %>%
+  filter(CalendarYearGp != "2000 to 2019") %>%
+  ggplot(aes(x = time,
+             y = est,
+             group = CalendarYearGp,
+             col = CalendarYearGp )) +
+  scale_y_continuous( labels = label_percent() ) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
+  scale_linetype_manual(values = c("dotted","dashed", "dotdash", "solid")) +
+  labs(x = "Time (Years)",
+       y = "Survival Probability",
+       col = "Calendar Year Group",
+       linetype = "Calendar Year Group") +
+  theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  ggh4x::facet_grid2(cols = vars(Gender), vars(Database), scales="free", independent = "y") 
+
+plotname <- paste0("FIGURE7_KMCalendarYr_Breast.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 6 , units = "in", res = 1200)
+print(survivalFigureData, newpage = FALSE)
+dev.off()
 
 ######################################################################################
 # Prostate cancer - removing gender facet labels and removing age facets with no data
@@ -2168,6 +2251,23 @@ plotname <- paste0("FIGURES1_IncidenceAgeSexStrat_Esophagus.png")
 png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
 print(plot1, newpage = FALSE)
 dev.off()
+
+
+#prevalence rates age strat
+prevalence_estimates_Oesophageal <- prevalence_estimates %>%
+  filter(outcome_cohort_name == "Esophagus" ) %>%
+  filter(denominator_age_group != "18 to 29" &
+           denominator_age_group != "All"
+           )
+  
+
+plot1 <- prevalenceFigure3a(prevalence_estimates_Oesophageal)
+plotname <- paste0("FIGURE4_PrevalenceAgeStrat_Esophagus.png")
+
+png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
 
 # PP for age* sex strat
 prevalence_estimates_Oesophageal1 <- prevalence_estimates %>%
