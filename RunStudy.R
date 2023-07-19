@@ -2,7 +2,8 @@
 outcome_table_name<-paste0(outcome_table_stem,"_o") # for incidence
 prevalent_table_name<-paste0(outcome_table_stem,"_p") # for prevalence
 feature_disease_table_name <- paste0(outcome_table_stem,"_fdisease") # for disease features
-feature_medication_table_name <- paste0(outcome_table_stem,"_fmed") # for disease features
+feature_disease_liver_table_name <- paste0(outcome_table_stem,"_fdiseaseliver") # for disease features
+feature_medication_table_name <- paste0(outcome_table_stem,"_fmed") # for med features
 
 
 if (grepl("CPRD", db.name) == TRUE) {

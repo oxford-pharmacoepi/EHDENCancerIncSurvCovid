@@ -108,7 +108,7 @@ info(logger, "- Plotting incidence and period prevalence results: cancer populat
 # run plots for checking QC checking -----
 
 # incidence: whole population
-inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
+inc_yrs_plot <- study_results1$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
   filter(denominator_cohort_id == 3 &
            denominator_age_group == "18;150" &
            analysis_interval == "years") %>%
@@ -141,7 +141,7 @@ plotAll <- inc_yrs_plot %>%
         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
         legend.key = element_rect(fill = "transparent", colour = "transparent"))
 
-plotname <- paste0("IncidenceRatesWholePop", db.name,".pdf")
+plotname <- paste0("IncidenceRatesWholePoptest", db.name,".pdf")
 
 pdf(here(qcfolder, plotname),
     width = 7, height = 5)
@@ -510,7 +510,7 @@ print(paste0("- Plotted incidence and period prevalence results: cancer populati
 info(logger, "- Plotted incidence and period prevalence results: cancer populations")
 
 
-#get the overall incidence from 2000 to 2019 -----
+#get the overall incidence across study period -----
 print(paste0("- Getting overall incidence: cancer populations"))
 info(logger, "- Getting overall incidence: cancer populations")
 

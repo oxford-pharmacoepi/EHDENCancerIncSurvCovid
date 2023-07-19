@@ -2,12 +2,12 @@
   "ConceptSets": [
     {
       "id": 0,
-      "name": "Opioids",
+      "name": "diseaseofliver",
       "expression": {
         "items": [
           {
             "concept": {
-              "CONCEPT_ID": 21604254,
+              "CONCEPT_ID": 194984,
               "CONCEPT_NAME": "",
               "STANDARD_CONCEPT": "",
               "STANDARD_CONCEPT_CAPTION": "",
@@ -29,7 +29,7 @@
   "PrimaryCriteria": {
     "CriteriaList": [
       {
-        "DrugExposure": {
+        "ConditionOccurrence": {
           "CodesetId": 0
         }
       }
@@ -39,7 +39,7 @@
       "PostDays": 0
     },
     "PrimaryCriteriaLimit": {
-      "Type": "All"
+      "Type": "First"
     }
   },
   "QualifiedLimit": {

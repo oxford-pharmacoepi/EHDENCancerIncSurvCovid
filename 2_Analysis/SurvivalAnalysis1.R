@@ -28,16 +28,23 @@ DataExtraction <- function(dataset){
   # # take "dataset" and do the code for each calender year
   # carry out for calender year
   # take year and split into groups based on the data available
-  grid <- rev(seq(max(lubridate::year(lubridate::ymd(dataset$outcome_start_date))), min(lubridate::year(lubridate::ymd(dataset$cohort_start_date))),by=-5))
+  #grid <- rev(seq(max(lubridate::year(lubridate::ymd(dataset$outcome_start_date))), min(lubridate::year(lubridate::ymd(dataset$cohort_start_date))),by=-5))
 
+  grid <- rev(seq(2019, min(lubridate::year(lubridate::ymd(dataset$cohort_start_date))),by=-5))
+  
+  # create a tool which creates 5 year age gaps but truncates at last year of study period
   # now need to create the start and end dates for each one
   startYear <- paste0(grid-4,"-01-01") # first days
   endYear <- paste0(grid,"-12-31") # end days (plus 4 to create 5 year bands)
   
+  #add on extra times for 2020-21
+  startYear <- c(startYear , "2020-01-01")
+  endYear <- c(endYear , "2021-12-31")
+  
   # split data into groups of calender year and put it into a list. This will create 4 groups split by calender year
   calenderSplitData <- list()
   
-  for(w in 1:length(grid)){
+  for(w in 1:length(endYear)){
     
     calenderdata <- dataset %>%
       filter( outcome_start_date >= startYear[w] &  
