@@ -37,7 +37,7 @@ prepare_output<-function(result){
     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentLiverCancer", "Liver")) %>%
     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentPancreaticCancer", "Pancreas")) %>%
     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentStomachCancer", "Stomach")) %>%
-    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentEsophagealCancer", "Esophagus")) %>%    
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentEsophagealCancer", "Oesophagus")) %>%    
     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentProstateCancer", "Prostate")) %>%
     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentLungCancer", "Lung")) %>%
     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentBreastCancer", "Breast")) %>%
@@ -46,7 +46,7 @@ prepare_output<-function(result){
     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentLiverCancer", "Liver")) %>%
     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentPancreaticCancer", "Pancreas")) %>%
     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentStomachCancer", "Stomach")) %>%
-    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentEsophagealCancer", "Esophagus")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentEsophagealCancer", "Oesophagus")) %>%
     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantBreastCancer", "Breast")) %>%
@@ -70,7 +70,7 @@ prepare_output<-function(result){
   
   result <- result %>%
     mutate(database_name = replace(database_name, database_name == "CPRDAurum", "CPRD Aurum")) %>%
-    mutate(database_name = replace(database_name, database_name == "CPRDGold", "CPRD GOLD")) 
+    mutate(database_name = replace(database_name, database_name == "CPRDGoldUpdate", "CPRD GOLD")) 
   
   #filter out the results for both genders for prostate cancer (as cohort only in male)
   result <- result %>%
@@ -101,7 +101,7 @@ prepare_output_survival <- function(result){
     mutate(Cancer = replace(Cancer, Cancer == "IncidentLiverCancer", "Liver")) %>%
     mutate(Cancer = replace(Cancer, Cancer == "IncidentPancreaticCancer", "Pancreas")) %>%
     mutate(Cancer = replace(Cancer, Cancer == "IncidentStomachCancer", "Stomach")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "IncidentEsophagealCancer", "Esophagus")) %>%    
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentEsophagealCancer", "Oesophagus")) %>%    
     mutate(Cancer = replace(Cancer, Cancer == "PrevalentProstateCancer", "Prostate")) 
   
   
@@ -117,15 +117,17 @@ prepare_output_survival <- function(result){
                                    "80 to 89", "90 +" ))) %>%
     mutate(CalenderYearGp = factor(CalenderYearGp,
                                    levels = c("2000 to 2019",
+                                              "2000 to 2021",
                                               "2000 to 2004", 
                                               "2005 to 2009", 
                                               "2010 to 2014",
-                                              "2015 to 2019")))
+                                              "2015 to 2019",
+                                              "2020 to 2021")))
 
   
   result <- result %>%
     mutate(Database = replace(Database, Database == "CPRDAurum", "CPRD Aurum")) %>%
-    mutate(Database = replace(Database, Database == "CPRDGold", "CPRD GOLD")) 
+    mutate(Database = replace(Database, Database == "CPRDGoldUpdate", "CPRD GOLD")) 
   
   result <- result %>%
     mutate(Gender=replace(Gender, Cancer=="Prostate", "Male"))
@@ -154,11 +156,11 @@ prepare_output_table1 <- function(result){
     mutate(Cancer = replace(Cancer, Cancer == "IncidentLiverCancer", "Liver")) %>%
     mutate(Cancer = replace(Cancer, Cancer == "IncidentPancreaticCancer", "Pancreas")) %>%
     mutate(Cancer = replace(Cancer, Cancer == "IncidentStomachCancer", "Stomach")) %>%
-    mutate(Cancer = replace(Cancer, Cancer == "IncidentEsophagealCancer", "Esophagus")) %>%    
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentEsophagealCancer", "Oesophagus")) %>%    
     mutate(Cancer = replace(Cancer, Cancer == "PrevalentProstateCancer", "Prostate")) %>%
   mutate(Cancer = replace(Cancer, Cancer == "PrevalentBreastCancer", "Breast")) %>%
   mutate(Cancer = replace(Cancer, Cancer == "PrevalentColorectalCancer", "Colorectal")) %>%
-  mutate(Cancer = replace(Cancer, Cancer == "PrevalentEsophagealCancer", "Esophagus")) %>%
+  mutate(Cancer = replace(Cancer, Cancer == "PrevalentEsophagealCancer", "Oesophagus")) %>%
   mutate(Cancer = replace(Cancer, Cancer == "PrevalentHeadNeckCancer", "Head & Neck")) %>%
   mutate(Cancer = replace(Cancer, Cancer == "PrevalentLiverCancer", "Liver")) %>%
   mutate(Cancer = replace(Cancer, Cancer == "PrevalentLungCancer", "Lung")) %>%
@@ -171,7 +173,7 @@ prepare_output_table1 <- function(result){
   
   result <- result %>%
     mutate(Database = replace(Database, Database == "CPRDAurum", "CPRD Aurum")) %>%
-    mutate(Database = replace(Database, Database == "CPRDGold", "CPRD GOLD")) 
+    mutate(Database = replace(Database, Database == "CPRDGoldUpdate", "CPRD GOLD")) 
   
   
   
@@ -285,8 +287,9 @@ saveRDS(survival_estimates,
 # - only include whole study period - loop over each database each cancer, whole population and sex and age
 #filter out calender year results and age*sex stratification
 # #add together total number of people censored (event or left the database) and calculate the time so time * number of people with that time
-test <- survival_estimates %>% 
-  filter(CalenderYearGp == "2000 to 2019") %>% 
+test <- survival_estimates %>%  
+  filter(CalenderYearGp == "2000 to 2021" | CalenderYearGp == "2000 to 2019" 
+           ) %>% 
   filter(Stratification != "Age*Gender" ) %>% 
   mutate(totalnp = n.event + n.censor) %>% 
   mutate(folup_agg = time * totalnp )
@@ -509,7 +512,8 @@ table1_results <- table1_results %>%
 # make into wider format for results
 table1_results <- table1_results %>% 
   tidyr::pivot_wider(names_from = Database,
-                     values_from = Variable
+                     values_from = Variable, 
+                     values_fill = NA
   )
 
 # remove drugs for CPRD

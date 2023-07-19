@@ -10,130 +10,6 @@ library(ggh4x)
 pathResults <- "C:/Users/dnewby/Desktop/Results"
 datapath <- "C:/Users/dnewby/Documents/GitHub/EHDENCancerIncidencePrevalence/CancerIncidencePrevalanceShiny/shiny/data"
 
-
-# FUNCTIONS ----
-# printing numbers with 3 decimal place and commas 
-# nice.num3<-function(x) {
-#   trimws(format(round(x,3),
-#                 big.mark=",", nsmall = 3, digits=3, scientific=FALSE))}
-# 
-# #preparing the output and renaming numbers for incidence and prevalence
-# prepare_output<-function(result){
-#   result <- result %>%
-#     
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerHypopharynx", "Hypopharynx")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerLarynx", "Larynx")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerNasalCavitySinus", "Nasal Cavity & Sinus")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerNasopharynx", "Nasopharynx")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerOralCavityPrevalent", "Oral Cavity")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerOropharynx", "Oropharynx")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerSalivaryGland", "Salivary Gland")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerTonguePrevalent", "Tongue")) %>% 
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerOralCavityIncidence", "Oral Cavity")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerTongueIncidence", "Tongue")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentProstateCancer", "Prostate")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentLungCancer", "Lung")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentBreastCancer", "Breast")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentColorectalCancer", "Colorectal")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentHeadNeckCancer", "Head & Neck")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentLiverCancer", "Liver")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentPancreaticCancer", "Pancreas")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentStomachCancer", "Stomach")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentEsophagealCancer", "Esophagus")) %>%    
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentProstateCancer", "Prostate")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentLungCancer", "Lung")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentBreastCancer", "Breast")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentColorectalCancer", "Colorectal")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentHeadNeckCancer", "Head & Neck")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentLiverCancer", "Liver")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentPancreaticCancer", "Pancreas")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentStomachCancer", "Stomach")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentEsophagealCancer", "Esophagus")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantBreastCancer", "Breast")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantColorectalCancer", "Colorectal")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantHeadNeckCancer", "Head & Neck")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "ProstateCancerMaleOnly", "Prostate"))
-#   
-#   
-#   result<- result %>% 
-#     mutate(denominator_age_group= stringr::str_replace(denominator_age_group, ";", " to ")) %>% 
-#     mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "18 to 150", "All")) %>% 
-#     mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "90 to 150", "90 +")) %>% 
-#     mutate(denominator_age_group = factor(denominator_age_group,
-#                                           levels = c("All",
-#                                                      "18 to 29", "30 to 39", "40 to 49",
-#                                                      "50 to 59", "60 to 69", "70 to 79",
-#                                                      "80 to 89", "90 +" )))
-#   
-#   result <- result %>%
-#     mutate(database_name = replace(database_name, database_name == "CPRDAurum", "CPRD Aurum")) %>%
-#     mutate(database_name = replace(database_name, database_name == "CPRDGold", "CPRD Gold")) 
-#   
-#   #filter out the results for both genders for prostate cancer (as cohort only in male)
-#   result <- result %>%
-#     filter(!(outcome_cohort_name == "Prostate" & denominator_sex == "Both")) %>%
-#     filter(!(outcome_cohort_name == "Prostate" & denominator_sex == "Female")) 
-#   
-#   return(result)
-# }
-# 
-# #preparation the output and renaming numbers for survival
-# prepare_output_survival <- function(result){
-#   result <- result %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerHypopharynx", "Hypopharynx")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerLarynx", "Larynx")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerNasalCavitySinus", "Nasal Cavity & Sinus")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerNasopharynx", "Nasopharynx")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerOralCavityPrevalent", "Oral Cavity")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerOropharynx", "Oropharynx")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerSalivaryGland", "Salivary Gland")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerTonguePrevalent", "Tongue")) %>% 
-#     mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerOralCavityIncidence", "Oral Cavity")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerTongueIncidence", "Tongue")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "IncidentProstateCancer", "Prostate")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "IncidentLungCancer", "Lung")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "IncidentBreastCancer", "Breast")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "IncidentColorectalCancer", "Colorectal")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "IncidentHeadNeckCancer", "Head & Neck")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "IncidentLiverCancer", "Liver")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "IncidentPancreaticCancer", "Pancreas")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "IncidentStomachCancer", "Stomach")) %>%
-#     mutate(Cancer = replace(Cancer, Cancer == "IncidentEsophagealCancer", "Esophagus")) %>%    
-#     mutate(Cancer = replace(Cancer, Cancer == "PrevalentProstateCancer", "Prostate")) 
-# 
-#   
-#   result<- result %>% 
-#     mutate(Age= stringr::str_replace(Age, "-", " to ")) %>% 
-#     mutate(CalendarYearGp= stringr::str_replace(CalendarYearGp, "-", " to ")) %>% 
-#     mutate(Age = replace(Age, Age == ">=90", "90 +")) %>% 
-#     mutate(Age = factor(Age,
-#                                           levels = c("All",
-#                                                      "18 to 29", "30 to 39", "40 to 49",
-#                                                      "50 to 59", "60 to 69", "70 to 79",
-#                                                      "80 to 89", "90 +" ))) %>%
-#   mutate(CalendarYearGp = factor(CalendarYearGp,
-#                       levels = c("2000 to 2019",
-#                                  "2000 to 2004", 
-#                                  "2005 to 2009", 
-#                                  "2010 to 2014",
-#                                  "2015 to 2019")))
-#   
-#   result <- result %>%
-#     mutate(Database = replace(Database, Database == "CPRDAurum", "CPRD Aurum")) %>%
-#     mutate(Database = replace(Database, Database == "CPRDGold", "CPRD Gold")) 
-#   
-#   result <- result %>%
-#     mutate(Gender=replace(Gender, Cancer=="Prostate", "Male"))
-#   
-#   return(result)
-# } 
-
-
 #INCIDENCE
 #incidence figure1 whole population stratified by database UPDATED
 incidenceFigure1 <- function(incidenceData) {
@@ -1224,48 +1100,48 @@ for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
 
 
   #survival for whole study period
-  survival_estimates_i <- survival_estimates %>%
-    filter(Cancer == names(table(survival_estimates$Cancer)[i]) )
-
-  plot1 <- survivalFigure4(survival_estimates_i)
-
-  plotname <- paste0("FIGURE5_KMGenderAllStrat_", names(table(survival_estimates$Cancer)[i]),".png")
-
-  if(names(table(survival_estimates$Cancer)[i]) == "Prostate") {
-
-    png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 7, height = 5, units = "in", res = 1200)
-    print(plot1, newpage = FALSE)
-    dev.off()
-
-
-  } else {
-
-    png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 10, height = 5, units = "in", res = 1200)
-    print(plot1, newpage = FALSE)
-    dev.off()
-  }
+  # survival_estimates_i <- survival_estimates %>%
+  #   filter(Cancer == names(table(survival_estimates$Cancer)[i]) )
+  # 
+  # plot1 <- survivalFigure4(survival_estimates_i)
+  # 
+  # plotname <- paste0("FIGURE5_KMGenderAllStrat_", names(table(survival_estimates$Cancer)[i]),".png")
+  # 
+  # if(names(table(survival_estimates$Cancer)[i]) == "Prostate") {
+  # 
+  #   png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 7, height = 5, units = "in", res = 1200)
+  #   print(plot1, newpage = FALSE)
+  #   dev.off()
+  # 
+  # 
+  # } else {
+  # 
+  #   png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 10, height = 5, units = "in", res = 1200)
+  #   print(plot1, newpage = FALSE)
+  #   dev.off()
+  # }
   
   # survival for 5 year study period ----
-  survival_estimates_i <- survival_estimates %>%
-    filter(Cancer == names(table(survival_estimates$Cancer)[i]) )
+  # survival_estimates_i <- survival_estimates %>%
+  #   filter(Cancer == names(table(survival_estimates$Cancer)[i]) )
   
-  plot1 <- survivalFigure5(survival_estimates_i)
-  
-  plotname <- paste0("FIGURE6_KMCalendarYr_", names(table(survival_estimates$Cancer)[i]),".png")
-  
-  if(names(table(survival_estimates$Cancer)[i]) == "Prostate") {
-  
-  png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 7, height = 5, units = "in", res = 1200)
-    print(plot1, newpage = FALSE)
-    dev.off()
-    
-    
-  } else {
-  
-  png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 10, height = 5, units = "in", res = 1200)
-  print(plot1, newpage = FALSE)
-  dev.off()
-  }
+  # plot1 <- survivalFigure5(survival_estimates_i)
+  # 
+  # plotname <- paste0("FIGURE6_KMCalendarYr_", names(table(survival_estimates$Cancer)[i]),".png")
+  # 
+  # if(names(table(survival_estimates$Cancer)[i]) == "Prostate") {
+  # 
+  # png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 7, height = 5, units = "in", res = 1200)
+  #   print(plot1, newpage = FALSE)
+  #   dev.off()
+  #   
+  #   
+  # } else {
+  # 
+  # png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 10, height = 5, units = "in", res = 1200)
+  # print(plot1, newpage = FALSE)
+  # dev.off()
+  # }
   
 }
 

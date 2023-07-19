@@ -35,8 +35,8 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
                             tags$hr(),
                             tags$h5(
  "This app is a companion to the study focussing on determining the incidence,prevalence and survival for 9 different cancers
- (Breast, Colorectal, Lung, Liver, Stomach, Head & Neck (including subsites), Prostate, Oesophagus, and Pancreas) between 2000 to 2019 using Primary care GP records
- from the United Kingdom (", tags$a(href="https://cprd.com/", "Clinical Practice Research Datalink"), "(CPRD) GOLD & CPRD Aurum)."), 
+ (Breast, Colorectal, Lung, Liver, Stomach, Head & Neck (including subsites), Prostate, Oesophagus, and Pancreas) between 2000 to 2021 using Primary care GP records
+ from the United Kingdom (", tags$a(href="https://cprd.com/", "Clinical Practice Research Datalink"), "(CPRD) GOLD). We additionally validated all results using CPRD Aurum between 2000 to 2019"), 
  
  tags$h5(
  "In the following pages you can find information on annual period prevalence, annual and overall incidence, 
@@ -417,18 +417,18 @@ of patients with an cancer outcome. All results have been stratified by age grou
                                             multiple = TRUE)
                             ),
                             tags$hr(),
-                            tags$h5("Analysis Settings"),
-                            div(style="display: inline-block;vertical-align:top; width: 150px;",
-                                pickerInput(inputId = "calendar_year_selector",
-                                            label = "Calendar Years",
-                                            choices = "2000 to 2019",
-                                            selected =  "2000 to 2019",
-                                            options = list(
-                                              `actions-box` = TRUE,
-                                              size = 10,
-                                              `selected-text-format` = "count > 3"),
-                                            multiple = TRUE)
-                            ),
+                            # tags$h5("Analysis Settings"),
+                            # div(style="display: inline-block;vertical-align:top; width: 150px;",
+                            #     pickerInput(inputId = "calendar_year_selector",
+                            #                 label = "Calendar Years",
+                            #                 choices = "2000 to 2019",
+                            #                 selected =  "2000 to 2019",
+                            #                 options = list(
+                            #                   `actions-box` = TRUE,
+                            #                   size = 10,
+                            #                   `selected-text-format` = "count > 3"),
+                            #                 multiple = TRUE)
+                            # ),
                             tabsetPanel(type = "tabs",
                                         tabPanel("Plot of KM survival curve",
                                                  tags$hr(),

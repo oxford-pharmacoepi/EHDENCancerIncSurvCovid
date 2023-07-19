@@ -31,39 +31,47 @@ incidence_attrition <- readRDS(here("data","incidence_attrition.rds"))
 # whole pop
 survival_estimates_whole <- readRDS(here("data","survival_estimates.rds")) %>%
   rename(CalendarYearGp = CalenderYearGp) %>%
-  filter(CalendarYearGp == "2000 to 2019") %>%
+  filter(CalendarYearGp == "2000 to 2019" | CalendarYearGp == "2000 to 2021" ) %>%
   droplevels() %>% 
   rename(Sex = Gender)
 
 survival_risk_table <- readRDS(here("data","survival_risk_table.rds")) %>%
   rename(CalendarYearGp = CalenderYearGp)
+
 survival_median_table <- readRDS(here("data","survival_median_table.rds")) %>%
   rename(CalendarYearGp = CalenderYearGp) %>%
-  filter(CalendarYearGp == "2000 to 2019") %>%
+  filter(CalendarYearGp == "2000 to 2019" | CalendarYearGp == "2000 to 2021" ) %>%
   droplevels()
+
 survival_rates_table <- readRDS(here("data","survival_rates_table.rds")) %>%
   rename(CalendarYearGp = CalenderYearGp) %>%
-  filter(CalendarYearGp == "2000 to 2019") %>%
-  droplevels()
+  filter(CalendarYearGp == "2000 to 2019" | CalendarYearGp == "2000 to 2021" ) %>%
+  droplevels() 
 
 #calendar pop
 survival_estimates_calendar <- readRDS(here("data","survival_estimates.rds")) %>%
   rename(CalendarYearGp = CalenderYearGp) %>%
-  filter(CalendarYearGp != "2000 to 2019") %>%
+  filter(CalendarYearGp != "2000 to 2019") %>% 
+  filter(CalendarYearGp != "2000 to 2021" ) %>%
   droplevels() %>% 
   rename(Sex = Gender)
 
 survival_risk_table_cy <- readRDS(here("data","survival_risk_table_cy.rds")) %>%
   rename(CalendarYearGp = CalenderYearGp)
+
 survival_median_table_cy <- readRDS(here("data","survival_median_table.rds")) %>%
   rename(CalendarYearGp = CalenderYearGp) %>%
-  filter(CalendarYearGp != "2000 to 2019") %>%
+  filter(CalendarYearGp != "2000 to 2019") %>% 
+  filter(CalendarYearGp != "2000 to 2021" ) %>%
   droplevels()
+
 survival_rates_table_cy <- readRDS(here("data","survival_rates_table.rds")) %>%
   rename(CalendarYearGp = CalenderYearGp) %>%
-  filter(CalendarYearGp != "2000 to 2019") %>%
+  filter(CalendarYearGp != "2000 to 2019") %>% 
+  filter(CalendarYearGp != "2000 to 2021" ) %>%
   droplevels() %>%
   filter(time != 10) %>%
+  filter( !(time == 5 & CalendarYearGp == "2020 to 2021" )) %>% 
   mutate(time = as.character(time)) %>% 
   rename(Sex = Gender)
 
