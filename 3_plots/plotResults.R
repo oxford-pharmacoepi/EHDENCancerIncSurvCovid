@@ -746,10 +746,10 @@ survivalFigure6 <- function(survivalData) {
 survivalFigure7 <- function(survivalData) {
   
  survivalFigureData <- survivalData %>%
-    filter(Stratification == "None") %>%
-    filter(CalendarYearGp != "2000 to 2019") %>%
-    filter(CalendarYearGp != "2000 to 2021") %>%
-    filter(Database == "CPRD GOLD") %>% 
+    # #filter(Stratification == "None") %>%
+    # filter(CalendarYearGp != "2000 to 2019") %>%
+    # filter(CalendarYearGp != "2000 to 2021") %>%
+    # filter(Database == "CPRD GOLD") %>% 
     ggplot(aes(x = time,
                y = est,
                group = CalendarYearGp,
@@ -759,6 +759,9 @@ survivalFigure7 <- function(survivalData) {
     scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
     geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
     scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
+   geom_ribbon(aes(ymin = lcl, 
+                   ymax = ucl, 
+                   fill = CalendarYearGp), alpha = .15, color = NA, show.legend = FALSE) +
     labs(x = "Time (Years)",
          y = "Survival Probability",
          col = "Calendar Year Group",
@@ -769,7 +772,45 @@ survivalFigure7 <- function(survivalData) {
           axis.line = element_line(colour = "black", size = 0.6) ,
           panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
           legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+   xlim(0, 2) +
  facet_grid(cols = vars(Cancer)) 
+  
+  return(survivalFigureData)
+  
+}
+
+# survival figure 8 whole population only GOLD calendar time effects with new colours
+survivalFigure8 <- function(survivalData) {
+  
+  survivalFigureData <- survivalData %>%
+    # #filter(Stratification == "None") %>%
+    # filter(CalendarYearGp != "2000 to 2019") %>%
+    # filter(CalendarYearGp != "2000 to 2021") %>%
+    # filter(Database == "CPRD GOLD") %>% 
+    ggplot(aes(x = time,
+               y = est,
+               group = CalendarYearGp,
+               col = CalendarYearGp )) +
+    scale_y_continuous( labels = label_percent() ) +
+    scale_colour_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
+    scale_fill_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) +
+    geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
+    scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
+    geom_ribbon(aes(ymin = lcl, 
+                    ymax = ucl, 
+                    fill = CalendarYearGp), alpha = .15, color = NA, show.legend = FALSE) +
+    labs(x = "Time (Years)",
+         y = "Survival Probability",
+         col = "Calendar Year Group",
+         linetype = "Calendar Year Group") +
+    theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+          strip.background = element_rect(color = "black", size = 0.6) ,
+          panel.background = element_blank() ,
+          axis.line = element_line(colour = "black", size = 0.6) ,
+          panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+          legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+    xlim(0, 2) +
+    facet_grid(cols = vars(Cancer)) 
   
   return(survivalFigureData)
   
@@ -1200,32 +1241,86 @@ for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
 
 }
 
+# create data for this also including breast cancer females 
+survivalData <- survival_estimates %>%
+  filter(Stratification == "None") %>%
+  filter(CalendarYearGp != "2000 to 2019") %>%
+  filter(CalendarYearGp != "2000 to 2021") %>%
+  filter(Database == "CPRD GOLD") %>% 
+  filter(Cancer != "Breast")
+
+#create a subset for breast cancer females
+survivalData1 <- survival_estimates %>%
+  filter(Stratification == "Gender") %>%
+  filter(CalendarYearGp != "2000 to 2019") %>%
+  filter(CalendarYearGp != "2000 to 2021") %>%
+  filter(Database == "CPRD GOLD") %>% 
+  filter(Cancer == "Breast") %>% 
+  filter(Gender != "Male")
+
+#combine data back together
+survivalData2 <- bind_rows(survivalData,survivalData1)
+
 #plot per cancer for GOLD with no stratification
 for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
   
-  survival_estimates_i <- survival_estimates %>%
+  survival_estimates_i <- survivalData2 %>%
     filter(Cancer == names(table(survival_estimates$Cancer)[i]) )
   
-  plot1 <- survivalFigure7(survival_estimates_i)
+  #plot1 <- survivalFigure7(survival_estimates_i)
+  plot1 <- survivalFigure8(survival_estimates_i)
   
   plotname <- paste0("FIGURE7_KMCalendarYr_GOLD_", names(table(survival_estimates$Cancer)[i]),".png")
     
     png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 7, height = 5, units = "in", res = 1200)
     print(plot1, newpage = FALSE)
     dev.off()
-    
-    
 
-  
-  
 }
+
+
 
 ##########################################################################################################
 ### specific updated plots for papers ####
 #########################################################################################################
 
-# barplots per cancer survival over time
 
+#survival facetted per cancer
+
+survivalFigureData <- survivalData %>%
+  filter(Stratification == "None") %>%
+  filter(CalendarYearGp != "2000 to 2019") %>%
+  filter(CalendarYearGp != "2000 to 2021") %>%
+  filter(Database == "CPRD GOLD") %>% 
+  ggplot(aes(x = time,
+             y = est,
+             group = CalendarYearGp,
+             col = CalendarYearGp )) +
+  scale_y_continuous( labels = label_percent() ) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
+  scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
+  geom_ribbon(aes(ymin = lcl, 
+                  ymax = ucl, 
+                  fill = CalendarYearGp), alpha = .15, color = NA, show.legend = FALSE) +
+  labs(x = "Time (Years)",
+       y = "Survival Probability",
+       col = "Calendar Year Group",
+       linetype = "Calendar Year Group") +
+  theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  xlim(0, 2) +
+  facet_grid(cols = vars(Cancer)) 
+
+
+
+
+# pointplots per cancer survival over time
 survival_rates1 <- survival_rates %>% 
   filter(Stratification == "None") %>% 
   filter(Cancer != "Breast") %>% 
@@ -1261,7 +1356,7 @@ theme(axis.text.x = element_text(angle = 45, hjust=0.95, size = 6),
       panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed")) +
   labs(x = "Calendar year",
        y = "One year survival (%)") +
-  facet_wrap(~Cancer, scales = "free")
+  facet_wrap(~Cancer, scales = "free_y")
 
 plotname <- paste0("ShorttermsurvivalmultipleCancers.png")
 
@@ -1328,13 +1423,13 @@ incidenceFigureData <- incidenceData3 %>%
        fill = "Database name") +
   scale_x_date(labels = date_format("%Y"), breaks = date_breaks("2 years"),
                expand = c(0.06,1)) +
-  facet_wrap(~ outcome_cohort_name, scales = "free", ncol = 3)
+  facet_wrap(~ outcome_cohort_name, scales = "free_y", ncol = 3)
 
 
 plotname <- paste0("IRsWholePop_multipleCancers.png")
 
 png(paste0(pathResults ,"/WholePop/", plotname),
-    width = 8, height = 8, units = "in", res = 1200)
+    width = 8, height = 7.5, units = "in", res = 1200)
 print(incidenceFigureData, newpage = FALSE)
 dev.off()
 
@@ -1394,13 +1489,13 @@ prevalenceFigureData <- prevalenceData3 %>%
        fill = "Database name") +
   scale_x_date(labels = date_format("%Y"), breaks = date_breaks("2 years"),
                expand = c(0.06,1)) +
-  facet_wrap(~ outcome_cohort_name, scales = "free", ncol = 3)
+  facet_wrap(~ outcome_cohort_name, scales = "free_y", ncol = 3)
 
 
 plotname <- paste0("PPsWholePop_multipleCancers.png")
 
 png(paste0(pathResults ,"/WholePop/", plotname),
-    width = 8, height = 8, units = "in", res = 1200)
+    width = 8, height = 7.5, units = "in", res = 1200)
 print(prevalenceFigureData, newpage = FALSE)
 dev.off()
 
