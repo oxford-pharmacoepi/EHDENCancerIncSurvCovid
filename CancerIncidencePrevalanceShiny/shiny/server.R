@@ -426,8 +426,9 @@ server <-	function(input, output, session) {
       filter(Age %in% input$survival_age_group_selector)     %>% 
       #rename(Sex = Gender) %>% 
       filter(Sex %in% input$survival_sex_selector)     %>% 
-      filter(Cancer %in% input$survival_outcome_cohort_name_selector) %>%
-      filter(CalendarYearGp %in% input$calendar_year_selector) 
+      filter(Cancer %in% input$survival_outcome_cohort_name_selector) 
+    #%>%
+      #filter(CalendarYearGp %in% input$calendar_year_selector) 
     
     table
   }) 
@@ -554,7 +555,7 @@ server <-	function(input, output, session) {
       filter(Database %in% input$survival_database_name_selector_cy)  %>% 
       filter(Age %in% input$survival_age_group_selector_cy)     %>% 
       filter(Sex %in% input$survival_sex_selector_cy)     %>% 
-      filter(Cancer %in% input$survival_outcome_cohort_name_selector_cy)  %>%
+      filter(Cancer %in% input$survival_outcome_cohort_name_selector_cy) %>%
       filter(CalendarYearGp %in% input$calendar_year_selector_cy) 
     
     table
@@ -662,8 +663,9 @@ server <-	function(input, output, session) {
       filter(Database %in% input$survival_database_name_selector)  %>% 
       filter(Age %in% input$survival_age_group_selector)     %>% 
       filter(Gender %in% input$survival_sex_selector)     %>% 
-      filter(Cancer %in% input$survival_outcome_cohort_name_selector)  %>%
-      filter(CalendarYearGp %in% input$calendar_year_selector) 
+      filter(Cancer %in% input$survival_outcome_cohort_name_selector) %>%
+      relocate(`20`, .after = `18`)
+     # filter(CalendarYearGp %in% input$calendar_year_selector) 
     
     table
   }) 
@@ -699,7 +701,7 @@ server <-	function(input, output, session) {
       filter(Database %in% input$survival_database_name_selector_cy)  %>% 
       filter(Age %in% input$survival_age_group_selector_cy)     %>% 
       filter(Gender %in% input$survival_sex_selector_cy)     %>% 
-      filter(Cancer %in% input$survival_outcome_cohort_name_selector_cy)  %>%
+      filter(Cancer %in% input$survival_outcome_cohort_name_selector_cy) %>%
       filter(CalendarYearGp %in% input$calendar_year_selector_cy) 
     
     table
@@ -737,7 +739,7 @@ server <-	function(input, output, session) {
       filter(Database %in% input$survival_database_name_selector_cy)  %>%
       filter(Age %in% input$survival_age_group_selector_cy)     %>%
       filter(Gender %in% input$survival_sex_selector_cy)     %>%
-      filter(Cancer %in% input$survival_outcome_cohort_name_selector_cy)  %>%
+      filter(Cancer %in% input$survival_outcome_cohort_name_selector_cy) %>%
       filter(CalendarYearGp %in% input$calendar_year_selector_cy)
 
     table
@@ -783,8 +785,7 @@ server <-	function(input, output, session) {
       filter(Database %in% input$survival_database_name_selector)  %>% 
       filter(Age %in% input$survival_age_group_selector)     %>% 
       filter(Gender %in% input$survival_sex_selector)     %>% 
-      filter(Cancer %in% input$survival_outcome_cohort_name_selector) %>%
-      filter(CalendarYearGp %in% input$calendar_year_selector) 
+      filter(Cancer %in% input$survival_outcome_cohort_name_selector) 
     
     table
   }) 
@@ -834,7 +835,7 @@ server <-	function(input, output, session) {
       filter(Database %in% input$survival_database_name_selector_cy)  %>%
       filter(Age %in% input$survival_age_group_selector_cy)     %>%
       filter(Sex %in% input$survival_sex_selector_cy)     %>%
-      filter(Cancer %in% input$survival_outcome_cohort_name_selector_cy)  %>%
+      filter(Cancer %in% input$survival_outcome_cohort_name_selector_cy) %>%
       filter(CalendarYearGp %in% input$calendar_year_selector_cy)
     
     table
@@ -900,8 +901,7 @@ server <-	function(input, output, session) {
       filter(Database %in% input$survival_database_name_selector)  %>%
       filter(Age %in% input$survival_age_group_selector)     %>%
       filter(Gender %in% input$survival_sex_selector)     %>%
-      filter(Cancer %in% input$survival_outcome_cohort_name_selector)  %>%
-      filter(CalendarYearGp %in% input$calendar_year_selector)
+      filter(Cancer %in% input$survival_outcome_cohort_name_selector)  
     
     table
   })
