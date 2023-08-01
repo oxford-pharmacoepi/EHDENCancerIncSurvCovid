@@ -19,3 +19,4 @@ logfile.log
 .Rprofile
 networkResults*
 4_ageStandardization/data*
+5_tables/data*
