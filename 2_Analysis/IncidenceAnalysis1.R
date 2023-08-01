@@ -850,3 +850,101 @@ pdf(here(qcfolder, plotname),
   
 }
 
+# for age standardization we need results without obscuring therefore if
+# age standardization required it will run this code and save the results
+
+if (agestandardization == TRUE) {
+  
+inc <- estimateIncidence(
+  cdm = cdm,
+  denominatorTable = "denominator",
+  outcomeTable = outcome_table_name,
+  denominatorCohortId = NULL,
+  outcomeCohortId = outcome_cohorts$cohort_definition_id,
+  outcomeCohortName = outcome_cohorts$cohort_name,
+  interval = "years", 
+  outcomeWashout = NULL,
+  repeatedEvents = FALSE,
+  completeDatabaseIntervals = TRUE,
+  minCellCount = 0,
+  returnParticipants = FALSE,
+  verbose = TRUE
+)
+
+# Estimate period prevalence ---------
+prev_period <- estimatePeriodPrevalence(
+  cdm = cdm,
+  denominatorTable = "denominator",
+  outcomeCohortId = prevalent_cohorts$cohort_definition_id,
+  outcomeCohortName = prevalent_cohorts$cohort_name,
+  outcomeLookbackDays = 0, 
+  outcomeTable = prevalent_table_name,
+  interval = "years" ,
+  completeDatabaseIntervals = TRUE, # prev only estimate for intervals where db captures all of the interval
+  fullContribution = FALSE , # individuals only required to be present for one day in interval
+  minCellCount = 0,
+  verbose = TRUE
+)
+
+# Get the results ----------------
+study_results1 <- gatherIncidencePrevalenceResults(cdm =cdm, 
+                                                  resultList=list(inc,prev_period ),
+                                                  databaseName = db.name)
+
+exportIncidencePrevalenceResults(result=study_results1,
+                                 zipName= paste0(db.name, "IPResultsAgeStandardization"),
+                                 outputFolder=here::here("Results", db.name))
+
+# for head and neck subtypes
+if (grepl("CPRD", db.name) == TRUE) {
+  
+  inc_han <- estimateIncidence(
+    cdm = cdm,
+    denominatorTable = "denominator",
+    outcomeTable = outcome_table_name_han,
+    denominatorCohortId = NULL,
+    outcomeCohortId = outcome_cohorts_han$cohort_definition_id,
+    outcomeCohortName = outcome_cohorts_han$cohort_name,
+    interval = c("years"), 
+    outcomeWashout = NULL,
+    repeatedEvents = FALSE,
+    completeDatabaseIntervals = TRUE,
+    minCellCount = 0,
+    returnParticipants = FALSE,
+    verbose = TRUE
+  )
+  
+  # Estimate period prevalence ---------
+  prev_period_han <- estimatePeriodPrevalence(
+    cdm = cdm,
+    denominatorTable = "denominator",
+    outcomeCohortId = prevalent_cohorts_han$cohort_definition_id,
+    outcomeCohortName = prevalent_cohorts_han$cohort_name,
+    outcomeLookbackDays = 0, 
+    outcomeTable = prevalent_table_name_han,
+    interval = c("years"),
+    completeDatabaseIntervals = TRUE, # prev only estimate for intervals where db captures all of the interval
+    fullContribution = FALSE , # individuals only required to be present for one day in interval
+    minCellCount = 0,
+    verbose = TRUE
+  )
+  
+  # Get the results ----------------
+  study_results_han1 <- gatherIncidencePrevalenceResults(cdm = cdm, 
+                                                        resultList=list(inc_han, prev_period_han),
+                                                        databaseName = db.name)
+  
+  
+
+  exportIncidencePrevalenceResults(result=study_results_han1,
+                                   zipName= paste0(db.name, "IPResultsHeadNeckSubtypesAgeStandarsization"),
+                                   outputFolder=here::here("Results", db.name))
+  
+  
+}
+
+
+
+
+}
+

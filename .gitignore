@@ -13,6 +13,7 @@ Results*
 CPRDAurumIPResults
 1_InstantiateCohorts/CopyOutcomeCohorts/*
 troubleshooting.R
+4_troubleshooting/*
 logfile.log
 3_QC*
 .Rprofile
