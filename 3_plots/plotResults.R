@@ -1267,7 +1267,6 @@ for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
   survival_estimates_i <- survivalData2 %>%
     filter(Cancer == names(table(survival_estimates$Cancer)[i]) )
   
-  #plot1 <- survivalFigure7(survival_estimates_i)
   plot1 <- survivalFigure8(survival_estimates_i)
   
   plotname <- paste0("FIGURE7_KMCalendarYr_GOLD_", names(table(survival_estimates$Cancer)[i]),".png")
@@ -1278,46 +1277,70 @@ for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
 
 }
 
+# plot survival for cancers on the same plot
+
+  survivalFigureData <- survivalData2 %>%
+    filter(Cancer == "Colorectal" |
+             Cancer == "Head & Neck" |
+             Cancer == "Liver" |
+             Cancer == "Lung" |
+             Cancer == "Oesophagus" |
+             Cancer == "Pancreas" |
+             Cancer == "Breast" |
+             Cancer == "Prostate" |
+             Cancer == "Stomach" ) %>% 
+    ggplot(aes(x = time,
+               y = est,
+               group = CalendarYearGp,
+               col = CalendarYearGp )) +
+    scale_y_continuous( labels = label_percent() ) +
+    scale_colour_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
+    scale_fill_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) +
+    geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
+    scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
+    geom_ribbon(aes(ymin = lcl, 
+                    ymax = ucl, 
+                    fill = CalendarYearGp), alpha = .15, color = NA, show.legend = FALSE) +
+    labs(x = "Time (Years)",
+         y = "Survival Probability",
+         col = "Calendar Year Group",
+         linetype = "Calendar Year Group") +
+    theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+          strip.background = element_rect(color = "black", size = 0.6) ,
+          panel.background = element_blank() ,
+          panel.spacing.x = unit(0.05, "cm") ,
+          panel.spacing.y = unit(0.1, "cm") ,
+          axis.text = element_text(size = 8) ,
+          #axis.title.y = element_text(size = 15),
+          #axis.title.x = element_text(size = 15),
+          legend.text = element_text(size=8),
+          legend.title = element_text(size=8),
+          #strip.text.x = element_text(size = 15),
+          axis.line = element_line(colour = "black", size = 0.6) ,
+          panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+          legend.box.spacing = unit(0, "pt") ,
+          legend.key = element_rect(fill = "transparent", colour = "transparent"),
+          legend.position='bottom') +
+    xlim(0, 2) +
+  facet_wrap(~ Cancer, scales = "free_y", ncol = 3)
+  
+  # +
+  #   theme(panel.spacing = unit(, "cm", data = NULL))
+  
+  
+  plotname <- paste0("FIGURE8_KMCalendarYr_GOLD_all_cancers.png")
+  
+  png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 8, height = 8, units = "in", res = 1200)
+  print(survivalFigureData, newpage = FALSE)
+  dev.off()
+  
+
+
 
 
 ##########################################################################################################
 ### specific updated plots for papers ####
 #########################################################################################################
-
-
-#survival facetted per cancer
-
-survivalFigureData <- survivalData %>%
-  filter(Stratification == "None") %>%
-  filter(CalendarYearGp != "2000 to 2019") %>%
-  filter(CalendarYearGp != "2000 to 2021") %>%
-  filter(Database == "CPRD GOLD") %>% 
-  ggplot(aes(x = time,
-             y = est,
-             group = CalendarYearGp,
-             col = CalendarYearGp )) +
-  scale_y_continuous( labels = label_percent() ) +
-  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
-  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
-  geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
-  scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
-  geom_ribbon(aes(ymin = lcl, 
-                  ymax = ucl, 
-                  fill = CalendarYearGp), alpha = .15, color = NA, show.legend = FALSE) +
-  labs(x = "Time (Years)",
-       y = "Survival Probability",
-       col = "Calendar Year Group",
-       linetype = "Calendar Year Group") +
-  theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
-        strip.background = element_rect(color = "black", size = 0.6) ,
-        panel.background = element_blank() ,
-        axis.line = element_line(colour = "black", size = 0.6) ,
-        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
-  xlim(0, 2) +
-  facet_grid(cols = vars(Cancer)) 
-
-
 
 
 # pointplots per cancer survival over time
