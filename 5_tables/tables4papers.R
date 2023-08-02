@@ -163,10 +163,30 @@ survival_probabilites_final <- rbind(survival_probabilites_final,
   arrange(Cancer)
 
 # save as csv
-write.csv(survival_probabilites_final ,file = paste0(datapath, "/survival_probabilites_covid_paper.csv"))
+write.csv(survival_probabilites_final ,file = paste0(datapath, "/table2survival_probabilites_covid_paper.csv"))
 
 
+################# n events, censoring, for cancers
 
+survival_probabilites_events <- survival_probabilites %>% 
+  filter(Gender == "Both") %>% 
+  filter(Cancer != "Breast")
 
+survival_probabilites_eventsBreast <- survival_probabilites %>% 
+  filter(Cancer == "Breast" & Gender == "Female")
 
+survival_probabilites_eventsProstate <- survival_probabilites %>% 
+  filter(Cancer == "Prostate")
+
+survival_probabilites_eventsfinal <- rbind(survival_probabilites_events,
+                                           survival_probabilites_eventsBreast,
+                                           survival_probabilites_eventsProstate ) %>% 
+  select(c(time, n.risk, n.event, n.censor, Cancer, CalenderYearGp, `Survival Rate % (95% CI)`  )) %>% 
+  arrange(Cancer) %>% 
+  rename(`Calendar Year` = CalenderYearGp) %>% 
+  relocate(`Survival Rate % (95% CI)`, .after = n.censor) %>% 
+  relocate(Cancer) %>% 
+  relocate(`Calendar Year`, .after = Cancer)
+
+write.csv(survival_probabilites_eventsfinal ,file = paste0(datapath, "/S6survival_events_covid_paper.csv")) 
 
