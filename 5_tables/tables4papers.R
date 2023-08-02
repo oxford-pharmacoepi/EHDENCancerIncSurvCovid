@@ -190,3 +190,157 @@ survival_probabilites_eventsfinal <- rbind(survival_probabilites_events,
 
 write.csv(survival_probabilites_eventsfinal ,file = paste0(datapath, "/S6survival_events_covid_paper.csv")) 
 
+
+####################################################################
+# table 1 stratified by calendar year
+#to generate a table for each cancer where patients are shown per diagnosis year split (2000-2004, 2005-2009 etc)
+
+prepare_output_table1 <- function(result){
+  result <- result %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerHypopharynx", "Hypopharynx")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerLarynx", "Larynx")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerNasalCavitySinus", "Nasal Cavity & Sinus")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerNasopharynx", "Nasopharynx")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerOralCavityPrevalent", "Oral Cavity")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerOropharynx", "Oropharynx")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerSalivaryGland", "Salivary Gland")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerTonguePrevalent", "Tongue")) %>% 
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerOralCavityIncidence", "Oral Cavity")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "HeadNeckSubtypeCancerTongueIncidence", "Tongue")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentProstateCancer", "Prostate")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentLungCancer", "Lung")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentBreastCancer", "Breast")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentColorectalCancer", "Colorectal")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentHeadNeckCancer", "Head & Neck")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentLiverCancer", "Liver")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentPancreaticCancer", "Pancreas")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentStomachCancer", "Stomach")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "IncidentEsophagealCancer", "Oesophagus")) %>%    
+    mutate(Cancer = replace(Cancer, Cancer == "PrevalentProstateCancer", "Prostate")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "PrevalentBreastCancer", "Breast")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "PrevalentColorectalCancer", "Colorectal")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "PrevalentEsophagealCancer", "Oesophagus")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "PrevalentHeadNeckCancer", "Head & Neck")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "PrevalentLiverCancer", "Liver")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "PrevalentLungCancer", "Lung")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "PrevalentPancreaticCancer", "Pancreas")) %>%
+    mutate(Cancer = replace(Cancer, Cancer == "PrevalentStomachCancer", "Stomach")) 
+  
+  
+  
+  
+  
+  result <- result %>%
+    mutate(Database = replace(Database, Database == "CPRDAurum", "CPRD Aurum")) %>%
+    mutate(Database = replace(Database, Database == "CPRDGoldUpdate", "CPRD GOLD")) 
+  
+  
+  
+  return(result)
+}
+
+
+table1_files<-results[stringr::str_detect(results, ".csv")]
+table1_files<-results[stringr::str_detect(results, "Table1")]
+
+table1_results <- list()
+for(i in seq_along(table1_files)){
+  table1_results[[i]]<-readr::read_csv(table1_files[[i]], 
+                                       show_col_types = FALSE)  
+}
+table1_results <- dplyr::bind_rows(table1_results)
+
+table1_results <- prepare_output_table1(table1_results)
+
+# table1_results <- table1_results %>% 
+#   distinct()
+
+table1_results <- table1_results %>% 
+  mutate("Variable"= ifelse(!is.na(percent),
+                            paste0(n, " (",
+                                   paste0(percent, ")")),
+                            NA
+  )) %>%
+  mutate("Variable1"= ifelse(!is.na(mean),
+                             paste0(mean, " (SD ",
+                                    paste0(standard_deviation, ")")),
+                             NA
+  )) %>%
+  mutate("Variable2"= ifelse(!is.na(median),
+                             paste0(median, " (",
+                                    paste0(interquartile_range, ")")),
+                             NA
+  )) %>%
+  mutate(Variable = case_when(n == "<5" ~ "<5", TRUE ~ Variable)) %>%
+  mutate(Variable = coalesce(Variable, Variable2)) %>%
+  mutate(Variable = coalesce(Variable, n))
+
+# remove rows we dont need
+table1_results <- table1_results %>% 
+  filter(!grepl("Sex: Female",var)) %>%
+  filter(!grepl("Death: Alive",var)) %>%
+  filter(!grepl("Prior_history_days_study_start",var))%>%
+  filter(!grepl("Prior_history_years_start",var)) %>%
+  filter(!grepl("Death: Dead",var)) %>%
+  filter(!grepl("time_days",var)) %>%
+  filter(!grepl("time_years",var)) %>%
+  filter(!grepl("DiabetesMellitus",var)) %>%
+  filter(!grepl("Prior_history_years",var)) %>%
+  filter(!grepl("CoronaryArteriosclerosis",var)) %>%
+  filter(!grepl("CrohnsDisease",var)) %>%
+  filter(!grepl("GastroesophagealRefluxDisease",var)) %>%
+  filter(!grepl("^HeartDisease",var)) %>%
+  filter(!grepl("HepatitisC",var)) %>%
+  filter(!grepl("HIV",var)) %>%
+  filter(!grepl("HpyloriGIInfection",var)) %>%
+  filter(!grepl("LesionLiver",var)) %>%
+  filter(!grepl("Obesity",var)) %>%
+  filter(!grepl("PeripheralVascularDisease",var)) %>%
+  filter(!grepl("Pneumonia",var)) %>%
+  filter(!grepl("Psoriasis",var)) %>%
+  filter(!grepl("RheumatoidArthritis",var)) %>%
+  filter(!grepl("Schizophrenia",var)) %>%
+  filter(!grepl("UlcerativeColitis",var)) %>%
+  filter(!grepl("UTIDisease",var)) %>%
+  filter(!grepl("VisualSystemDisorder",var)) %>%
+  filter(!grepl("IncidentBreastCancer",var)) %>%
+  filter(!grepl("IncidentColorectalCancer",var)) %>%
+  filter(!grepl("IncidentEsophagealCancer",var)) %>%
+  filter(!grepl("IncidentHeadNeckCancer",var)) %>%
+  filter(!grepl("IncidentLiverCancer",var)) %>%
+  filter(!grepl("IncidentLungCancer",var)) %>%
+  filter(!grepl("IncidentPancreaticCancer",var)) %>%
+  filter(!grepl("IncidentProstateCancer",var)) %>%
+  filter(!grepl("IncidentStomachCancer",var)) %>%
+  filter(!grepl("alcoholicliverdamage",var)) %>%
+  filter(!grepl("alcoholism",var)) %>%
+  filter(!grepl("alphaantitrypsindeficiency",var)) %>%
+  filter(!grepl("autoimmunehepatitis",var)) %>%
+  filter(!grepl("diseaseofliver",var)) %>%
+  filter(!grepl("Hemochromatosis",var)) %>%
+  filter(!grepl("hepb",var)) %>%
+  filter(!grepl("hypercholesterolemia",var)) %>%
+  filter(!grepl("nash",var)) %>%
+  filter(!grepl("nonalcoholicfattyliver",var)) %>%
+  filter(!grepl("obesity_obs_cond",var)) %>% 
+  select(c(var, Variable, Cancer, Calendar_year ))
+
+
+# make into wider format for results
+table1_results <- table1_results %>% 
+  tidyr::pivot_wider(names_from = Calendar_year,
+                     values_from = Variable, 
+                     values_fill = NA
+  )
+
+
+write.csv(table1_results ,file = paste0(datapath, "/S3patientcharacteristics_cy_covid_paper.csv")) 
+
+
+
+
+
+
+
+
+
