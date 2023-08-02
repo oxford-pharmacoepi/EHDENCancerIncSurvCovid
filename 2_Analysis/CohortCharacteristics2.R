@@ -380,6 +380,12 @@ for(i in seq_along(disease_cohorts_liver$cohort_definition_id)){
   
 }
 
+# gender splits for characterisation
+PopFemale <- Pop %>% 
+  filter(gender == "Female")
+PopMale <- Pop %>% 
+  filter(gender == "Male")
+
 # tidy up results for table 1
 get_summary_characteristics<-function(data){
   
@@ -825,4 +831,218 @@ if (grepl("CPRD", db.name) == TRUE){
   write_csv(table1Characteristics_all_han, here::here(paste0("Results/",db.name,"/Table1Han",db.name,".csv")))
   
 }
+
+# function to extract table one characteristics per gender and by calendar year diagnosis
+if (agestandardization == TRUE) {
   
+#for females
+  table1CharacteristicsF <- list()
+  
+  #create a loop that puts table 1 for each outcome
+  for(j in seq_along(outcome_cohorts$cohort_definition_id)){
+    
+    
+    table1CharacteristicsF[[j]] <- get_summary_characteristics(PopFemale %>% 
+                                                                filter(outcome_cohort_name==outcome_cohorts$cohort_name[[j]])) %>%
+      mutate(Cancer = outcome_cohorts$cohort_name[[j]])
+    
+    table1CharacteristicsF[[j]]$n <- as.character(table1CharacteristicsF[[j]]$n)
+    
+    print(paste0("Getting table 1 for ", outcome_cohorts$cohort_name[[j]], " (" , j , " of ", length(outcome_cohorts$cohort_name), ")")) 
+    
+  }
+  
+  #bind all results together
+  table1Characteristics_female <- bind_rows(table1CharacteristicsF) %>%
+    mutate(Database = db.name, analysis = "Incidence", Gender = "Female")
+  
+  #save the results
+  write_csv(table1Characteristics_female, here::here(paste0("Results/",db.name,"/Table1Females",db.name,".csv")))
+  
+# for males
+  
+  table1CharacteristicsM <- list()
+  
+  #create a loop that puts table 1 for each outcome
+  for(j in seq_along(outcome_cohorts$cohort_definition_id)){
+    
+    
+    table1CharacteristicsM[[j]] <- get_summary_characteristics(PopMale %>% 
+                                                                filter(outcome_cohort_name==outcome_cohorts$cohort_name[[j]])) %>%
+      mutate(Cancer = outcome_cohorts$cohort_name[[j]])
+    
+    table1CharacteristicsM[[j]]$n <- as.character(table1CharacteristicsM[[j]]$n)
+    
+    print(paste0("Getting table 1 for ", outcome_cohorts$cohort_name[[j]], " (" , j , " of ", length(outcome_cohorts$cohort_name), ")")) 
+    
+  }
+  
+  #bind all results together
+  table1Characteristics_male <- bind_rows(table1CharacteristicsM) %>%
+    mutate(Database = db.name, analysis = "Incidence", Gender = "Male")
+  
+  #save the results
+  write_csv(table1Characteristics_male, here::here(paste0("Results/",db.name,"/Table1Males",db.name,".csv")))  
+  
+
+# for calender year
+  Popcy <- DataExtraction(dataset = Pop)  
+  
+  table1Characteristics2000 <- list()
+  table1Characteristics2005 <- list()
+  table1Characteristics2010 <- list()
+  table1Characteristics2015 <- list()
+  table1Characteristics2020 <- list()
+  
+  #create a loop that puts table 1 for each outcome 2000-2004
+  for(j in seq_along(outcome_cohorts$cohort_definition_id)){
+    
+    
+    table1Characteristics2000[[j]] <- get_summary_characteristics(Popcy[[2]] %>% 
+                                                                 filter(outcome_cohort_name==outcome_cohorts$cohort_name[[j]])) %>%
+      mutate(Cancer = outcome_cohorts$cohort_name[[j]])
+    
+    table1Characteristics2000[[j]]$n <- as.character(table1Characteristics2000[[j]]$n)
+    
+    print(paste0("Getting table 1 for ", outcome_cohorts$cohort_name[[j]], " (" , j , " of ", length(outcome_cohorts$cohort_name), ")")) 
+    
+  }
+ 
+  #create a loop that puts table 1 for each outcome 2005-2009
+  for(j in seq_along(outcome_cohorts$cohort_definition_id)){
+    
+    
+    table1Characteristics2005[[j]] <- get_summary_characteristics(Popcy[[3]] %>% 
+                                                                    filter(outcome_cohort_name==outcome_cohorts$cohort_name[[j]])) %>%
+      mutate(Cancer = outcome_cohorts$cohort_name[[j]])
+    
+    table1Characteristics2005[[j]]$n <- as.character(table1Characteristics2005[[j]]$n)
+    
+    print(paste0("Getting table 1 for ", outcome_cohorts$cohort_name[[j]], " (" , j , " of ", length(outcome_cohorts$cohort_name), ")")) 
+    
+  }
+  
+  #create a loop that puts table 1 for each outcome 2010-2014
+  for(j in seq_along(outcome_cohorts$cohort_definition_id)){
+    
+    
+    table1Characteristics2010[[j]] <- get_summary_characteristics(Popcy[[4]] %>% 
+                                                                    filter(outcome_cohort_name==outcome_cohorts$cohort_name[[j]])) %>%
+      mutate(Cancer = outcome_cohorts$cohort_name[[j]])
+    
+    table1Characteristics2010[[j]]$n <- as.character(table1Characteristics2010[[j]]$n)
+    
+    print(paste0("Getting table 1 for ", outcome_cohorts$cohort_name[[j]], " (" , j , " of ", length(outcome_cohorts$cohort_name), ")")) 
+    
+  }  
+  
+  #create a loop that puts table 1 for each outcome 2015-2019
+  for(j in seq_along(outcome_cohorts$cohort_definition_id)){
+    
+    
+    table1Characteristics2015[[j]] <- get_summary_characteristics(Popcy[[5]] %>% 
+                                                                    filter(outcome_cohort_name==outcome_cohorts$cohort_name[[j]])) %>%
+      mutate(Cancer = outcome_cohorts$cohort_name[[j]])
+    
+    table1Characteristics2015[[j]]$n <- as.character(table1Characteristics2015[[j]]$n)
+    
+    print(paste0("Getting table 1 for ", outcome_cohorts$cohort_name[[j]], " (" , j , " of ", length(outcome_cohorts$cohort_name), ")")) 
+    
+  }
+  
+  #create a loop that puts table 1 for each outcome 2020-2021
+  for(j in seq_along(outcome_cohorts$cohort_definition_id)){
+    
+    
+    table1Characteristics2020[[j]] <- get_summary_characteristics(Popcy[[6]] %>% 
+                                                                    filter(outcome_cohort_name==outcome_cohorts$cohort_name[[j]])) %>%
+      mutate(Cancer = outcome_cohorts$cohort_name[[j]])
+    
+    table1Characteristics2020[[j]]$n <- as.character(table1Characteristics2020[[j]]$n)
+    
+    print(paste0("Getting table 1 for ", outcome_cohorts$cohort_name[[j]], " (" , j , " of ", length(outcome_cohorts$cohort_name), ")")) 
+    
+  }
+  
+  #bind all results together
+  table1Characteristics_cy2000 <- bind_rows(table1Characteristics2000) %>%
+    mutate(Database = db.name, analysis = "Incidence", Calendar_year = "2000 to 2004") 
+  
+  table1Characteristics_cy2005 <- bind_rows(table1Characteristics2005) %>%
+    mutate(Database = db.name, analysis = "Incidence", Calendar_year = "2005 to 2009") 
+  
+  table1Characteristics_cy2010 <- bind_rows(table1Characteristics2010) %>%
+    mutate(Database = db.name, analysis = "Incidence", Calendar_year = "2010 to 2014") 
+  
+  table1Characteristics_cy2015 <- bind_rows(table1Characteristics2015) %>%
+    mutate(Database = db.name, analysis = "Incidence", Calendar_year = "2015 to 2019") 
+  
+  table1Characteristics_cy2020 <- bind_rows(table1Characteristics2020) %>%
+    mutate(Database = db.name, analysis = "Incidence", Calendar_year = "2020 to 2021") 
+  
+#merge all together and remove results for breast cancer as this contains both males and females
+  table1Characteristics_cy<- rbind(
+    
+    table1Characteristics_cy2000,
+    table1Characteristics_cy2005,
+    table1Characteristics_cy2010,
+    table1Characteristics_cy2015,
+    table1Characteristics_cy2020
+    
+  ) %>% 
+    filter(Cancer != "IncidentBreastCancer")
+  
+
+  
+# for calender year females breast cancer only
+  
+  PopFemaleBreast <- PopFemale %>% 
+    filter(outcome_cohort_name == "IncidentBreastCancer")
+  
+  PopcyF <- DataExtraction(dataset = PopFemale) 
+  
+  #get results set up
+  table1Characteristics2000f <- get_summary_characteristics(PopcyF[[2]]) %>% 
+    mutate(Cancer = "Breast", Database = db.name, analysis = "Incidence", Calendar_year = "2000 to 2004") 
+  table1Characteristics2000f$n <- as.character(table1Characteristics2000f$n)  
+  
+  table1Characteristics2005f <- get_summary_characteristics(PopcyF[[3]]) %>% 
+    mutate(Cancer = "Breast", Database = db.name, analysis = "Incidence", Calendar_year = "2005 to 2009") 
+  table1Characteristics2005f$n <- as.character(table1Characteristics2005f$n) 
+  
+  table1Characteristics2010f <- get_summary_characteristics(PopcyF[[4]]) %>% 
+    mutate(Cancer = "Breast", Database = db.name, analysis = "Incidence", Calendar_year = "2010 to 2014") 
+  table1Characteristics2010f$n <- as.character(table1Characteristics2010f$n) 
+  
+  table1Characteristics2015f <- get_summary_characteristics(PopcyF[[5]]) %>% 
+    mutate(Cancer = "Breast", Database = db.name, analysis = "Incidence", Calendar_year = "2015 to 2019") 
+  table1Characteristics2015f$n <- as.character(table1Characteristics2015f$n) 
+  
+  table1Characteristics2020f <- get_summary_characteristics(PopcyF[[6]]) %>% 
+    mutate(Cancer = "Breast", Database = db.name, analysis = "Incidence", Calendar_year = "2020 to 2021") 
+  table1Characteristics2020f$n <- as.character(table1Characteristics2020f$n) 
+  
+  table1Characteristics_cy_f <- rbind(
+    
+    table1Characteristics2000f ,
+    table1Characteristics2005f ,
+    table1Characteristics2010f ,
+    table1Characteristics2015f ,
+    table1Characteristics2020f
+  )
+  
+  
+  
+  #merge results together
+  table1Characteristics_cy_final <- rbind(table1Characteristics_cy, table1Characteristics_cy_f)
+  
+  #save results
+  write_csv(table1Characteristics_cy_final, here::here(paste0("Results/",db.name,"/Table1CalenderYrStrat",db.name,".csv")))   
+}
+
+
+
+
+
+
+
