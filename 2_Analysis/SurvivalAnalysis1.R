@@ -1,85 +1,5 @@
 # KM survival analysis ---
 
-#FUNCTION to extract the data and calculate the correct observation time and event (death) for different calender strata
-DataExtraction <- function(dataset){
-  data <-dataset
-  #for whole dataset
-  #make new end of observation period to studyEndDate parameter ----
-  # data <-dataset %>%
-  #   mutate(endOfObservation = ifelse(observation_period_end_date >= studyEndDate, studyEndDate, NA)) %>%
-  #   mutate(endOfObservation = as.Date(endOfObservation) ) %>%
-  #   mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
-  # 
-  # # binary death outcome (for survival) ---
-  # # need to take into account follow up
-  # # if death date is > database end data set death to 0
-  # data <-data %>%
-  #   mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
-  #   mutate(status= ifelse(death_date > endOfObservation , 1, status )) %>%
-  #   mutate(status= ifelse(is.na(status), 1, status ))
-  # 
-  # # calculate follow up in years
-  # data <-data %>%
-  #   mutate(time_days=as.numeric(difftime(endOfObservation,
-  #                                        outcome_start_date,
-  #                                        units="days"))) %>%
-  #   mutate(time_years=time_days/365.25)
-  # 
-  # # take "dataset" and do the code for each calender year
-  # carry out for calender year
-  # take year and split into groups based on the data available
-  #grid <- rev(seq(max(lubridate::year(lubridate::ymd(dataset$outcome_start_date))), min(lubridate::year(lubridate::ymd(dataset$cohort_start_date))),by=-5))
-
-  grid <- rev(seq(2019, min(lubridate::year(lubridate::ymd(dataset$cohort_start_date))),by=-5))
-  
-  # create a tool which creates 5 year age gaps but truncates at last year of study period
-  # now need to create the start and end dates for each one
-  startYear <- paste0(grid-4,"-01-01") # first days
-  endYear <- paste0(grid,"-12-31") # end days (plus 4 to create 5 year bands)
-  
-  #add on extra times for 2020-21
-  startYear <- c(startYear , "2020-01-01")
-  endYear <- c(endYear , "2021-12-31")
-  
-  # split data into groups of calender year and put it into a list. This will create 4 groups split by calender year
-  calenderSplitData <- list()
-  
-  for(w in 1:length(endYear)){
-    
-    calenderdata <- dataset %>%
-      filter( outcome_start_date >= startYear[w] &  
-                outcome_start_date <= endYear[w] )
-    
-      calenderdata <- calenderdata %>%
-      mutate(endOfObservation = ifelse(observation_period_end_date >= endYear[w], endYear[w], NA)) %>%
-      mutate(endOfObservation = as.Date(endOfObservation) ) %>%
-      mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
-    
-    # binary death outcome (for survival) ---
-    # need to take into account follow up
-    # if death date is > database end data set death to 0
-    calenderdata <- calenderdata %>%
-      mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
-      mutate(status= ifelse(death_date > endOfObservation , 1, status )) %>%
-      mutate(status= ifelse(is.na(status), 1, status ))
-    
-    # calculate follow up in years
-    calenderdata <- calenderdata %>%
-      mutate(time_days=as.numeric(difftime(endOfObservation,
-                                           outcome_start_date,
-                                           units="days"))) %>%
-      mutate(time_years=time_days/365.25)
-    
-    calenderSplitData[[w]] <- calenderdata
-    
-  }
-  
-
-  return(c(list(data),calenderSplitData))
-
-  
-}
-
 # remove people who died on the same day as the outcome
 Pop<-Pop %>%
   filter(time_days != 0)
@@ -815,7 +735,7 @@ if (grepl("CPRD", db.name) == TRUE){
 }
 
 #################################
-# age standardization and KM for 1 and 2 year
+# KM for 1 and 2 year
 ##################################
 
 if (agestandardization == TRUE) {
