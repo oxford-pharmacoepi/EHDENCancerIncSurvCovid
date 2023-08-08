@@ -137,7 +137,9 @@ incidenceFigure3a <- function(incidenceData) {
             panel.background = element_blank() ,
             axis.line = element_line(colour = "black", size = 0.6) ,
             panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-            legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+            legend.box.spacing = unit(0, "pt") ,
+            legend.key = element_rect(fill = "transparent", colour = "transparent"),
+            legend.position='bottom') +
       labs(x = "Calendar year",
            y = "Incidence rate per 100000 person-years",
            col = "Database name",
@@ -172,7 +174,9 @@ incidenceFigure3b <- function(incidenceData) {
           panel.background = element_blank() ,
           axis.line = element_line(colour = "black", size = 0.6) ,
           panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-          legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+          legend.box.spacing = unit(0, "pt") ,
+          legend.key = element_rect(fill = "transparent", colour = "transparent"),
+          legend.position='bottom') +
     labs(x = "Calendar year",
          y = "Incidence rate per 100000 person-years",
          col = "Database name",
@@ -253,7 +257,9 @@ incidenceFigure5 <- function(incidenceData) {
           panel.background = element_blank() ,
           axis.line = element_line(colour = "black", size = 0.6) ,
           panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-          legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+          legend.box.spacing = unit(0, "pt") ,
+          legend.key = element_rect(fill = "transparent", colour = "transparent"),
+          legend.position='bottom') +
     labs(x = "Calendar year",
          y = "Incidence rate per 100000 person-years",
          col = "Database & Sex",
@@ -399,7 +405,9 @@ prevalenceFigure3a <- function(prevalenceData) {
           panel.background = element_blank() ,
           axis.line = element_line(colour = "black", size = 0.6) ,
           panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-          legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+          legend.box.spacing = unit(0, "pt") ,
+          legend.key = element_rect(fill = "transparent", colour = "transparent"),
+          legend.position='bottom') +
     labs(x = "Calendar year",
          y = "Prevalence",
          col = "Database name",
@@ -436,7 +444,9 @@ prevalenceFigure3b <- function(prevalenceData) {
           panel.background = element_blank() ,
           axis.line = element_line(colour = "black", size = 0.6) ,
           panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-          legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+          legend.box.spacing = unit(0, "pt") ,
+          legend.key = element_rect(fill = "transparent", colour = "transparent"),
+          legend.position='bottom') +
     labs(x = "Calendar year",
          y = "Prevalence",
          col = "Database name",
@@ -517,7 +527,9 @@ prevalenceFigure5 <- function(prevalenceData) {
           panel.background = element_blank() ,
           axis.line = element_line(colour = "black", size = 0.6) ,
           panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-          legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+          legend.box.spacing = unit(0, "pt") ,
+          legend.key = element_rect(fill = "transparent", colour = "transparent"),
+          legend.position='bottom') +
     labs(x = "Calendar year",
          y = "Prevalence",
          col = "Database & Sex",
@@ -691,7 +703,10 @@ survivalFigure5 <- function(survivalData) {
     scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
     scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
     geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
-    scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
+    scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash", "solid", "longdash")) +
+    geom_ribbon(aes(ymin = lcl, 
+                    ymax = ucl, 
+                    fill = CalendarYearGp), alpha = .1, color = NA, show.legend = FALSE) +
      labs(x = "Time (Years)",
          y = "Survival Probability",
          col = "Calendar Year Group",
@@ -701,9 +716,50 @@ survivalFigure5 <- function(survivalData) {
           panel.background = element_blank() ,
           axis.line = element_line(colour = "black", size = 0.6) ,
           panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+          legend.box.spacing = unit(0, "pt") ,
+          legend.position='bottom',
           legend.key = element_rect(fill = "transparent", colour = "transparent")) +
     ggh4x::facet_grid2(cols = vars(Gender), vars(Database), scales="free", independent = "y") 
   
+  
+  return(survivalFigureData)
+  
+}
+
+# survival figure 5 whole population and gender strat with calendar year strat (puts gender as column and database as rows) - short term survival
+survivalFigure5a <- function(survivalData) {
+  
+  survivalFigureData <- survivalData %>%
+    filter(Stratification == "None"| Stratification == "Gender") %>%
+    filter(CalendarYearGp != "2000 to 2019") %>%
+    filter(CalendarYearGp != "2000 to 2021") %>%
+    
+    ggplot(aes(x = time,
+               y = est,
+               group = CalendarYearGp,
+               col = CalendarYearGp )) +
+    scale_y_continuous( labels = label_percent() ) +
+    scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
+    scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+    geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
+    scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash", "solid", "longdash")) +
+    geom_ribbon(aes(ymin = lcl, 
+                    ymax = ucl, 
+                    fill = CalendarYearGp), alpha = .1, color = NA, show.legend = FALSE) +
+    labs(x = "Time (Years)",
+         y = "Survival Probability",
+         col = "Calendar Year Group",
+         linetype = "Calendar Year Group") +
+    theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+          strip.background = element_rect(color = "black", size = 0.6) ,
+          panel.background = element_blank() ,
+          axis.line = element_line(colour = "black", size = 0.6) ,
+          panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+          legend.box.spacing = unit(0, "pt") ,
+          legend.position='bottom',
+          legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+    xlim(0, 1) +
+    ggh4x::facet_grid2(cols = vars(Gender), vars(Database), scales="free_y", independent = "y") 
   
   return(survivalFigureData)
   
@@ -771,6 +827,8 @@ survivalFigure7 <- function(survivalData) {
           panel.background = element_blank() ,
           axis.line = element_line(colour = "black", size = 0.6) ,
           panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+          legend.box.spacing = unit(0, "pt") ,
+          legend.position='bottom',
           legend.key = element_rect(fill = "transparent", colour = "transparent")) +
    xlim(0, 2) +
  facet_grid(cols = vars(Cancer)) 
@@ -994,7 +1052,7 @@ for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
     
     plotname <- paste0("FIGURE2_IncidenceAgeStrat_", names(table(incidence_estimates$outcome_cohort_name)[i]),".png")
     
-    png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+    png(paste0(pathResults ,"/AgeStrat/", plotname), width = 7, height = 10, units = "in", res = 1200)
     print(plot1, newpage = FALSE)
     dev.off()
     
@@ -1008,7 +1066,7 @@ for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
       
       plotname <- paste0("FIGURE2_IncidenceAgeStrat_", names(table(incidence_estimates$outcome_cohort_name)[i]),".png")
       
-      png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+      png(paste0(pathResults ,"/AgeStrat/", plotname), width = 7, height = 10, units = "in", res = 1200)
       print(plot1, newpage = FALSE)
       dev.off()
     }
@@ -1028,7 +1086,7 @@ for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
     
     plotname <- paste0("FIGURE4_PrevalenceAgeStrat_", names(table(prevalence_estimates$outcome_cohort_name)[i]),".png")
     
-    png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+    png(paste0(pathResults ,"/AgeStrat/", plotname), width = 7, height = 10, units = "in", res = 1200)
     print(plot1, newpage = FALSE)
     dev.off()   
     
@@ -1043,7 +1101,7 @@ for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
       
       plotname <- paste0("FIGURE4_PrevalenceAgeStrat_", names(table(prevalence_estimates$outcome_cohort_name)[i]),".png")
       
-      png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+      png(paste0(pathResults ,"/AgeStrat/", plotname), width = 7, height = 10, units = "in", res = 1200)
       print(plot1, newpage = FALSE)
       dev.off()
       
@@ -1107,9 +1165,9 @@ for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
     
     plot1 <- incidenceFigure5(incidence_estimates_i)
     
-    plotname <- paste0("FIGUREX_IncidenceAgeSexStrat_", names(table(incidence_estimates$outcome_cohort_name)[i]),".png")
+    plotname <- paste0("FIGURES1_IncidenceAgeSexStrat_", names(table(incidence_estimates$outcome_cohort_name)[i]),".png")
     
-    png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+    png(paste0(pathResults ,"/AgeStrat/", plotname), width = 7, height = 10, units = "in", res = 1200)
     print(plot1, newpage = FALSE)
     dev.off()
   }
@@ -1133,9 +1191,9 @@ for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
     
     plot1 <- prevalenceFigure5(prevalence_estimates_i)
     
-    plotname <- paste0("FIGUREX_PrevalenceAgeSexStrat_", names(table(prevalence_estimates$outcome_cohort_name)[i]),".png")
+    plotname <- paste0("FIGURES2_PrevalenceAgeSexStrat_", names(table(prevalence_estimates$outcome_cohort_name)[i]),".png")
     
-    png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+    png(paste0(pathResults ,"/AgeStrat/", plotname), width = 7, height = 10, units = "in", res = 1200)
     print(plot1, newpage = FALSE)
     dev.off()
     
@@ -1227,19 +1285,54 @@ for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
 
   if(names(table(survival_estimates$Cancer)[i]) == "Prostate") {
 
-  png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 7, height = 5, units = "in", res = 1200)
+  png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 6, height = 5, units = "in", res = 1200)
     print(plot1, newpage = FALSE)
     dev.off()
 
 
   } else {
 
-  png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 10, height = 5, units = "in", res = 1200)
+  png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 8, height = 5, units = "in", res = 1200)
   print(plot1, newpage = FALSE)
   dev.off()
   }
+  
+  
+
+  # survival for 1 year study period ----
+  survival_estimates_i <- survival_estimates %>%
+    filter(Cancer == names(table(survival_estimates$Cancer)[i]) ) %>% 
+    filter(time <= 1.000)
+  
+  plot1 <- survivalFigure5a(survival_estimates_i)
+  
+  plotname <- paste0("FIGURE7_KMCalendarYr_shortterm_", names(table(survival_estimates$Cancer)[i]),".png")
+  
+  if(names(table(survival_estimates$Cancer)[i]) == "Prostate") {
+    
+    png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 6, height = 5, units = "in", res = 1200)
+    print(plot1, newpage = FALSE)
+    dev.off()
+    
+    
+  } else {
+    
+    png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 8, height = 5, units = "in", res = 1200)
+    print(plot1, newpage = FALSE)
+    dev.off()
+  }
+  
+  
+  
+  
+  
 
 }
+
+
+##########################################################################################################
+### specific updated plots for papers ####
+#########################################################################################################
 
 # create data for this also including breast cancer females 
 survivalData <- survival_estimates %>%
@@ -1265,82 +1358,91 @@ survivalData2 <- bind_rows(survivalData,survivalData1)
 for(i in 1:length(table(incidence_estimates$outcome_cohort_name))) {
   
   survival_estimates_i <- survivalData2 %>%
-    filter(Cancer == names(table(survival_estimates$Cancer)[i]) )
+    filter(Cancer == names(table(survival_estimates$Cancer)[i]) ) %>% 
+    filter(time <= 2.100000000)
   
   plot1 <- survivalFigure8(survival_estimates_i)
   
-  plotname <- paste0("FIGURE7_KMCalendarYr_GOLD_", names(table(survival_estimates$Cancer)[i]),".png")
-    
-    png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 7, height = 5, units = "in", res = 1200)
-    print(plot1, newpage = FALSE)
-    dev.off()
-
+  plotname <- paste0("S5_KMCalendarYr_GOLD_", names(table(survival_estimates$Cancer)[i]),".pdf")
+  
+  pdf(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 9, height = 7)
+  print(plot1, newpage = FALSE)
+  dev.off()
+  
+  plotname1 <- paste0("S5_KMCalendarYr_GOLD_", names(table(survival_estimates$Cancer)[i]),".png")
+  
+  png(paste0(pathResults ,"/GenderWholeStrat/", plotname1), width = 7, height = 5, units = "in", res = 1200)
+  print(plot1, newpage = FALSE)
+  dev.off()
+  
+  
 }
 
 # plot survival for cancers on the same plot
 
-  survivalFigureData <- survivalData2 %>%
-    filter(Cancer == "Colorectal" |
-             Cancer == "Head & Neck" |
-             Cancer == "Liver" |
-             Cancer == "Lung" |
-             Cancer == "Oesophagus" |
-             Cancer == "Pancreas" |
-             Cancer == "Breast" |
-             Cancer == "Prostate" |
-             Cancer == "Stomach" ) %>% 
-    ggplot(aes(x = time,
-               y = est,
-               group = CalendarYearGp,
-               col = CalendarYearGp )) +
-    scale_y_continuous( labels = label_percent() ) +
-    scale_colour_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
-    scale_fill_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) +
-    geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
-    scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
-    geom_ribbon(aes(ymin = lcl, 
-                    ymax = ucl, 
-                    fill = CalendarYearGp), alpha = .15, color = NA, show.legend = FALSE) +
-    labs(x = "Time (Years)",
-         y = "Survival Probability",
-         col = "Calendar Year Group",
-         linetype = "Calendar Year Group") +
-    theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
-          strip.background = element_rect(color = "black", size = 0.6) ,
-          panel.background = element_blank() ,
-          panel.spacing.x = unit(0.05, "cm") ,
-          panel.spacing.y = unit(0.1, "cm") ,
-          axis.text = element_text(size = 8) ,
-          #axis.title.y = element_text(size = 15),
-          #axis.title.x = element_text(size = 15),
-          legend.text = element_text(size=8),
-          legend.title = element_text(size=8),
-          #strip.text.x = element_text(size = 15),
-          axis.line = element_line(colour = "black", size = 0.6) ,
-          panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-          legend.box.spacing = unit(0, "pt") ,
-          legend.key = element_rect(fill = "transparent", colour = "transparent"),
-          legend.position='bottom') +
-    xlim(0, 2) +
+survivalFigureData <- survivalData2 %>%
+  filter(Cancer == "Colorectal" |
+           Cancer == "Head & Neck" |
+           Cancer == "Liver" |
+           Cancer == "Lung" |
+           Cancer == "Oesophagus" |
+           Cancer == "Pancreas" |
+           Cancer == "Breast" |
+           Cancer == "Prostate" |
+           Cancer == "Stomach" ) %>% 
+  filter(time <= 2.1000000000000) %>% 
+  ggplot(aes(x = time,
+             y = est,
+             group = CalendarYearGp,
+             col = CalendarYearGp )) +
+  scale_y_continuous( labels = label_percent() ) +
+  scale_colour_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
+  scale_fill_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
+  scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
+  geom_ribbon(aes(ymin = lcl, 
+                  ymax = ucl, 
+                  fill = CalendarYearGp), alpha = .15, color = NA, show.legend = FALSE) +
+  labs(x = "Time (Years)",
+       y = "Survival Probability",
+       col = "Calendar Year Group",
+       linetype = "Calendar Year Group") +
+  theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        panel.spacing.x = unit(0.05, "cm") ,
+        panel.spacing.y = unit(0.1, "cm") ,
+        axis.text = element_text(size = 8) ,
+        #axis.title.y = element_text(size = 15),
+        #axis.title.x = element_text(size = 15),
+        legend.text = element_text(size=8),
+        legend.title = element_text(size=8),
+        #strip.text.x = element_text(size = 15),
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.box.spacing = unit(0, "pt") ,
+        legend.key = element_rect(fill = "transparent", colour = "transparent"),
+        legend.position='bottom') +
+  xlim(0, 2) +
   facet_wrap(~ Cancer, scales = "free_y", ncol = 3)
-  
-  # +
-  #   theme(panel.spacing = unit(, "cm", data = NULL))
-  
-  
-  plotname <- paste0("FIGURE8_KMCalendarYr_GOLD_all_cancers.png")
-  
-  png(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 8, height = 8, units = "in", res = 1200)
-  print(survivalFigureData, newpage = FALSE)
-  dev.off()
-  
+
+# +
+#   theme(panel.spacing = unit(, "cm", data = NULL))
+
+
+plotname <- paste0("FIGURE2_KMCalendarYr_GOLD_all_cancers.pdf")
+
+pdf(paste0(pathResults ,"/GenderWholeStrat/", plotname), width = 10, height = 10)
+print(survivalFigureData, newpage = FALSE)
+dev.off()
+
+plotname1 <- paste0("FIGURE2_KMCalendarYr_GOLD_all_cancers.png")
+png(paste0(pathResults ,"/GenderWholeStrat/", plotname1), width = 8, height = 8, units = "in", res = 1200)
+print(survivalFigureData, newpage = FALSE)
+dev.off()
 
 
 
-
-##########################################################################################################
-### specific updated plots for papers ####
-#########################################################################################################
 
 
 # pointplots per cancer survival over time
@@ -1449,13 +1551,20 @@ incidenceFigureData <- incidenceData3 %>%
   facet_wrap(~ outcome_cohort_name, scales = "free_y", ncol = 3)
 
 
-plotname <- paste0("IRsWholePop_multipleCancers.png")
+# plotname <- paste0("IRsWholePop_multipleCancers.png")
+# 
+# png(paste0(pathResults ,"/WholePop/", plotname),
+#     width = 8, height = 7.5, units = "in", res = 1200)
+# print(incidenceFigureData, newpage = FALSE)
+# dev.off()
 
-png(paste0(pathResults ,"/WholePop/", plotname),
-    width = 8, height = 7.5, units = "in", res = 1200)
+
+plotname <- paste0("S4IRsWholePop_multipleCancers.pdf")
+
+pdf(paste0(pathResults ,"/WholePop/", plotname),
+    width = 10, height = 9.5)
 print(incidenceFigureData, newpage = FALSE)
 dev.off()
-
 
 ################################## Prevalence #######
 #plot for all cancer IRs on one facet
@@ -1560,7 +1669,9 @@ incidenceFigureData <- incidenceDatahan %>%
         panel.background = element_blank() ,
         axis.line = element_line(colour = "black", size = 0.6) ,
         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+        legend.box.spacing = unit(0, "pt") ,
+        legend.key = element_rect(fill = "transparent", colour = "transparent"),
+        legend.position='bottom') +
   labs(x = "Calendar year",
        y = "Incidence rate per 100000 person-years",
        col = "Database name" ,
