@@ -1685,6 +1685,19 @@ print(incidenceFigureData, newpage = FALSE)
 dev.off()
 
 
+# sex*age strata for Han
+incidence_estimates_han1 <- incidence_estimates %>%
+  filter(outcome_cohort_name == "Head & Neck" & analysis_interval == "years") %>%
+  filter(denominator_age_group != "18 to 29" )
+
+plot1 <- incidenceFigure5(incidence_estimates_han1)
+plotname <- paste0("FIGURES1_IncidenceAgeSexStrat_han.png")
+
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 7, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+
 #PREVALENCE
 #plot for all head and neck cancers in one plot
 prevalenceDatahan <- prevalence_estimates %>%
@@ -1735,7 +1748,7 @@ prevalenceFigureData <- prevalenceDatahan %>%
 
 plotname <- paste0("FIGURE4_PrevalenceWholePop_hansubsites.png")
 
-png(paste0(pathResults ,"/WholePop/", plotname),
+png(paste0(pathResults ,"/ExtraPlots/", plotname),
     width = 7, height = 10, units = "in", res = 1200)
 print(prevalenceFigureData, newpage = FALSE)
 dev.off()
@@ -1779,7 +1792,7 @@ prevalenceFigureData <- prevalenceDatahan %>%
   
 plotname <- paste0("FIGURE_S8_PrevalencGender_hansubsites.png")
 
-png(paste0(pathResults ,"/GenderStrat/", plotname),
+png(paste0(pathResults ,"/ExtraPlots/", plotname),
     width = 8, height = 10, units = "in", res = 1200)
 print(prevalenceFigureData, newpage = FALSE)
 dev.off()
@@ -2148,9 +2161,6 @@ plotname <- paste0("FIGURE4_PrevalenceAgeStrat_Breast_Females.png")
 png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 7, height = 10 , units = "in", res = 1200)
 print(prevalenceFigureData, newpage = FALSE)
 dev.off()
-
-
-
 
 
 prevalence_estimates_breast_M <- prevalence_estimates %>%
