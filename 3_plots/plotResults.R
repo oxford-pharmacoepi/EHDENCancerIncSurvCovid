@@ -129,7 +129,7 @@ incidenceFigure3a <- function(incidenceData) {
       geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, 
                       ymax = incidence_100000_pys_95CI_upper, 
                       fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
-    geom_point(aes(shape = database_name, fill = database_name),size = 1) +
+    geom_point(aes(shape = database_name, fill = database_name),size = 2) +
     scale_shape_manual(values = c(24,21)) +
       theme(axis.text.x = element_text(angle = 45, hjust=1),
             panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
@@ -166,7 +166,7 @@ incidenceFigure3b <- function(incidenceData) {
     geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, 
                     ymax = incidence_100000_pys_95CI_upper, 
                     fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
-    geom_point(aes(shape = database_name, fill = database_name),size = 1) +
+    geom_point(aes(shape = database_name, fill = database_name),size = 2) +
     scale_shape_manual(values = c(24,21)) +
     theme(axis.text.x = element_text(angle = 45, hjust=1),
           panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
@@ -394,7 +394,7 @@ prevalenceFigure3a <- function(prevalenceData) {
     geom_ribbon(aes(ymin = prevalence_95CI_lower, 
                     ymax = prevalence_95CI_upper, 
                     fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
-    geom_point(aes(shape = database_name, fill = database_name ),size = 1) +
+    geom_point(aes(shape = database_name, fill = database_name ),size = 2) +
     scale_shape_manual(values = c(24,21)) +
     scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
     theme(axis.text.x = element_text(angle = 45, hjust=1),
@@ -433,7 +433,7 @@ prevalenceFigure3b <- function(prevalenceData) {
     geom_ribbon(aes(ymin = prevalence_95CI_lower, 
                     ymax = prevalence_95CI_upper, 
                     fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
-    geom_point(aes(shape = database_name, fill = database_name),size = 1) +
+    geom_point(aes(shape = database_name, fill = database_name),size = 2) +
     scale_shape_manual(values = c(24,21)) +
     scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
     theme(axis.text.x = element_text(angle = 45, hjust=1),
@@ -1926,7 +1926,6 @@ incidence_estimates_i <- incidence_estimates %>%
          )
 
 # INCDIDENCE
-
 incidenceFigureData <- incidence_estimates_i %>%
   ggplot(aes(x = incidence_start_date,
              y = incidence_100000_pys,
@@ -1966,7 +1965,6 @@ print(incidenceFigureData, newpage = FALSE)
 dev.off()
 
 # PREVALENCE
-
 prevalence_estimates_i <- prevalence_estimates %>%
   filter(outcome_cohort_name == "Breast" & 
            denominator_age_group == "All" &
@@ -2237,7 +2235,7 @@ survivalFigureData <- survival_estimates_breast %>%
         legend.box.spacing = unit(0, "pt") ,
         legend.key = element_rect(fill = "transparent", colour = "transparent"),
         legend.position='bottom') +
-  scale_x_continuous(breaks=seq(0, 20, 2)) +
+  scale_x_continuous(breaks=seq(0, 22, 2)) +
   facet_grid(cols = vars(Gender)) 
 
 plotname <- paste0("FIGURE6_KMGenderAllStrat_Breast.png")
@@ -2267,6 +2265,9 @@ survivalFigureData <- survival_estimates_breast1 %>%
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
   geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
   scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
+  geom_ribbon(aes(ymin = lcl, 
+                  ymax = ucl, 
+                  fill = CalendarYearGp), alpha = .15, color = NA, show.legend = FALSE) +
   labs(x = "Time (Years)",
        y = "Survival Probability",
        col = "Calendar Year Group",
@@ -2325,12 +2326,11 @@ incidenceFigureData <- incidence_estimates %>%
 
 
 plotname <- paste0("FIGURE1_Incidence_Males_Prostate.png")
-png(paste0(pathResults ,"/WholePop/", plotname), width = 6, height = 5 , units = "in", res = 1200)
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 6, height = 5 , units = "in", res = 1200)
 print(incidenceFigureData, newpage = FALSE)
 dev.off()
 
 # prevalence whole population
-
 prevalenceFigureData <- prevalence_estimates %>%
   filter(denominator_sex == "Male",
          denominator_age_group == "All",
@@ -2511,6 +2511,9 @@ survivalFigureData <- survival_estimates %>%
   scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
   geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
   scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
+  geom_ribbon(aes(ymin = lcl, 
+                  ymax = ucl, 
+                  fill = CalendarYearGp), alpha = .15, color = NA, show.legend = FALSE) +
   labs(x = "Time (Years)",
        y = "Survival Probability",
        col = "Calendar Year Group",
@@ -2602,7 +2605,7 @@ incidence_estimates_liver1 <- incidence_estimates %>%
 plot1 <- incidenceFigure5(incidence_estimates_liver1)
 plotname <- paste0("FIGURES1_IncidenceAgeSexStrat_liver.png")
 
-png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 6, height = 6, units = "in", res = 1200)
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 7, height = 6, units = "in", res = 1200)
 print(plot1, newpage = FALSE)
 dev.off()
 
@@ -2616,7 +2619,7 @@ incidence_estimates_lung <- incidence_estimates %>%
 plot1 <- incidenceFigure3a(incidence_estimates_lung)
 plotname <- paste0("FIGURE2_IncidenceAgeStrat_lung.png")
 
-png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 8, height = 10, units = "in", res = 1200)
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 7, height = 10, units = "in", res = 1200)
 print(plot1, newpage = FALSE)
 dev.off()
 
@@ -2647,7 +2650,7 @@ incidence_estimates_Oesophageal <- incidence_estimates %>%
 plot1 <- incidenceFigure3a(incidence_estimates_Oesophageal)
 plotname <- paste0("FIGURE2_IncidenceAgeStrat_Esophagus.png")
 
-png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 8, height = 10, units = "in", res = 1200)
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 7, height = 10, units = "in", res = 1200)
 print(plot1, newpage = FALSE)
 dev.off()
 
@@ -2661,7 +2664,7 @@ incidence_estimates_Oesophageal1 <- incidence_estimates %>%
 plot1 <- incidenceFigure5(incidence_estimates_Oesophageal1)
 plotname <- paste0("FIGURES1_IncidenceAgeSexStrat_Esophagus.png")
 
-png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 8, height = 10, units = "in", res = 1200)
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 7, height = 8, units = "in", res = 1200)
 print(plot1, newpage = FALSE)
 dev.off()
 
@@ -2677,7 +2680,7 @@ prevalence_estimates_Oesophageal <- prevalence_estimates %>%
 plot1 <- prevalenceFigure3a(prevalence_estimates_Oesophageal)
 plotname <- paste0("FIGURE4_PrevalenceAgeStrat_Esophagus.png")
 
-png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 8, height = 10, units = "in", res = 1200)
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 7, height = 10, units = "in", res = 1200)
 print(plot1, newpage = FALSE)
 dev.off()
 
@@ -2695,10 +2698,6 @@ print(plot1, newpage = FALSE)
 dev.off()
 
 
-
-
-
-
 ##############################################################################################
 #GASTRIC CANCER
 
@@ -2714,6 +2713,20 @@ png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 8, height = 10, units
 print(plot1, newpage = FALSE)
 dev.off()
 
+#prev rates age strat
+prev_estimates_gastric <- prevalence_estimates %>%
+  filter(outcome_cohort_name == "Stomach" & analysis_interval == "years") %>%
+  filter(denominator_age_group != "18 to 29" )
+
+plot1 <- prevalenceFigure3a(prev_estimates_gastric)
+plotname <- paste0("FIGURE4_PrevalenceAgeStrat_stomach.png")
+
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 7, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+
+
 #incidence rates age*gender strat
 incidence_estimates_gastric1 <- incidence_estimates %>%
   filter(outcome_cohort_name == "Stomach" & analysis_interval == "years") %>%
@@ -2721,6 +2734,18 @@ incidence_estimates_gastric1 <- incidence_estimates %>%
 
 plot1 <- incidenceFigure5(incidence_estimates_gastric1)
 plotname <- paste0("FIGURES1_IncidenceAgeSexStrat_stomach.png")
+
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+# prev plots age*gender strat
+prev_estimates_gastric1 <- prevalence_estimates %>%
+  filter(outcome_cohort_name == "Stomach" & analysis_interval == "years") %>%
+  filter(denominator_age_group != "18 to 29"  )
+
+plot1 <- prevalenceFigure5(prev_estimates_gastric1)
+plotname <- paste0("FIGURES2_PrevalenceAgeSexStrat_stomach.png")
 
 png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 8, height = 10, units = "in", res = 1200)
 print(plot1, newpage = FALSE)
@@ -2751,6 +2776,17 @@ prevalence_estimates_pancreas <- prevalence_estimates %>%
 
 plot1 <- prevalenceFigure3a(prevalence_estimates_pancreas)
 plotname <- paste0("FIGURE4_PrevalenceAgeStrat_pancreas.png")
+
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+prevalence_estimates_pancreas1 <- prevalence_estimates %>%
+  filter(outcome_cohort_name == "Pancreas" & analysis_interval == "years") %>%
+  filter(denominator_age_group != "18 to 29" )
+
+plot1 <- prevalenceFigure5(prevalence_estimates_pancreas)
+plotname <- paste0("FIGURES2_PrevalenceAgeSexStrat_pancreas.png")
 
 png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 8, height = 10, units = "in", res = 1200)
 print(plot1, newpage = FALSE)
