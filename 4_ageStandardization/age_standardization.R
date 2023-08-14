@@ -345,7 +345,8 @@ agestandardizedprev_final <- bind_rows(agestandardizedprev)
 #save the results
 saveRDS(agestandardizedprev_final, paste0(datapath ,"/prevalence_estimates_age_sd.rds"))
 
-
+#load the results
+agestandardizedinc_final <- readRDS(paste0(datapath ,"/incidence_estimates_age_sd.rds"))
 ###################################################
 #plot the results of new age adjusted results INCIDENCE
 incidenceFigureData <- agestandardizedinc_final %>%
@@ -380,11 +381,16 @@ incidenceFigureData <- agestandardizedinc_final %>%
   facet_wrap(~ Cancer, scales = "free_y", ncol = 3)
 
 
-plotname <- paste0("IRsWholePop_multipleCancers_ageadjusted.png")
+plotname <- paste0("/FIGURE1_IRsWholePop_multipleCancers_ageadjusted.pdf")
 
-png(paste0(datapath , plotname),
-    width = 8, height = 7.5, units = "in", res = 1200)
+# png(paste0(datapath , plotname),
+#     width = 8, height = 7.5, units = "in", res = 1200)
+# print(incidenceFigureData, newpage = FALSE)
+
+pdf(paste0(datapath , plotname),
+    width = 10, height = 9.5)
 print(incidenceFigureData, newpage = FALSE)
+
 dev.off()
 
 
