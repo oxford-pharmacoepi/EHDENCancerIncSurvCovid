@@ -999,7 +999,7 @@ if (agestandardization == TRUE) {
   PopFemaleBreast <- PopFemale %>% 
     filter(outcome_cohort_name == "IncidentBreastCancer")
   
-  PopcyF <- DataExtraction(dataset = PopFemale) 
+  PopcyF <- DataExtraction(dataset = PopFemaleBreast) 
   
   #get results set up
   table1Characteristics2000f <- get_summary_characteristics(PopcyF[[2]]) %>% 
