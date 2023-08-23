@@ -604,7 +604,7 @@ survivalFigure3a <- function(survivalData) {
           legend.key = element_rect(fill = "transparent", colour = "transparent")) +
     scale_x_continuous(breaks=seq(0, 20, 2)) +
     facet_wrap(~ Age, ncol = 2, scales = "free_x") +
-    coord_cartesian(xlim = c(0, 20))
+    coord_cartesian(xlim = c(0, 22))
   
   
   return(survivalFigureData)
@@ -640,7 +640,7 @@ survivalFigure3b <- function(survivalData) {
           legend.key = element_rect(fill = "transparent", colour = "transparent")) +
     scale_x_continuous(breaks=seq(0, 20, 2)) +
     facet_wrap(~ Age, ncol = 2, scales = "free_x") +
-    coord_cartesian(xlim = c(0, 20))
+    coord_cartesian(xlim = c(0, 22))
   
   
   return(survivalFigureData)
@@ -1685,6 +1685,164 @@ print(incidenceFigureData, newpage = FALSE)
 dev.off()
 
 
+# incidence han cancer all overall and subsites
+incidenceDatahan1 <- incidence_estimates %>%
+  filter(outcome_cohort_name == "Oral Cavity" |
+           outcome_cohort_name == "Tongue" |
+           outcome_cohort_name == "Nasal Cavity & Sinus" |
+           outcome_cohort_name == "Salivary Gland" |          
+           outcome_cohort_name == "Larynx" |
+           outcome_cohort_name == "Hypopharynx" |
+           outcome_cohort_name == "Nasopharynx" |
+           outcome_cohort_name == "Oropharynx"  |
+           outcome_cohort_name == "Head & Neck"
+         
+  )
+
+incidenceFigureData <- incidenceDatahan1 %>%
+  filter(denominator_sex == "Both",
+         denominator_age_group == "All", 
+         analysis_interval == "years") %>%
+  ggplot(aes(x = incidence_start_date,
+             y = incidence_100000_pys,
+             group = database_name)) +
+  geom_line(color = "black", size = 0.25) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, 
+                  ymax = incidence_100000_pys_95CI_upper, 
+                  fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_point(aes(shape = database_name, fill = database_name ),size = 1.5) +
+  scale_shape_manual(values = c(24,21)) +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.box.spacing = unit(0, "pt") ,
+        legend.key = element_rect(fill = "transparent", colour = "transparent"),
+        legend.position='bottom') +
+  labs(x = "Calendar year",
+       y = "Incidence rate per 100000 person-years",
+       col = "Database name" ,
+       shape = "Database name",
+       fill = "Database name") +
+  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("4 years"),
+               expand = c(0.06,1)) +
+  facet_wrap(~ outcome_cohort_name, scales = "free", ncol = 3)
+
+plotname <- paste0("FIGURE2_Incidencehan_and_hansubsites.png")
+
+png(paste0(pathResults ,"/ExtraPlots/", plotname),
+    width = 9, height = 9, units = "in", res = 1200)
+print(incidenceFigureData, newpage = FALSE)
+dev.off()
+
+
+
+###########################################
+# sex stratification for han and subsites (same plot as above but with both sexes plotted)
+incidenceFigureData <- incidenceDatahan1 %>%
+  filter(denominator_age_group == "All") %>%
+  filter(denominator_sex != "Both") %>%
+  filter(analysis_interval != "overall") %>% 
+  unite(Database_Sex, 
+        "database_name", "denominator_sex",
+        sep=": ", remove = FALSE) %>% 
+  ggplot(aes(x = incidence_start_date,
+             y = incidence_100000_pys,
+             group = Database_Sex)) +
+  geom_line(color = "black", size = 0.2) +
+  scale_colour_manual(values = c("#ED0000FF", "#00468BFF", "#ED0000FF", "#00468BFF")) + #blue, #red #blue, #red 
+  scale_fill_manual(values = c("#ED0000FF", "#00468BFF", "#ED0000FF", "#00468BFF")) +
+  geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower,
+                  ymax = incidence_100000_pys_95CI_upper,
+                  fill = Database_Sex), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_point(aes(shape = Database_Sex, fill = Database_Sex),size = 1.5) +
+  scale_shape_manual(values = c(24,22,21,25)) +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  labs(x = "Calendar year",
+       y = "Incidence rate per 100000 person-years",
+       col = "Database & Sex",
+       shape = "Database & Sex" ,
+       fill = "Database & Sex" ) +
+  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("4 years"),
+               expand = c(0.06,1)) +
+  facet_wrap(~ outcome_cohort_name, scales = "free", ncol = 3)
+
+plotname <- paste0("FIGURES_Incidencehan_and_hansubsites_sexstrata.png")
+
+png(paste0(pathResults ,"/ExtraPlots/", plotname),
+    width = 10, height = 9, units = "in", res = 1200)
+print(incidenceFigureData, newpage = FALSE)
+dev.off()
+
+##### plotting age effects per han subsite
+# plot facetted by subsite with plots per age group the overall IR
+
+incidenceFigureData <- incidenceDatahan1 %>%
+  filter(denominator_sex == "Both",
+         denominator_age_group != "All", 
+         analysis_interval == "overall") %>%
+  ggplot(aes(x = denominator_age_group,
+             y = incidence_100000_pys,
+             group = database_name)) +
+  #geom_pointrange(aes(ymin=len-sd, ymax=len+sd))
+  geom_errorbar(aes(ymin=incidence_100000_pys_95CI_lower, ymax=incidence_100000_pys_95CI_upper), width=0) +
+  #geom_line(color = "black", size = 0.25) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  # geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, 
+  #                 ymax = incidence_100000_pys_95CI_upper, 
+  #                 fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_point(aes(shape = database_name, fill = database_name ),size = 1.5) +
+  scale_shape_manual(values = c(24,21)) +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.box.spacing = unit(0, "pt") ,
+        legend.key = element_rect(fill = "transparent", colour = "transparent"),
+        legend.position='bottom') +
+  labs(x = "Age Group",
+       y = "Incidence rate per 100000 person-years",
+       col = "Database name" ,
+       shape = "Database name",
+       fill = "Database name") +
+  facet_wrap(~ outcome_cohort_name, scales = "free", ncol = 3)
+
+plotname <- paste0("FIGUREX_Incidencehan_and_hansubsites_age_effects_overall.png")
+
+png(paste0(pathResults ,"/ExtraPlots/", plotname),
+    width = 9, height = 9, units = "in", res = 1200)
+print(incidenceFigureData, newpage = FALSE)
+dev.off()
+
+
+# age strata for Han - removing 18-29 years of age
+
+incidence_estimates_han1 <- incidence_estimates %>%
+  filter(outcome_cohort_name == "Head & Neck" & analysis_interval == "years") %>%
+  filter(denominator_age_group != "18 to 29" )
+
+plot1 <- incidenceFigure3a(incidence_estimates_han1)
+plotname <- paste0("FIGURE2_IncidenceAgeStrat_Head & Neck.png")
+
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 7, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+
+
 # sex*age strata for Han
 incidence_estimates_han1 <- incidence_estimates %>%
   filter(outcome_cohort_name == "Head & Neck" & analysis_interval == "years") %>%
@@ -1753,6 +1911,108 @@ png(paste0(pathResults ,"/ExtraPlots/", plotname),
 print(prevalenceFigureData, newpage = FALSE)
 dev.off()
 
+###########
+#prevalence for head and neck cancer and subsites all on one plot
+
+prevalenceDatahan1 <- prevalence_estimates %>%
+  filter(outcome_cohort_name == "Oral Cavity" |
+           outcome_cohort_name == "Tongue" |
+           outcome_cohort_name == "Nasal Cavity & Sinus" |
+           outcome_cohort_name == "Salivary Gland" |          
+           outcome_cohort_name == "Larynx" |
+           outcome_cohort_name == "Hypopharynx" |
+           outcome_cohort_name == "Nasopharynx" |
+           outcome_cohort_name == "Oropharynx"  |
+           outcome_cohort_name == "Head & Neck"
+         
+  )
+
+
+prevalenceFigureData <- prevalenceDatahan1 %>%
+  filter(denominator_sex == "Both",
+         denominator_age_group == "All", 
+         analysis_interval == "years") %>%
+  ggplot(aes(x = prevalence_start_date,
+             y = prevalence,
+             group = database_name)) +
+  geom_line(color = "black", size = 0.25) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_ribbon(aes(ymin = prevalence_95CI_lower, 
+                  ymax = prevalence_95CI_upper, 
+                  fill = database_name), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_point(aes(shape = database_name, fill = database_name),size = 1.75) +
+  scale_shape_manual(values = c(24,21)) +
+  scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.box.spacing = unit(0, "pt") ,
+        legend.key = element_rect(fill = "transparent", colour = "transparent"),
+        legend.position='bottom') +
+  labs(x = "Calendar year",
+       y = "Prevalence",
+       col = "Database name",
+       shape = "Database name",
+       fill = "Database name") +
+  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("4 years"),
+               expand = c(0.06,1)) +
+  facet_wrap(~ outcome_cohort_name, scales = "free", ncol = 3)
+
+plotname <- paste0("FIGURE4_Prevalencehan_hansubsites_all.png")
+
+png(paste0(pathResults ,"/ExtraPlots/", plotname),
+    width = 9, height = 9, units = "in", res = 1200)
+print(prevalenceFigureData, newpage = FALSE)
+dev.off()
+
+# prevalence for all subsites stratified by sex (the above plot but with both sexes)
+prevalenceFigureData <- prevalenceDatahan1 %>%
+  filter(denominator_age_group == "All") %>%
+  filter(denominator_sex != "Both") %>%
+  filter(analysis_interval != "overall") %>% 
+  unite(Database_Sex, 
+        "database_name", "denominator_sex",
+        sep=": ", remove = FALSE) %>% 
+  ggplot(aes(x = prevalence_start_date,
+             y = prevalence,
+             group = Database_Sex)) +
+  geom_line(color = "black", size = 0.2) +
+  scale_colour_manual(values = c("#ED0000FF", "#00468BFF", "#ED0000FF", "#00468BFF")) + #blue, #red #blue, #red 
+  scale_fill_manual(values = c("#ED0000FF", "#00468BFF", "#ED0000FF", "#00468BFF")) +
+  geom_ribbon(aes(ymin = prevalence_95CI_lower,
+                  ymax = prevalence_95CI_upper,
+                  fill = Database_Sex), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_point(aes(shape = Database_Sex, fill = Database_Sex),size = 1.5) +
+  scale_shape_manual(values = c(24,22,21,25)) +
+  scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
+  theme(axis.text.x = element_text(angle = 45, hjust=1),
+        panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  labs(x = "Calendar year",
+       y = "Prevalence",
+       col = "Database & Sex",
+       shape = "Database & Sex" ,
+       fill = "Database & Sex" ) +
+  scale_x_date(labels = date_format("%Y"), breaks = date_breaks("4 years"),
+               expand = c(0.06,1)) +
+  facet_wrap(~ outcome_cohort_name, scales = "free", ncol = 3)
+
+plotname <- paste0("FIGURE_S_PrevalencGender_han_hansubsites.png")
+
+png(paste0(pathResults ,"/ExtraPlots/", plotname),
+    width = 10, height = 8, units = "in", res = 1200)
+print(prevalenceFigureData, newpage = FALSE)
+dev.off()
+
+
 
 # prevalence stratified by sex and database for all subsites
 prevalenceFigureData <- prevalenceDatahan %>%
@@ -1820,7 +2080,7 @@ print(plot1, newpage = FALSE)
 dev.off()
 
 # tongue
-incidence_estimates_tongue <- incidenceDatahan %>%
+incidence_estimates_tongue <- incidenceDatahan1 %>%
   filter(outcome_cohort_name == "Tongue" & analysis_interval == "years") %>%
   filter(denominator_age_group != "18 to 29" & 
            denominator_age_group != "30 to 39" &
@@ -1895,7 +2155,7 @@ prevalenceDatahan_subset <- prevalenceDatahan %>%
 plot1 <- prevalenceFigure3a(prevalenceDatahan_subset)
 plotname <- paste0("FIGURE_SX_PrevalenceAgeStra_larynx.png")
 
-png(paste0(pathResults ,"/AgeStrat/", plotname), width = 8, height = 10, units = "in", res = 1200)
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 8, height = 10, units = "in", res = 1200)
 print(plot1, newpage = FALSE)
 dev.off()
 
@@ -1926,6 +2186,156 @@ print(plot1, newpage = FALSE)
 dev.off()
 
 
+prevalenceDatahan_subset <- prevalenceDatahan %>% 
+  filter(outcome_cohort_name == "Tongue" ) %>% 
+  filter(denominator_age_group != "18 to 29")
+
+plot1 <- prevalenceFigure3a(prevalenceDatahan_subset)
+plotname <- paste0("FIGURE_SX_PrevalenceAgeStra_tongue.png")
+
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 8, height = 10, units = "in", res = 1200)
+print(plot1, newpage = FALSE)
+dev.off()
+
+#################################
+# survival plots for all han and subsites
+
+survivalDatahan1 <- survival_estimates %>%
+  filter(Cancer == "Oral Cavity" |
+           Cancer == "Tongue" |
+           Cancer == "Nasal Cavity & Sinus" |
+           Cancer == "Salivary Gland" |          
+           Cancer == "Larynx" |
+           Cancer == "Hypopharynx" |
+           Cancer == "Nasopharynx" |
+           Cancer == "Oropharynx"  |
+           Cancer == "Head & Neck"
+         
+  )
+
+
+# filter out the data we need (removing sex and age results)
+
+survivalFigureData <- survivalDatahan1 %>%
+  filter(Age == "All") %>%
+  filter(Gender == "Both") %>% 
+  filter(CalendarYearGp == "2000 to 2019" |
+           CalendarYearGp == "2000 to 2021" ) %>%
+  ggplot(aes(x = time,
+             y = est,
+             group = Database,
+             col = Database )) +
+  scale_y_continuous( labels = scales::percent, limits = c(0, NA)) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark read, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_ribbon(aes(ymin = lcl, 
+                  ymax = ucl, 
+                  fill = Database), alpha = .15, color = NA, show.legend = FALSE) +
+  geom_line(aes(linetype = Database),size = 0.5) +
+  scale_linetype_manual(values = c("solid", "dashed", "twodash","dotted")) +
+  labs(x = "Time (Years)",
+       y = "Survival Probability",
+       col = "Database name",
+       linetype = "Database name") +
+  theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  scale_x_continuous(breaks=seq(0, 22, 2)) +
+  facet_wrap(~ Cancer, ncol = 3, scales = "free") +
+coord_cartesian(xlim = c(0, 22))
+
+plotname <- paste0("FIGURE_SX_survival_han_subsites.png")
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 9, height = 8, units = "in", res = 1200)
+print(survivalFigureData, newpage = FALSE)
+dev.off()
+
+
+#survival by calender time for han and subsites for GOLD
+
+survivalFigureData <- survivalDatahan1 %>%
+  filter(Age == "All") %>%
+  filter(Gender == "Both") %>% 
+  filter(CalendarYearGp != "2000 to 2019") %>% 
+  filter(CalendarYearGp != "2000 to 2021") %>% 
+  filter(Database == "CPRD GOLD") %>% 
+  ggplot(aes(x = time,
+             y = est,
+             group = CalendarYearGp,
+             col = CalendarYearGp )) +
+  scale_y_continuous( labels = label_percent() ) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
+  scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash", "solid", "longdash")) +
+  geom_ribbon(aes(ymin = lcl, 
+                  ymax = ucl, 
+                  fill = CalendarYearGp), alpha = .1, color = NA, show.legend = FALSE) +
+  labs(x = "Time (Years)",
+       y = "Survival Probability",
+       col = "Calendar Year Group",
+       linetype = "Calendar Year Group") +
+  theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.box.spacing = unit(0, "pt") ,
+        legend.position='bottom',
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  xlim(0, 5) +
+  facet_wrap(~ Cancer, ncol = 3, scales = "free") 
+
+ # ggh4x::facet_grid2(cols = vars(Database),vars(Cancer), scales="free_y", independent = "y") 
+
+plotname <- paste0("FIGURE_SX_survival_cy_han_subsites_GOLD.png")
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 8, height = 8, units = "in", res = 1200)
+print(survivalFigureData, newpage = FALSE)
+dev.off()
+
+
+#survival by calender time for han and subsites for AURUM
+survivalFigureData <- survivalDatahan1 %>%
+  filter(Age == "All") %>%
+  filter(Gender == "Both") %>% 
+  filter(CalendarYearGp != "2000 to 2019") %>% 
+  filter(CalendarYearGp != "2000 to 2021") %>% 
+  filter(Database == "CPRD Aurum") %>% 
+  ggplot(aes(x = time,
+             y = est,
+             group = CalendarYearGp,
+             col = CalendarYearGp )) +
+  scale_y_continuous( labels = label_percent() ) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
+  scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash", "solid", "longdash")) +
+  geom_ribbon(aes(ymin = lcl, 
+                  ymax = ucl, 
+                  fill = CalendarYearGp), alpha = .1, color = NA, show.legend = FALSE) +
+  labs(x = "Time (Years)",
+       y = "Survival Probability",
+       col = "Calendar Year Group",
+       linetype = "Calendar Year Group") +
+  theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.box.spacing = unit(0, "pt") ,
+        legend.position='bottom',
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  xlim(0, 5) +
+  facet_wrap(~ Cancer, ncol = 3, scales = "free") 
+
+# ggh4x::facet_grid2(cols = vars(Database),vars(Cancer), scales="free_y", independent = "y") 
+
+plotname <- paste0("FIGURE_SX_survival_cy_han_subsites_AURUM.png")
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 8, height = 8, units = "in", res = 1200)
+print(survivalFigureData, newpage = FALSE)
+dev.off()
 
 #############################################################################################
 # breast cancer - make the axis non fixed so can see the IR/prev of the males
@@ -2410,7 +2820,7 @@ survivalFigureData <- survival_estimates %>%
         legend.box.spacing = unit(0, "pt") ,
         legend.key = element_rect(fill = "transparent", colour = "transparent"),
         legend.position='bottom') +
-  scale_x_continuous(breaks=seq(0, 20, 2))
+  scale_x_continuous(breaks=seq(0, 22, 2))
 
 plotname <- paste0("FIGURE5_KM_Males_Prostate.png")
 png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 6, height = 5 , units = "in", res = 1200)
