@@ -108,7 +108,7 @@ info(logger, "- Plotting incidence and period prevalence results: cancer populat
 # run plots for checking QC checking -----
 
 # incidence: whole population
-inc_yrs_plot <- study_results1$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
+inc_yrs_plot <- study_results$incidence_estimates %>%  # need to amend this bit of code to select the estimates relating to inc_yrs
   filter(denominator_cohort_id == 3 &
            denominator_age_group == "18;150" &
            analysis_interval == "years") %>%

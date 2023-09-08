@@ -1,6 +1,26 @@
 # instantiate outcome cohorts
 info(logger, "- getting incident outcome definitions")
 
+outcome_cohorts <- CDMConnector::readCohortSet(here::here(
+  "1_InstantiateCohorts",
+  "OutcomeCohorts"
+))
+
+prevalent_cohorts <- CDMConnector::readCohortSet(here::here(
+  "1_InstantiateCohorts",
+  "PrevalentCohorts"))
+
+outcome_cohorts_han <- CDMConnector::readCohortSet(here::here(
+  "1_InstantiateCohorts",
+  "HeadNeckSubtypes" ,
+  "OutcomeCohorts"
+))
+
+
+prevalent_cohorts_han <- CDMConnector::readCohortSet(here::here("1_InstantiateCohorts",
+                                                                "HeadNeckSubtypes" ,
+                                                                "PrevalentCohorts"))
+
 # only instanstiate cohorts if this argument is TRUE
 if (instantiatedCohorts == TRUE) {
   
@@ -12,29 +32,11 @@ if (instantiatedCohorts == TRUE) {
                                                       outcome_table_name_han,
                                                       prevalent_table_name_han))
   
-  outcome_cohorts <- CDMConnector::readCohortSet(here::here(
-    "1_InstantiateCohorts",
-    "OutcomeCohorts"
-  ))
-  
-  prevalent_cohorts <- readCohortSet(here::here(
-    "1_InstantiateCohorts",
-    "PrevalentCohorts"))
-  
-  outcome_cohorts_han <- CDMConnector::readCohortSet(here(
-    "1_InstantiateCohorts",
-    "HeadNeckSubtypes" ,
-    "OutcomeCohorts"
-  ))
-  
-  
-  prevalent_cohorts_han <- readCohortSet(here::here("1_InstantiateCohorts",
-                                                    "HeadNeckSubtypes" ,
-                                                    "PrevalentCohorts"))
   
 } else {
 
-
+print("Instantiating cancer cohorts")
+  
 info(logger, "- getting incident outcomes")
 
 cdm <- CDMConnector::generateCohortSet(cdm, 
@@ -49,7 +51,7 @@ info(logger, "- got outcomes")
 # instantiate prevalent outcome cohorts
 info(logger, "- getting prevalent outcomes")
 
-cdm <- generateCohortSet(cdm = cdm, 
+cdm <- CDMConnector::generateCohortSet(cdm = cdm, 
                          cohortSet = prevalent_cohorts,
                          name = prevalent_table_name,
                          overwrite = TRUE
@@ -83,7 +85,7 @@ if (grepl("CPRD", db.name) == TRUE) {
   info(logger, "- getting prevalent han outcomes")
 
   
-  cdm <- generateCohortSet(cdm = cdm, 
+  cdm <- CDMConnector::generateCohortSet(cdm = cdm, 
                            cohortSet = prevalent_cohorts_han,
                            name = prevalent_table_name_han,
                            overwrite = TRUE

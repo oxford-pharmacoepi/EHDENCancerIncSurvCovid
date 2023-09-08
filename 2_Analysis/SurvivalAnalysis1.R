@@ -655,6 +655,227 @@ exportSurvivalResults(result=calenderyr_results,
                       outputFolder=here::here("Results", db.name))
 
 
+
+#################################
+# KM for 1 and 2 year (covid paper)
+##################################
+
+if (agestandardization == TRUE) {
+  
+  grid <- c(0, 0.5, 1, 1.5, 2)
+  prbtime <- c(0.5,1,1.5,2)
+  
+  SurAnalysis1 <- function(dataset, outcomeCohort) {
+    
+    # whole population
+    observedsurprobsKM <- list()
+    observedrisktableKM <- list()
+    
+    # loop to carry out for each cancer
+    for(j in 1:nrow(outcomeCohort)) { 
+      
+      #subset the data by cancer type
+      data <- dataset %>%
+        filter(outcome_cohort_id == j)
+      
+      # get the risk table ---
+      observedrisktableKM[[j]] <- RiskSetCount(grid,data$time_years) %>%
+        rbind(grid) %>% as.data.frame() %>%
+        `colnames<-`(grid) %>%
+        mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All", Gender = "Both" ) %>%
+        slice(1)
+      
+      print(paste0("Extract risk table ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
+      
+      #grab survival probabilities 
+      sprob <- survfit(Surv(time_years, status) ~ 1, data=data) %>% 
+        summary(times = prbtime, extend = TRUE)
+      
+      cols <- lapply(c(2:15) , function(x) sprob[x])
+      observedsurprobsKM[[j]] <- do.call(data.frame, cols) %>%
+        mutate(Method = "Kaplan-Meier", 
+               Cancer = outcomeCohort$cohort_name[j],
+               Gender = "Both" ,
+               Age = "All" )
+      
+      print(paste0("survival probabilites from KM from observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
+      
+      
+    }
+    
+    # take the results from a list (one element for each cancer) and put into dataframe for KM survival
+    # observedkmcombined <- dplyr::bind_rows(observedkm) %>%
+    #   rename(est = estimate , ucl = conf.high, lcl = conf.low ) %>%
+    #   mutate(Stratification = "None")
+    # 
+    # medkmcombined <- dplyr::bind_rows(observedmedianKM) %>%
+    #   mutate(Stratification = "None")
+    
+    # generate the risk table and remove entries < 5 patients
+    risktableskm <- dplyr::bind_rows(observedrisktableKM) %>%
+      mutate(across(everything(), ~replace(., . ==  0 , NA))) %>%
+      mutate(across(everything(), ~replace(., .  <=  5 , "<5"))) %>%
+      replace(is.na(.), 0) %>%
+      relocate(Cancer) %>%
+      mutate(across(everything(), as.character)) %>%
+      mutate(Stratification = "None")
+    
+    #generate probabilities
+    sprobkmcombined <- dplyr::bind_rows(observedsurprobsKM) %>%
+      mutate(Stratification = "None")
+    
+    info(logger, 'KM analysis for whole population COMPLETE')
+    
+    # GENDER STRATIFICATION-----
+    
+    observedsurprobsKM_gender <- list()
+    observedrisktableKM_gender <- list()
+    
+    # loop to carry out for each cancer
+    for(j in 1:nrow(outcomeCohort)) { 
+      
+      #subset the data by cancer type
+      data <- dataset %>%
+        filter(outcome_cohort_id == j) 
+      
+      #creates a test that determines if both genders in the data
+      genderlevels <- data %>%
+        group_by(gender) %>% summarise(count = n()) %>% tally()
+      
+      # analysis wont run if only 1 gender present
+      if(genderlevels == 2){
+        
+        # get the risk table ---
+        
+        observedrisktableKM_gender[[j]] <- RiskSetCount(grid,data$time_years[data$gender == "Male"])%>%
+          rbind(grid) %>% as.data.frame() %>%
+          `colnames<-`(grid) %>%
+          mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All") %>%
+          slice(1) %>%
+          rbind(RiskSetCount(grid,data$time_years[data$gender == "Female"]))%>%
+          mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All", Gender = c("Male", "Female"))
+        
+        print(paste0("Extract risk table ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
+        
+        #grab survival probabilities
+        sprob <- survfit(Surv(time_years, status) ~ gender, data=data) %>%
+          summary(times = prbtime, extend = TRUE)
+        
+        cols <- lapply(c(2:16) , function(x) sprob[x])
+        observedsurprobsKM_gender[[j]] <- do.call(data.frame, cols) %>%
+          rename(Gender = strata) %>%
+          mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All", Gender = str_replace(Gender, "gender=Male", "Male"), Gender = str_replace(Gender,"gender=Female", "Female"))
+        
+        print(paste0("survival probabilites from KM from observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
+        
+      } else {
+        
+        print(paste0("Gender stratification KM analysis not carried out for ", outcomeCohort$cohort_name[j], " due to only 1 gender present " , Sys.time()))
+        
+      }
+      
+    } # this closes the loop on the analysis containing both genders
+    
+    
+    #generate the risk table and remove entries < 5 patients
+    risktableskm_gender <- dplyr::bind_rows(observedrisktableKM_gender) 
+    risktableskm_gender <- risktableskm_gender %>%
+      mutate_at(.vars = c(1:(ncol(risktableskm_gender)-4)), funs(ifelse(.== 0, NA, .))) %>%  
+      mutate_at(.vars = c(1:(ncol(risktableskm_gender)-4)), funs(ifelse(.<= 5, "<5", .))) %>%
+      replace(is.na(.), 0) %>%
+      relocate(Cancer) %>%
+      mutate(across(everything(), as.character)) %>%
+      mutate(Stratification = "Gender")
+    
+    #generate probabilities
+    sprobkmcombined_gender <- dplyr::bind_rows(observedsurprobsKM_gender) %>%
+      mutate(Stratification = "Gender")
+    
+    info(logger, 'KM analysis for gender stratification COMPLETE')
+    
+    
+    # combine all the survival results -----
+    
+    #risk table # error with characters and double formats
+    riskTableResults <- bind_rows(
+      risktableskm , # all
+      risktableskm_gender  
+    ) %>%
+      mutate(Database = db.name, CalenderYearGp = paste0(min(lubridate::year(lubridate::ymd(data$cohort_end_date))),"-",
+                                                         max(lubridate::year(lubridate::ymd(data$cohort_end_date)))))
+    
+    #1,5,10 survival probabilites results
+    SurvProb1510KMResults <- bind_rows( 
+      sprobkmcombined , # all
+      sprobkmcombined_gender 
+    ) %>%
+      mutate(Database = db.name, CalenderYearGp = paste0(min(lubridate::year(lubridate::ymd(data$cohort_end_date))),"-",
+                                                         max(lubridate::year(lubridate::ymd(data$cohort_end_date)))))
+    
+    # put results all together in a list
+    survival_study_results <- list(
+      riskTableResults,
+      
+      SurvProb1510KMResults)
+    
+    names(survival_study_results) <- c(paste0("risk_table_results"),
+                                       paste0("one_five_ten_survival_rates")
+    )
+    
+    
+    print(paste0("Survival Analysis completed"))
+    
+    return(survival_study_results)
+    
+  }  
+  
+  #SurResults1 <- list()
+  
+  for(l in 1:length(PopAll)) {
+    SurResults1[[l]] <- SurAnalysis1(dataset = PopAll[[l]],
+                                     outcomeCohort = outcome_cohorts)
+  }
+  
+  # extract calender year results
+  rtres <- list()
+  oftsrres <- list()
+  
+  # extract information for calender year (element 1 is whole population so start from 2:n)
+  for(q in 2:length(PopAll)) {
+    
+    rtres[[q]] <- SurResults1[[q]]$risk_table_results
+    oftsrres[[q]] <- SurResults1[[q]]$one_five_ten_survival_rates
+    
+  }
+  
+  # bind the results for calender years
+  risk_table_cy <- bind_rows(rtres)
+  survival_prob_cy <- bind_rows(oftsrres)
+  
+  calenderyr_results <- list(
+    risk_table_cy,
+    survival_prob_cy)
+  
+  names(calenderyr_results) <- c(paste0("risk_table_results_cy", db.name),
+                                 paste0("one_five_ten_survival_rates_cy", db.name))
+  
+  # zip results
+  print("Zipping results to output folder")
+  
+  
+  #calender year stratification for covid analysis
+  exportSurvivalResults(result=calenderyr_results,
+                        zipName= paste0(db.name, "CalenderYrSurvivalResults_covid"),
+                        outputFolder=here::here("Results", db.name))
+  
+}
+
+
+
+
+######################################
+# KM analysis for head and neck cancer subtypes
+####################################
 # for head and neck cancer substypes
 if (grepl("CPRD", db.name) == TRUE){
   
@@ -733,222 +954,4 @@ if (grepl("CPRD", db.name) == TRUE){
                         outputFolder=here::here("Results", db.name))
 
 }
-
-#################################
-# KM for 1 and 2 year
-##################################
-
-if (agestandardization == TRUE) {
-  
-  grid <- c(0, 0.5, 1, 1.5, 2)
-  prbtime <- c(0.5,1,1.5,2)
-  
-SurAnalysis1 <- function(dataset, outcomeCohort) {
-    
-    # whole population
-    observedsurprobsKM <- list()
-    observedrisktableKM <- list()
-    
-    # loop to carry out for each cancer
-    for(j in 1:nrow(outcomeCohort)) { 
-      
-      #subset the data by cancer type
-      data <- dataset %>%
-        filter(outcome_cohort_id == j)
-      
- 
-      # get the risk table ---
-      
-      observedrisktableKM[[j]] <- RiskSetCount(grid,data$time_years) %>%
-        rbind(grid) %>% as.data.frame() %>%
-        `colnames<-`(grid) %>%
-        mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All", Gender = "Both" ) %>%
-        slice(1)
-      
-      print(paste0("Extract risk table ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
-      
- 
-      #grab survival probabilities 
-      sprob <- survfit(Surv(time_years, status) ~ 1, data=data) %>% 
-        summary(times = prbtime, extend = TRUE)
-      
-      cols <- lapply(c(2:15) , function(x) sprob[x])
-      observedsurprobsKM[[j]] <- do.call(data.frame, cols) %>%
-        mutate(Method = "Kaplan-Meier", 
-               Cancer = outcomeCohort$cohort_name[j],
-               Gender = "Both" ,
-               Age = "All" )
-      
-      print(paste0("survival probabilites from KM from observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
-      
-      
-    }
-    
-    # take the results from a list (one element for each cancer) and put into dataframe for KM survival
-    observedkmcombined <- dplyr::bind_rows(observedkm) %>%
-      rename(est = estimate , ucl = conf.high, lcl = conf.low ) %>%
-      mutate(Stratification = "None")
-    
-    medkmcombined <- dplyr::bind_rows(observedmedianKM) %>%
-      mutate(Stratification = "None")
-    
-    # generate the risk table and remove entries < 5 patients
-    risktableskm <- dplyr::bind_rows(observedrisktableKM) %>%
-      mutate(across(everything(), ~replace(., . ==  0 , NA))) %>%
-      mutate(across(everything(), ~replace(., .  <=  5 , "<5"))) %>%
-      replace(is.na(.), 0) %>%
-      relocate(Cancer) %>%
-      mutate(across(everything(), as.character)) %>%
-      mutate(Stratification = "None")
-    
-    #generate probabilities
-    sprobkmcombined <- dplyr::bind_rows(observedsurprobsKM) %>%
-      mutate(Stratification = "None")
-    
-    info(logger, 'KM analysis for whole population COMPLETE')
-    
-    # GENDER STRATIFICATION-----
-    
-    observedsurprobsKM_gender <- list()
-    observedrisktableKM_gender <- list()
-    
-    # loop to carry out for each cancer
-    for(j in 1:nrow(outcomeCohort)) { 
-      
-      #subset the data by cancer type
-      data <- dataset %>%
-        filter(outcome_cohort_id == j) 
-
-      #creates a test that determines if both genders in the data
-      genderlevels <- data %>%
-        group_by(gender) %>% summarise(count = n()) %>% tally()
-      
-      # analysis wont run if only 1 gender present
-      if(genderlevels == 2){
-        
-        # get the risk table ---
-        
-        observedrisktableKM_gender[[j]] <- RiskSetCount(grid,data$time_years[data$gender == "Male"])%>%
-          rbind(grid) %>% as.data.frame() %>%
-          `colnames<-`(grid) %>%
-          mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All") %>%
-          slice(1) %>%
-          rbind(RiskSetCount(grid,data$time_years[data$gender == "Female"]))%>%
-          mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All", Gender = c("Male", "Female"))
-        
-        print(paste0("Extract risk table ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
-        
-        #grab survival probabilities
-        sprob <- survfit(Surv(time_years, status) ~ gender, data=data) %>%
-          summary(times = prbtime, extend = TRUE)
-        
-        cols <- lapply(c(2:16) , function(x) sprob[x])
-        observedsurprobsKM_gender[[j]] <- do.call(data.frame, cols) %>%
-          rename(Gender = strata) %>%
-          mutate(Method = "Kaplan-Meier", Cancer = outcomeCohort$cohort_name[j], Age = "All", Gender = str_replace(Gender, "gender=Male", "Male"), Gender = str_replace(Gender,"gender=Female", "Female"))
-        
-        print(paste0("survival probabilites from KM from observed data ", Sys.time()," for ",outcomeCohort$cohort_name[j], " completed"))
-        
-      } else {
-        
-        print(paste0("Gender stratification KM analysis not carried out for ", outcomeCohort$cohort_name[j], " due to only 1 gender present " , Sys.time()))
-        
-      }
-      
-    } # this closes the loop on the analysis containing both genders
-    
-    
-    #generate the risk table and remove entries < 5 patients
-    risktableskm_gender <- dplyr::bind_rows(observedrisktableKM_gender) 
-    risktableskm_gender <- risktableskm_gender %>%
-      mutate_at(.vars = c(1:(ncol(risktableskm_gender)-4)), funs(ifelse(.== 0, NA, .))) %>%  
-      mutate_at(.vars = c(1:(ncol(risktableskm_gender)-4)), funs(ifelse(.<= 5, "<5", .))) %>%
-      replace(is.na(.), 0) %>%
-      relocate(Cancer) %>%
-      mutate(across(everything(), as.character)) %>%
-      mutate(Stratification = "Gender")
-    
-    #generate probabilities
-    sprobkmcombined_gender <- dplyr::bind_rows(observedsurprobsKM_gender) %>%
-      mutate(Stratification = "Gender")
-    
-    info(logger, 'KM analysis for gender stratification COMPLETE')
-    
-
-    # combine all the survival results -----
-
-    #risk table # error with characters and double formats
-    riskTableResults <- bind_rows(
-      risktableskm , # all
-      risktableskm_gender  
-    ) %>%
-      mutate(Database = db.name, CalenderYearGp = paste0(min(lubridate::year(lubridate::ymd(data$cohort_end_date))),"-",
-                                                         max(lubridate::year(lubridate::ymd(data$cohort_end_date)))))
-    
-    #1,5,10 survival probabilites results
-    SurvProb1510KMResults <- bind_rows( 
-      sprobkmcombined , # all
-      sprobkmcombined_gender 
-    ) %>%
-      mutate(Database = db.name, CalenderYearGp = paste0(min(lubridate::year(lubridate::ymd(data$cohort_end_date))),"-",
-                                                         max(lubridate::year(lubridate::ymd(data$cohort_end_date)))))
-    
-    # put results all together in a list
-    survival_study_results <- list(
-                                   riskTableResults,
-                                  
-                                   SurvProb1510KMResults)
-    
-    names(survival_study_results) <- c(paste0("risk_table_results"),
-                                  paste0("one_five_ten_survival_rates")
-    )
-    
-    
-    print(paste0("Survival Analysis completed"))
-    
-    return(survival_study_results)
-    
-  }  
-
-SurResults1 <- list()
-
-for(l in 1:length(PopAll)) {
-  SurResults1[[l]] <- SurAnalysis1(dataset = PopAll[[l]],
-                                 outcomeCohort = outcome_cohorts)
-}
-
-# extract calender year results
-rtres <- list()
-oftsrres <- list()
-
-# extract information for calender year (element 1 is whole population so start from 2:n)
-for(q in 2:length(PopAll)) {
-  
-  rtres[[q]] <- SurResults1[[q]]$risk_table_results
-  oftsrres[[q]] <- SurResults1[[q]]$one_five_ten_survival_rates
-  
-}
-
-# bind the results for calender years
-risk_table_cy <- bind_rows(rtres)
-survival_prob_cy <- bind_rows(oftsrres)
-
-calenderyr_results <- list(
-  risk_table_cy,
-  survival_prob_cy)
-
-names(calenderyr_results) <- c(paste0("risk_table_results_cy", db.name),
-                                   paste0("one_five_ten_survival_rates_cy", db.name))
-
-# zip results
-print("Zipping results to output folder")
-
-
-#calender year stratification for covid analysis
-exportSurvivalResults(result=calenderyr_results,
-                      zipName= paste0(db.name, "CalenderYrSurvivalResults_covid"),
-                      outputFolder=here::here("Results", db.name))
-
-}
-
 
