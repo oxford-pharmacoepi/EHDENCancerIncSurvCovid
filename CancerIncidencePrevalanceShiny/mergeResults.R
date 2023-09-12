@@ -70,7 +70,7 @@ prepare_output<-function(result){
   
   result <- result %>%
     mutate(database_name = replace(database_name, database_name == "CPRDAurum", "CPRD Aurum")) %>%
-    mutate(database_name = replace(database_name, database_name == "CPRDGoldUpdate", "CPRD GOLD")) 
+    mutate(database_name = replace(database_name, database_name == "CPRDGoldUpdate2", "CPRD GOLD")) 
   
   #filter out the results for both genders for prostate cancer (as cohort only in male)
   result <- result %>%
@@ -127,7 +127,7 @@ prepare_output_survival <- function(result){
   
   result <- result %>%
     mutate(Database = replace(Database, Database == "CPRDAurum", "CPRD Aurum")) %>%
-    mutate(Database = replace(Database, Database == "CPRDGoldUpdate", "CPRD GOLD")) 
+    mutate(Database = replace(Database, Database == "CPRDGoldUpdate2", "CPRD GOLD")) 
   
   result <- result %>%
     mutate(Gender=replace(Gender, Cancer=="Prostate", "Male"))
@@ -173,7 +173,7 @@ prepare_output_table1 <- function(result){
   
   result <- result %>%
     mutate(Database = replace(Database, Database == "CPRDAurum", "CPRD Aurum")) %>%
-    mutate(Database = replace(Database, Database == "CPRDGoldUpdate", "CPRD GOLD")) 
+    mutate(Database = replace(Database, Database == "CPRDGoldUpdate2", "CPRD GOLD")) 
   
   
   

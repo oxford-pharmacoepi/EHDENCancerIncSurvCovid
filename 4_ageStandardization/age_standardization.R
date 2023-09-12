@@ -14,144 +14,142 @@ library(dsr)
 #dsr package needs a specific version to work 
 # packageurl <- "https://cran.r-project.org/src/contrib/Archive/dsr/dsr_0.2.2.tar.gz"
 # install.packages(packageurl, repos=NULL, type="source")
-
-library(dsr)
 #folder of data
 datapath <- "C:/Users/dnewby/Documents/GitHub/EHDENCancerIncidencePrevalence/4_ageStandardization/data"
 #path to european population standard 2013
 ESP13path <- "C:/Users/dnewby/Documents/GitHub/EHDENCancerIncidencePrevalence/4_ageStandardization/ESP13.csv"
 
-# printing numbers with 3 decimal place and commas 
-# nice.num3<-function(x) {
-#   trimws(format(round(x,3),
-#                 big.mark=",", nsmall = 3, digits=3, scientific=FALSE))}
-# 
-# nice.num2<-function(x) {
-#   trimws(format(round(x,2),
-#                 big.mark=",", nsmall = 2, digits=2, scientific=FALSE))}
-# 
-# 
-# # read in incidence - prevalence data and process
-# prepare_output<-function(result){
-#   result <- result %>%
-#     
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerHypopharynx", "Hypopharynx")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerLarynx", "Larynx")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerNasalCavitySinus", "Nasal Cavity & Sinus")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerNasopharynx", "Nasopharynx")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerOralCavityPrevalent", "Oral Cavity")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerOropharynx", "Oropharynx")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerSalivaryGland", "Salivary Gland")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerTonguePrevalent", "Tongue")) %>% 
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerOralCavityIncidence", "Oral Cavity")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerTongueIncidence", "Tongue")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentProstateCancer", "Prostate")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentLungCancer", "Lung")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentBreastCancer", "Breast")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentColorectalCancer", "Colorectal")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentHeadNeckCancer", "Head & Neck")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentLiverCancer", "Liver")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentPancreaticCancer", "Pancreas")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentStomachCancer", "Stomach")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentEsophagealCancer", "Oesophagus")) %>%    
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentProstateCancer", "Prostate")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentLungCancer", "Lung")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentBreastCancer", "Breast")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentColorectalCancer", "Colorectal")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentHeadNeckCancer", "Head & Neck")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentLiverCancer", "Liver")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentPancreaticCancer", "Pancreas")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentStomachCancer", "Stomach")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentEsophagealCancer", "Oesophagus")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantBreastCancer", "Breast")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantColorectalCancer", "Colorectal")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantHeadNeckCancer", "Head & Neck")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
-#     mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "ProstateCancerMaleOnly", "Prostate"))
-#   
-#   
-#   result<- result %>% 
-#     mutate(denominator_age_group= stringr::str_replace(denominator_age_group, ";", " to ")) %>% 
-#     mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "18 to 150", "All")) %>% 
-#     mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "90 to 150", "90 +")) %>% 
-#     mutate(denominator_age_group = factor(denominator_age_group,
-#                                           levels = c("All",
-#                                                      "18 to 29", "30 to 39", "40 to 49",
-#                                                      "50 to 59", "60 to 69", "70 to 79",
-#                                                      "80 to 89", "90 +" )))
-#   
-#   result <- result %>%
-#     mutate(database_name = replace(database_name, database_name == "CPRDAurum", "CPRD Aurum")) %>%
-#     mutate(database_name = replace(database_name, database_name == "CPRDGoldUpdate", "CPRD GOLD")) 
-#   
-#   #filter out the results for both genders for prostate cancer (as cohort only in male)
-#   result <- result %>%
-#     filter(!(outcome_cohort_name == "Prostate" & denominator_sex == "Both")) %>%
-#     filter(!(outcome_cohort_name == "Prostate" & denominator_sex == "Female")) 
-#   
-#   return(result)
-# } # need to update this for the different files
-# 
-# # Load, prepare, and merge results -----
-# results <-list.files(datapath, full.names = TRUE,
-#                      recursive = TRUE,
-#                      include.dirs = TRUE,
-#                      pattern = ".zip")
-# 
-# #unzip data
-# for (i in (1:length(results))) {
-#   utils::unzip(zipfile = results[[i]],
-#                exdir = datapath)
-# }
-# 
-# #grab the results from the folders
-# results <- list.files(
-#   path = datapath,
-#   pattern = ".csv",
-#   full.names = TRUE,
-#   recursive = TRUE,
-#   include.dirs = TRUE
-# )
-# 
-# 
-# # merge the prevalence estimates
-# prevalence_estimates_files<-results[stringr::str_detect(results, ".csv")]
-# prevalence_estimates_files<-results[stringr::str_detect(results, "prevalence_estimates")]
-# 
-# 
-# prevalence_estimates <- list()
-# for(i in seq_along(prevalence_estimates_files)){
-#   prevalence_estimates[[i]]<-readr::read_csv(prevalence_estimates_files[[i]], 
-#                                              show_col_types = FALSE)  
-# }
-# prevalence_estimates <- dplyr::bind_rows(prevalence_estimates)
-# prevalence_estimates <- prepare_output(prevalence_estimates)
-# prevalence_estimates <- prevalence_estimates %>% 
-#   mutate("Prevalence (95% CI)"= ifelse(!is.na(prevalence),
-#                                        paste0(paste0(nice.num3(prevalence*100), "%"), " (",
-#                                               paste0(nice.num3(prevalence_95CI_lower*100), "%")," to ", 
-#                                               paste0(nice.num3(prevalence_95CI_upper*100), "%"), ")"),
-#                                        NA
-#   ))
-# saveRDS(prevalence_estimates, 
-#         paste0(datapath, "/prevalence_estimates.rds"))
-# 
-# incidence_estimates_files<-results[stringr::str_detect(results, ".csv")]
-# incidence_estimates_files<-results[stringr::str_detect(results, "incidence_estimates")]
-# incidence_estimates <- list()
-# for(i in seq_along(incidence_estimates_files)){
-#   incidence_estimates[[i]]<-readr::read_csv(incidence_estimates_files[[i]], 
-#                                             show_col_types = FALSE)  
-# }
-# incidence_estimates <- dplyr::bind_rows(incidence_estimates)
-# incidence_estimates <- prepare_output(incidence_estimates)
-# 
-# saveRDS(incidence_estimates, 
-#         paste0(datapath,  "/incidence_estimates.rds"))
+#printing numbers with 3 decimal place and commas
+nice.num3<-function(x) {
+  trimws(format(round(x,3),
+                big.mark=",", nsmall = 3, digits=3, scientific=FALSE))}
+
+nice.num2<-function(x) {
+  trimws(format(round(x,2),
+                big.mark=",", nsmall = 2, digits=2, scientific=FALSE))}
+
+
+# read in incidence - prevalence data and process
+prepare_output<-function(result){
+  result <- result %>%
+
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerHypopharynx", "Hypopharynx")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerLarynx", "Larynx")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerNasalCavitySinus", "Nasal Cavity & Sinus")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerNasopharynx", "Nasopharynx")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerOralCavityPrevalent", "Oral Cavity")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerOropharynx", "Oropharynx")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerSalivaryGland", "Salivary Gland")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerTonguePrevalent", "Tongue")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerOralCavityIncidence", "Oral Cavity")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "HeadNeckSubtypeCancerTongueIncidence", "Tongue")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentProstateCancer", "Prostate")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentLungCancer", "Lung")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentBreastCancer", "Breast")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentColorectalCancer", "Colorectal")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentHeadNeckCancer", "Head & Neck")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentLiverCancer", "Liver")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentPancreaticCancer", "Pancreas")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentStomachCancer", "Stomach")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "IncidentEsophagealCancer", "Oesophagus")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentProstateCancer", "Prostate")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentLungCancer", "Lung")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentBreastCancer", "Breast")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentColorectalCancer", "Colorectal")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentHeadNeckCancer", "Head & Neck")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentLiverCancer", "Liver")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentPancreaticCancer", "Pancreas")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentStomachCancer", "Stomach")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "PrevalentEsophagealCancer", "Oesophagus")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantProstateCancer", "Prostate")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLungCancer", "Lung")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantBreastCancer", "Breast")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantColorectalCancer", "Colorectal")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantHeadNeckCancer", "Head & Neck")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantLiverCancer", "Liver")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantPancreaticCancer", "Pancreas")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "MalignantStomachCancer", "Stomach")) %>%
+    mutate(outcome_cohort_name = replace(outcome_cohort_name, outcome_cohort_name == "ProstateCancerMaleOnly", "Prostate"))
+
+
+  result<- result %>%
+    mutate(denominator_age_group= stringr::str_replace(denominator_age_group, ";", " to ")) %>%
+    mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "18 to 150", "All")) %>%
+    mutate(denominator_age_group = replace(denominator_age_group, denominator_age_group == "90 to 150", "90 +")) %>%
+    mutate(denominator_age_group = factor(denominator_age_group,
+                                          levels = c("All",
+                                                     "18 to 29", "30 to 39", "40 to 49",
+                                                     "50 to 59", "60 to 69", "70 to 79",
+                                                     "80 to 89", "90 +" )))
+
+  result <- result %>%
+    mutate(database_name = replace(database_name, database_name == "CPRDAurum", "CPRD Aurum")) %>%
+    mutate(database_name = replace(database_name, database_name == "CPRDGoldUpdate2", "CPRD GOLD"))
+
+  #filter out the results for both genders for prostate cancer (as cohort only in male)
+  result <- result %>%
+    filter(!(outcome_cohort_name == "Prostate" & denominator_sex == "Both")) %>%
+    filter(!(outcome_cohort_name == "Prostate" & denominator_sex == "Female"))
+
+  return(result)
+} # need to update this for the different files
+
+# Load, prepare, and merge results -----
+results <-list.files(datapath, full.names = TRUE,
+                     recursive = TRUE,
+                     include.dirs = TRUE,
+                     pattern = ".zip")
+
+#unzip data
+for (i in (1:length(results))) {
+  utils::unzip(zipfile = results[[i]],
+               exdir = datapath)
+}
+
+#grab the results from the folders
+results <- list.files(
+  path = datapath,
+  pattern = ".csv",
+  full.names = TRUE,
+  recursive = TRUE,
+  include.dirs = TRUE
+)
+
+
+# merge the prevalence estimates
+prevalence_estimates_files<-results[stringr::str_detect(results, ".csv")]
+prevalence_estimates_files<-results[stringr::str_detect(results, "prevalence_estimates")]
+
+
+prevalence_estimates <- list()
+for(i in seq_along(prevalence_estimates_files)){
+  prevalence_estimates[[i]]<-readr::read_csv(prevalence_estimates_files[[i]],
+                                             show_col_types = FALSE)
+}
+prevalence_estimates <- dplyr::bind_rows(prevalence_estimates)
+prevalence_estimates <- prepare_output(prevalence_estimates)
+prevalence_estimates <- prevalence_estimates %>%
+  mutate("Prevalence (95% CI)"= ifelse(!is.na(prevalence),
+                                       paste0(paste0(nice.num3(prevalence*100), "%"), " (",
+                                              paste0(nice.num3(prevalence_95CI_lower*100), "%")," to ",
+                                              paste0(nice.num3(prevalence_95CI_upper*100), "%"), ")"),
+                                       NA
+  ))
+saveRDS(prevalence_estimates,
+        paste0(datapath, "/prevalence_estimates.rds"))
+
+incidence_estimates_files<-results[stringr::str_detect(results, ".csv")]
+incidence_estimates_files<-results[stringr::str_detect(results, "incidence_estimates")]
+incidence_estimates <- list()
+for(i in seq_along(incidence_estimates_files)){
+  incidence_estimates[[i]]<-readr::read_csv(incidence_estimates_files[[i]],
+                                            show_col_types = FALSE)
+}
+incidence_estimates <- dplyr::bind_rows(incidence_estimates)
+incidence_estimates <- prepare_output(incidence_estimates)
+
+saveRDS(incidence_estimates,
+        paste0(datapath,  "/incidence_estimates.rds"))
 
 #read in the incidence and prevalence files
 prevalence_estimates <- readRDS(paste0(datapath ,"/prevalence_estimates.rds"))
@@ -347,6 +345,7 @@ saveRDS(agestandardizedprev_final, paste0(datapath ,"/prevalence_estimates_age_s
 
 #load the results
 agestandardizedinc_final <- readRDS(paste0(datapath ,"/incidence_estimates_age_sd.rds"))
+
 ###################################################
 #plot the results of new age adjusted results INCIDENCE
 incidenceFigureData <- agestandardizedinc_final %>%
@@ -429,12 +428,14 @@ prevalenceFigureData <- agestandardizedprev_final %>%
   facet_wrap(~ Cancer, scales = "free_y", ncol = 3)
 
 
-plotname <- paste0("PPsWholePop_multipleCancers_age_adjusted.png")
+plotname <- paste0("/PPsWholePop_multipleCancers_age_adjusted.pdf")
 
-png(paste0(datapath , plotname),
-    width = 8, height = 7.5, units = "in", res = 1200)
+pdf(paste0(datapath , plotname),
+    width = 10, height = 9.5)
 print(prevalenceFigureData, newpage = FALSE)
+
 dev.off()
+
 
 
 
