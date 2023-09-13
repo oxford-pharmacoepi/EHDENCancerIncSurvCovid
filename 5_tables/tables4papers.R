@@ -73,7 +73,7 @@ prepare_output_survival <- function(result){
   
   result <- result %>%
     mutate(Database = replace(Database, Database == "CPRDAurum", "CPRD Aurum")) %>%
-    mutate(Database = replace(Database, Database == "CPRDGoldUpdate", "CPRD GOLD")) 
+    mutate(Database = replace(Database, Database == "CPRDGoldUpdate2", "CPRD GOLD")) 
   
   result <- result %>%
     mutate(Gender=replace(Gender, Cancer=="Prostate", "Male"))
@@ -232,7 +232,7 @@ prepare_output_table1 <- function(result){
   
   result <- result %>%
     mutate(Database = replace(Database, Database == "CPRDAurum", "CPRD Aurum")) %>%
-    mutate(Database = replace(Database, Database == "CPRDGoldUpdate", "CPRD GOLD")) 
+    mutate(Database = replace(Database, Database == "CPRDGoldUpdate2", "CPRD GOLD")) 
   
   
   
@@ -241,13 +241,14 @@ prepare_output_table1 <- function(result){
 
 
 table1_files<-results[stringr::str_detect(results, ".csv")]
-table1_files<-results[stringr::str_detect(results, "Table1")]
+table1_files<-results[stringr::str_detect(results, "Table1CalenderYr")]
 
 table1_results <- list()
 for(i in seq_along(table1_files)){
   table1_results[[i]]<-readr::read_csv(table1_files[[i]], 
                                        show_col_types = FALSE)  
 }
+
 table1_results <- dplyr::bind_rows(table1_results)
 
 table1_results <- prepare_output_table1(table1_results)
@@ -277,7 +278,7 @@ table1_results <- table1_results %>%
 
 # remove rows we dont need
 table1_results <- table1_results %>% 
-  filter(!grepl("Sex: Female",var)) %>%
+  #filter(!grepl("Sex: Female",var)) %>%
   filter(!grepl("Death: Alive",var)) %>%
   filter(!grepl("Prior_history_days_study_start",var))%>%
   filter(!grepl("Prior_history_years_start",var)) %>%
@@ -323,6 +324,8 @@ table1_results <- table1_results %>%
   filter(!grepl("nash",var)) %>%
   filter(!grepl("nonalcoholicfattyliver",var)) %>%
   filter(!grepl("obesity_obs_cond",var)) %>% 
+  filter(!grepl("alcohol",var)) %>% 
+  filter(!grepl("nafld",var)) %>% 
   select(c(var, Variable, Cancer, Calendar_year ))
 
 
@@ -336,11 +339,311 @@ table1_results <- table1_results %>%
 
 write.csv(table1_results ,file = paste0(datapath, "/S3patientcharacteristics_cy_covid_paper.csv")) 
 
+# make the table one for main paper
+table1_files1<-results[stringr::str_detect(results, ".csv")]
+table1_files1<-results[stringr::str_detect(results, "Table1")]
+
+table1_files1  <- table1_files1[1]
+
+table1_results1 <- list()
+
+for(i in seq_along(table1_files1)){
+  table1_results1[[i]]<-readr::read_csv(table1_files1[[i]], 
+                                       show_col_types = FALSE) 
+}
+
+
+
+table1_results1 <- dplyr::bind_rows(table1_results1)
+
+table1_results1 <- prepare_output_table1(table1_results1)
+
+# table1_results <- table1_results %>% 
+#   distinct()
+
+table1_results1 <- table1_results1 %>% 
+  mutate("Variable"= ifelse(!is.na(percent),
+                            paste0(n, " (",
+                                   paste0(percent, ")")),
+                            NA
+  )) %>%
+  mutate("Variable1"= ifelse(!is.na(mean),
+                             paste0(mean, " (SD ",
+                                    paste0(standard_deviation, ")")),
+                             NA
+  )) %>%
+  mutate("Variable2"= ifelse(!is.na(median),
+                             paste0(median, " (",
+                                    paste0(interquartile_range, ")")),
+                             NA
+  )) %>%
+  mutate(Variable = case_when(n == "<5" ~ "<5", TRUE ~ Variable)) %>%
+  mutate(Variable = coalesce(Variable, Variable2)) %>%
+  mutate(Variable = coalesce(Variable, n))
+
+# remove rows we dont need
+table1_results1 <- table1_results1 %>% 
+  #filter(!grepl("Sex: Female",var)) %>%
+  filter(!grepl("Death: Alive",var)) %>%
+  filter(!grepl("Prior_history_days_study_start",var))%>%
+  filter(!grepl("Prior_history_years_start",var)) %>%
+  filter(!grepl("Death: Dead",var)) %>%
+  filter(!grepl("time_days",var)) %>%
+  filter(!grepl("time_years",var)) %>%
+  filter(!grepl("DiabetesMellitus",var)) %>%
+  filter(!grepl("Prior_history_years",var)) %>%
+  filter(!grepl("CoronaryArteriosclerosis",var)) %>%
+  filter(!grepl("CrohnsDisease",var)) %>%
+  filter(!grepl("GastroesophagealRefluxDisease",var)) %>%
+  filter(!grepl("^HeartDisease",var)) %>%
+  filter(!grepl("HepatitisC",var)) %>%
+  filter(!grepl("HIV",var)) %>%
+  filter(!grepl("HpyloriGIInfection",var)) %>%
+  filter(!grepl("LesionLiver",var)) %>%
+  filter(!grepl("Obesity",var)) %>%
+  filter(!grepl("PeripheralVascularDisease",var)) %>%
+  filter(!grepl("Pneumonia",var)) %>%
+  filter(!grepl("Psoriasis",var)) %>%
+  filter(!grepl("RheumatoidArthritis",var)) %>%
+  filter(!grepl("Schizophrenia",var)) %>%
+  filter(!grepl("UlcerativeColitis",var)) %>%
+  filter(!grepl("UTIDisease",var)) %>%
+  filter(!grepl("VisualSystemDisorder",var)) %>%
+  filter(!grepl("IncidentBreastCancer",var)) %>%
+  filter(!grepl("IncidentColorectalCancer",var)) %>%
+  filter(!grepl("IncidentEsophagealCancer",var)) %>%
+  filter(!grepl("IncidentHeadNeckCancer",var)) %>%
+  filter(!grepl("IncidentLiverCancer",var)) %>%
+  filter(!grepl("IncidentLungCancer",var)) %>%
+  filter(!grepl("IncidentPancreaticCancer",var)) %>%
+  filter(!grepl("IncidentProstateCancer",var)) %>%
+  filter(!grepl("IncidentStomachCancer",var)) %>%
+  filter(!grepl("alcoholicliverdamage",var)) %>%
+  filter(!grepl("alcoholism",var)) %>%
+  filter(!grepl("alphaantitrypsindeficiency",var)) %>%
+  filter(!grepl("autoimmunehepatitis",var)) %>%
+  filter(!grepl("diseaseofliver",var)) %>%
+  filter(!grepl("Hemochromatosis",var)) %>%
+  filter(!grepl("hepb",var)) %>%
+  filter(!grepl("hypercholesterolemia",var)) %>%
+  filter(!grepl("nash",var)) %>%
+  filter(!grepl("nonalcoholicfattyliver",var)) %>%
+  filter(!grepl("obesity_obs_cond",var)) %>% 
+  filter(!grepl("alcohol",var)) %>% 
+  filter(!grepl("nafld",var)) %>% 
+  select(c(var, Variable, Cancer)) %>% 
+  mutate(Gender = "Both") %>% 
+  mutate(across(everything(), as.character))
+
+
+# read in males
+table1_files2<-results[stringr::str_detect(results, ".csv")]
+table1_files2<-results[stringr::str_detect(results, "Table1")]
+
+table1_files2  <- table1_files2[3]
+
+table1_results2 <- list()
+
+for(i in seq_along(table1_files2)){
+  table1_results2[[i]]<-readr::read_csv(table1_files2[[i]], 
+                                        show_col_types = FALSE) 
+}
+
+
+
+table1_results2 <- dplyr::bind_rows(table1_results2)
+
+table1_results2 <- prepare_output_table1(table1_results2)
+
+table1_results2 <- table1_results2 %>% 
+  mutate("Variable"= ifelse(!is.na(percent),
+                            paste0(n, " (",
+                                   paste0(percent, ")")),
+                            NA
+  )) %>%
+  mutate("Variable1"= ifelse(!is.na(mean),
+                             paste0(mean, " (SD ",
+                                    paste0(standard_deviation, ")")),
+                             NA
+  )) %>%
+  mutate("Variable2"= ifelse(!is.na(median),
+                             paste0(median, " (",
+                                    paste0(interquartile_range, ")")),
+                             NA
+  )) %>%
+  mutate(Variable = case_when(n == "<5" ~ "<5", TRUE ~ Variable)) %>%
+  mutate(Variable = coalesce(Variable, Variable2)) %>%
+  mutate(Variable = coalesce(Variable, n))
+
+# remove rows we dont need
+table1_results2 <- table1_results2 %>% 
+ # filter(!grepl("Sex: Female",var)) %>%
+  filter(!grepl("Death: Alive",var)) %>%
+  filter(!grepl("Prior_history_days_study_start",var))%>%
+  filter(!grepl("Prior_history_years_start",var)) %>%
+  filter(!grepl("Death: Dead",var)) %>%
+  filter(!grepl("time_days",var)) %>%
+  filter(!grepl("time_years",var)) %>%
+  filter(!grepl("DiabetesMellitus",var)) %>%
+  filter(!grepl("Prior_history_years",var)) %>%
+  filter(!grepl("CoronaryArteriosclerosis",var)) %>%
+  filter(!grepl("CrohnsDisease",var)) %>%
+  filter(!grepl("GastroesophagealRefluxDisease",var)) %>%
+  filter(!grepl("^HeartDisease",var)) %>%
+  filter(!grepl("HepatitisC",var)) %>%
+  filter(!grepl("HIV",var)) %>%
+  filter(!grepl("HpyloriGIInfection",var)) %>%
+  filter(!grepl("LesionLiver",var)) %>%
+  filter(!grepl("Obesity",var)) %>%
+  filter(!grepl("PeripheralVascularDisease",var)) %>%
+  filter(!grepl("Pneumonia",var)) %>%
+  filter(!grepl("Psoriasis",var)) %>%
+  filter(!grepl("RheumatoidArthritis",var)) %>%
+  filter(!grepl("Schizophrenia",var)) %>%
+  filter(!grepl("UlcerativeColitis",var)) %>%
+  filter(!grepl("UTIDisease",var)) %>%
+  filter(!grepl("VisualSystemDisorder",var)) %>%
+  filter(!grepl("IncidentBreastCancer",var)) %>%
+  filter(!grepl("IncidentColorectalCancer",var)) %>%
+  filter(!grepl("IncidentEsophagealCancer",var)) %>%
+  filter(!grepl("IncidentHeadNeckCancer",var)) %>%
+  filter(!grepl("IncidentLiverCancer",var)) %>%
+  filter(!grepl("IncidentLungCancer",var)) %>%
+  filter(!grepl("IncidentPancreaticCancer",var)) %>%
+  filter(!grepl("IncidentProstateCancer",var)) %>%
+  filter(!grepl("IncidentStomachCancer",var)) %>%
+  filter(!grepl("alcoholicliverdamage",var)) %>%
+  filter(!grepl("alcoholism",var)) %>%
+  filter(!grepl("alphaantitrypsindeficiency",var)) %>%
+  filter(!grepl("autoimmunehepatitis",var)) %>%
+  filter(!grepl("diseaseofliver",var)) %>%
+  filter(!grepl("Hemochromatosis",var)) %>%
+  filter(!grepl("hepb",var)) %>%
+  filter(!grepl("hypercholesterolemia",var)) %>%
+  filter(!grepl("nash",var)) %>%
+  filter(!grepl("nonalcoholicfattyliver",var)) %>%
+  filter(!grepl("obesity_obs_cond",var)) %>% 
+  filter(!grepl("alcohol",var)) %>% 
+  filter(!grepl("nafld",var)) %>% 
+  select(c(var, Variable, Cancer, Gender)) 
+
+
+
+# read in females
+table1_files3<-results[stringr::str_detect(results, ".csv")]
+table1_files3<-results[stringr::str_detect(results, "Table1")]
+
+table1_files3  <- table1_files3[2]
+
+table1_results3 <- list()
+
+for(i in seq_along(table1_files3)){
+  table1_results3[[i]]<-readr::read_csv(table1_files3[[i]], 
+                                        show_col_types = FALSE) 
+}
+
+
+
+table1_results3 <- dplyr::bind_rows(table1_results3)
+
+table1_results3 <- prepare_output_table1(table1_results3)
+
+table1_results3 <- table1_results3 %>% 
+  mutate("Variable"= ifelse(!is.na(percent),
+                            paste0(n, " (",
+                                   paste0(percent, ")")),
+                            NA
+  )) %>%
+  mutate("Variable1"= ifelse(!is.na(mean),
+                             paste0(mean, " (SD ",
+                                    paste0(standard_deviation, ")")),
+                             NA
+  )) %>%
+  mutate("Variable2"= ifelse(!is.na(median),
+                             paste0(median, " (",
+                                    paste0(interquartile_range, ")")),
+                             NA
+  )) %>%
+  mutate(Variable = case_when(n == "<5" ~ "<5", TRUE ~ Variable)) %>%
+  mutate(Variable = coalesce(Variable, Variable2)) %>%
+  mutate(Variable = coalesce(Variable, n))
+
+# remove rows we dont need
+table1_results3 <- table1_results3 %>% 
+  # filter(!grepl("Sex: Female",var)) %>%
+  filter(!grepl("Death: Alive",var)) %>%
+  filter(!grepl("Prior_history_days_study_start",var))%>%
+  filter(!grepl("Prior_history_years_start",var)) %>%
+  filter(!grepl("Death: Dead",var)) %>%
+  filter(!grepl("time_days",var)) %>%
+  filter(!grepl("time_years",var)) %>%
+  filter(!grepl("DiabetesMellitus",var)) %>%
+  filter(!grepl("Prior_history_years",var)) %>%
+  filter(!grepl("CoronaryArteriosclerosis",var)) %>%
+  filter(!grepl("CrohnsDisease",var)) %>%
+  filter(!grepl("GastroesophagealRefluxDisease",var)) %>%
+  filter(!grepl("^HeartDisease",var)) %>%
+  filter(!grepl("HepatitisC",var)) %>%
+  filter(!grepl("HIV",var)) %>%
+  filter(!grepl("HpyloriGIInfection",var)) %>%
+  filter(!grepl("LesionLiver",var)) %>%
+  filter(!grepl("Obesity",var)) %>%
+  filter(!grepl("PeripheralVascularDisease",var)) %>%
+  filter(!grepl("Pneumonia",var)) %>%
+  filter(!grepl("Psoriasis",var)) %>%
+  filter(!grepl("RheumatoidArthritis",var)) %>%
+  filter(!grepl("Schizophrenia",var)) %>%
+  filter(!grepl("UlcerativeColitis",var)) %>%
+  filter(!grepl("UTIDisease",var)) %>%
+  filter(!grepl("VisualSystemDisorder",var)) %>%
+  filter(!grepl("IncidentBreastCancer",var)) %>%
+  filter(!grepl("IncidentColorectalCancer",var)) %>%
+  filter(!grepl("IncidentEsophagealCancer",var)) %>%
+  filter(!grepl("IncidentHeadNeckCancer",var)) %>%
+  filter(!grepl("IncidentLiverCancer",var)) %>%
+  filter(!grepl("IncidentLungCancer",var)) %>%
+  filter(!grepl("IncidentPancreaticCancer",var)) %>%
+  filter(!grepl("IncidentProstateCancer",var)) %>%
+  filter(!grepl("IncidentStomachCancer",var)) %>%
+  filter(!grepl("alcoholicliverdamage",var)) %>%
+  filter(!grepl("alcoholism",var)) %>%
+  filter(!grepl("alphaantitrypsindeficiency",var)) %>%
+  filter(!grepl("autoimmunehepatitis",var)) %>%
+  filter(!grepl("diseaseofliver",var)) %>%
+  filter(!grepl("Hemochromatosis",var)) %>%
+  filter(!grepl("hepb",var)) %>%
+  filter(!grepl("hypercholesterolemia",var)) %>%
+  filter(!grepl("nash",var)) %>%
+  filter(!grepl("nonalcoholicfattyliver",var)) %>%
+  filter(!grepl("obesity_obs_cond",var)) %>% 
+  filter(!grepl("alcohol",var)) %>% 
+  filter(!grepl("nafld",var)) %>% 
+  select(c(var, Variable, Cancer, Gender)) 
 
 
 
 
+# get the results together
+
+#breast cancer females
+table1bc_f <- table1_results3 %>% 
+  filter(Cancer == "Breast")
+
+#breast cancer from
+table1all <- table1_results1 %>% 
+  filter(Cancer != "Breast")
+
+#merge back together
+finaltable1 <- rbind(table1bc_f, table1all ) %>% 
+  select(!(Gender))
 
 
+# make into wider format for results
+finaltable1wide <- finaltable1 %>% 
+  tidyr::pivot_wider(names_from = Cancer,
+                     values_from = Variable, 
+                     values_fill = NA
+  )
 
 
+write.csv(finaltable1wide ,file = paste0(datapath, "/Table1PatientCharacteristics.csv")) 

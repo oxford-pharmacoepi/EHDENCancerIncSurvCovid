@@ -1547,12 +1547,12 @@ incidenceFigureData <- incidenceData3 %>%
   facet_wrap(~ outcome_cohort_name, scales = "free_y", ncol = 3)
 
 
-# plotname <- paste0("IRsWholePop_multipleCancers.png")
-# 
-# png(paste0(pathResults ,"/WholePop/", plotname),
-#     width = 8, height = 7.5, units = "in", res = 1200)
-# print(incidenceFigureData, newpage = FALSE)
-# dev.off()
+plotname <- paste0("S4IRsWholePop_multipleCancers.png")
+
+png(paste0(pathResults ,"/WholePop/", plotname),
+    width = 8, height = 7.5, units = "in", res = 1200)
+print(incidenceFigureData, newpage = FALSE)
+dev.off()
 
 
 plotname <- paste0("S4IRsWholePop_multipleCancers.pdf")
