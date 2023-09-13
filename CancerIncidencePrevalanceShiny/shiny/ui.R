@@ -39,7 +39,7 @@ ui <-  fluidPage(theme = shinytheme("spacelab"),
  from the United Kingdom (", tags$a(href="https://cprd.com/", "Clinical Practice Research Datalink"), "(CPRD) GOLD). We additionally validated all results using CPRD Aurum between 2000 to 2019"), 
  
  tags$h5(
- "In the following pages you can find information on annual period prevalence, annual and overall incidence, 
+ "In the following pages you can find information on annualised period prevalence, annualised and overall incidence, 
  survival for the whole population, calendar year survival and a description of the characteristics of the study populations 
 of patients with an cancer outcome. All results have been stratified by age group and sex."),
 

@@ -503,7 +503,7 @@ table1_results <- table1_results %>%
   filter(!grepl("Sex: Female",var)) %>%
   filter(!grepl("Death: Alive",var)) %>%
   filter(!grepl("Prior_history_days_study_start",var))%>%
-  filter(!grepl("Prior_history_years_start",var)) %>%
+  #filter(!grepl("Prior_history_years_start",var)) %>%
   filter(!grepl("Death: Dead",var)) %>%
   filter(!grepl("time_days",var)) %>%
   filter(!grepl("time_years",var)) %>%
