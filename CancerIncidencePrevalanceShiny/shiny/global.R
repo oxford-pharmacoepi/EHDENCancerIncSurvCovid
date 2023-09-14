@@ -77,7 +77,7 @@ survival_rates_table_cy <- readRDS(here("data","survival_rates_table.rds")) %>%
 
 table_one_results <- readRDS(here("data","table1_results.rds")) %>%
   filter(analysis == "Incidence") %>% 
-  filter(!grepl("Prior_history_years",var))
+  filter(!grepl("Prior_history_years",var)) 
   
 survival_followup_table <- readRDS(here("data","survival_median_mean_follow_up.rds")) 
 

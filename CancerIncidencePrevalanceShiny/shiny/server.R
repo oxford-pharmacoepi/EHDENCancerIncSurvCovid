@@ -905,7 +905,6 @@ server <-	function(input, output, session) {
     
     table
   })
-  
   output$tbl_survival_rates_table <-  DT::renderDataTable({
     
     table<-get_survival_rates_table()
@@ -965,7 +964,8 @@ server <-	function(input, output, session) {
   get_table_one <-reactive({
     
     table<-table_one_results %>% 
-      filter(Cancer %in% input$table1_outcome_cohort_name_selector)
+      filter(Cancer %in% input$table1_outcome_cohort_name_selector) %>% 
+      filter(Sex %in% input$table1_sex_selector) 
 
     table
   }) 

@@ -1627,7 +1627,6 @@ png(paste0(pathResults ,"/WholePop/", plotname),
 print(prevalenceFigureData, newpage = FALSE)
 dev.off()
 
-
 ##########################################################################################################
 # HEAD AND NECK CANCER SUBTYPES
 # INCIDENCE
@@ -3056,6 +3055,47 @@ png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 8, height = 10, units
 print(plot1, newpage = FALSE)
 dev.off()
 
+## survival over time removal of Both just keep in both genders
+
+surivival_estimates_lung2 <- survival_estimates %>%
+  filter(Cancer == "Lung") %>% 
+  filter(Stratification == "Gender") %>% 
+  filter(Age == "All") %>% 
+  filter(CalendarYearGp != "2000 to 2019") %>% 
+  filter(CalendarYearGp != "2000 to 2021") 
+
+survivalFigureData <- surivival_estimates_lung2 %>%
+  ggplot(aes(x = time,
+             y = est,
+             group = CalendarYearGp,
+             col = CalendarYearGp )) +
+  scale_y_continuous( labels = label_percent() ) +
+  scale_colour_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
+  scale_fill_manual(values = c("#00468BFF", "#ED0000FF", "#0099B4FF", "#42B540FF", "#925E9FFF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
+  scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash", "solid", "longdash")) +
+  geom_ribbon(aes(ymin = lcl, 
+                  ymax = ucl, 
+                  fill = CalendarYearGp), alpha = .1, color = NA, show.legend = FALSE) +
+  labs(x = "Time (Years)",
+       y = "Survival Probability",
+       col = "Calendar Year Group",
+       linetype = "Calendar Year Group") +
+  theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+        strip.background = element_rect(color = "black", size = 0.6) ,
+        panel.background = element_blank() ,
+        axis.line = element_line(colour = "black", size = 0.6) ,
+        panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+        legend.box.spacing = unit(0, "pt") ,
+        legend.position='bottom',
+        legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  ggh4x::facet_grid2(cols = vars(Gender), vars(Database), scales="free", independent = "y") 
+
+plotname <- paste0("FIGURE6_KMCalendarYr_Lung.png")
+
+png(paste0(pathResults ,"/ExtraPlots/", plotname), width = 8, height = 8, units = "in", res = 1200)
+print(survivalFigureData, newpage = FALSE)
+dev.off()
 
 ##############################################################################################
 

@@ -524,8 +524,7 @@ of patients with an cancer outcome. All results have been stratified by age grou
                                               size = 10,
                                               `selected-text-format` = "count > 3"),
                                             multiple = TRUE)
-                            )
-                            ,
+                            ),
                             tags$hr(),
                             tags$h5("Population Settings"),
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
@@ -647,7 +646,7 @@ of patients with an cancer outcome. All results have been stratified by age grou
                    ## Population characteristics ------ 
                    tabPanel("Population Characteristics",	  
                             tags$h3("Study Population Characteristics"),
-                            tags$h5("The population characteristics are shown below..."),
+                            tags$h5("The population characteristics are shown below. For all conditions unless otherwise specified this was obtained looking at any time in history before cancer diagnosis. For smoking we obtained smoking status looking back either 5 or 10 years in previous history from cancer diagnosis"),
                             tags$hr(),
                             tags$h5("Study outcome") ,
                             div(style="display: inline-block;vertical-align:top; width: 150px;",
@@ -663,6 +662,18 @@ of patients with an cancer outcome. All results have been stratified by age grou
 
 
 
+                            ),
+                            
+                            div(style="display: inline-block;vertical-align:top; width: 150px;",
+                                pickerInput(inputId = "table1_sex_selector",
+                                            label = "Sex",
+                                            choices = sort(unique(table_one_results$Sex)),
+                                            selected = c("Both"),
+                                            options = list(
+                                              `actions-box` = TRUE,
+                                              size = 10,
+                                              `selected-text-format` = "count > 3"),
+                                            multiple = TRUE)
                             ),
                             
                             

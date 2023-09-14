@@ -462,15 +462,17 @@ saveRDS(survival_rates_table,
         here("shiny", "data", "/survival_rates_table.rds"))
 
 
-# table 1 
+# table 1 BOTH genders
 table1_files<-results[stringr::str_detect(results, ".csv")]
-table1_files<-results[stringr::str_detect(results, "Table1")]
+table1_files<-results[stringr::str_detect(results, "Table1[C|H]")]
 
 table1_results <- list()
+
 for(i in seq_along(table1_files)){
   table1_results[[i]]<-readr::read_csv(table1_files[[i]], 
                                              show_col_types = FALSE)  
 }
+
 table1_results <- dplyr::bind_rows(table1_results)
 
 table1_results <- prepare_output_table1(table1_results)
@@ -538,11 +540,187 @@ table1_results <- table1_results %>%
   filter(!grepl("LipidModifyingAgents",var)) %>%
   filter(!grepl("Opioids",var)) %>%
   filter(!grepl("Psychostimulants",var)) %>% 
-  filter(!grepl("HpyloriGIInfection",var))
+  filter(!grepl("HpyloriGIInfection",var)) %>% 
+  mutate(Sex = "Both") %>% 
+  mutate(across(everything(), as.character))
   
 
+# saveRDS(table1_results, 
+#         here("shiny", "data", "table1_results.rds"))
+# 
 
 
-saveRDS(table1_results, 
+
+# females
+table1_filesF<-results[stringr::str_detect(results, ".csv")]
+table1_filesF<-results[stringr::str_detect(results, "Female")]
+
+table1_resultsF <- list()
+
+for(i in seq_along(table1_filesF)){
+  table1_resultsF[[i]]<-readr::read_csv(table1_filesF[[i]], 
+                                       show_col_types = FALSE)  
+}
+
+table1_resultsF <- dplyr::bind_rows(table1_resultsF)
+
+table1_resultsF <- prepare_output_table1(table1_resultsF)
+
+table1_resultsF <- table1_resultsF %>% 
+  distinct()
+
+table1_resultsF <- table1_resultsF %>% 
+  mutate("Variable"= ifelse(!is.na(percent),
+                            paste0(n, " (",
+                                   paste0(percent, ")")),
+                            NA
+  )) %>%
+  mutate("Variable1"= ifelse(!is.na(mean),
+                             paste0(mean, " (SD ",
+                                    paste0(standard_deviation, ")")),
+                             NA
+  )) %>%
+  mutate("Variable2"= ifelse(!is.na(median),
+                             paste0(median, " (",
+                                    paste0(interquartile_range, ")")),
+                             NA
+  )) %>%
+  mutate(Variable = case_when(n == "<5" ~ "<5", TRUE ~ Variable)) %>%
+  mutate(Variable = coalesce(Variable, Variable2)) %>%
+  mutate(Variable = coalesce(Variable, n))
+
+# remove rows we dont need
+table1_resultsF <- table1_resultsF %>% 
+  #filter(!grepl("Sex: Female",var)) %>%
+  filter(!grepl("Death: Alive",var)) %>%
+  filter(!grepl("Prior_history_days_study_start",var))%>%
+  #filter(!grepl("Prior_history_years_start",var)) %>%
+  filter(!grepl("Death: Dead",var)) %>%
+  filter(!grepl("time_days",var)) %>%
+  filter(!grepl("time_years",var)) %>%
+  select(c(var, Variable, Cancer, Database, analysis, Gender ))
+
+# make into wider format for results
+table1_resultsF <- table1_resultsF %>% 
+  tidyr::pivot_wider(names_from = Database,
+                     values_from = Variable, 
+                     values_fill = NA
+  )
+
+# remove drugs for CPRD
+table1_resultsF <- table1_resultsF %>% 
+  filter(!grepl("AgentsReninAngiotensinSystem",var)) %>%
+  filter(!grepl("Antidepressants",var)) %>%
+  filter(!grepl("Antiepileptics",var))%>%
+  filter(!grepl("AntiinflammatoryAntirheumatic",var)) %>%
+  filter(!grepl("Antineoplastics",var)) %>%
+  filter(!grepl("Antipsoriatics",var)) %>%
+  filter(!grepl("Antipsychotics",var)) %>%
+  filter(!grepl("Antithrombotics",var)) %>%
+  filter(!grepl("Anxiolytics",var)) %>%
+  filter(!grepl("BetaBlockers",var)) %>%
+  filter(!grepl("CalciumChannelBlockers",var)) %>%
+  filter(!grepl("Diuretics",var))%>%
+  filter(!grepl("DrugsAcidRelatedDisorders",var)) %>%
+  filter(!grepl("DrugsDiabetes",var)) %>%
+  filter(!grepl("DrugsObstructiveAirwayDiseases",var)) %>%
+  filter(!grepl("HypnoticsSedatives",var)) %>%
+  filter(!grepl("Immunosuppressants",var)) %>%
+  filter(!grepl("LipidModifyingAgents",var)) %>%
+  filter(!grepl("Opioids",var)) %>%
+  filter(!grepl("Psychostimulants",var)) %>% 
+  filter(!grepl("HpyloriGIInfection",var)) %>% 
+  rename(Sex = Gender) %>% 
+  mutate(across(everything(), as.character))
+
+
+# Males
+table1_filesM<-results[stringr::str_detect(results, ".csv")]
+table1_filesM<-results[stringr::str_detect(results, "Male")]
+
+table1_resultsM <- list()
+
+for(i in seq_along(table1_filesM)){
+  table1_resultsM[[i]]<-readr::read_csv(table1_filesM[[i]], 
+                                        show_col_types = FALSE)  
+}
+
+table1_resultsM <- dplyr::bind_rows(table1_resultsM)
+
+table1_resultsM <- prepare_output_table1(table1_resultsM)
+
+table1_resultsM <- table1_resultsM %>% 
+  distinct()
+
+table1_resultsM <- table1_resultsM %>% 
+  mutate("Variable"= ifelse(!is.na(percent),
+                            paste0(n, " (",
+                                   paste0(percent, ")")),
+                            NA
+  )) %>%
+  mutate("Variable1"= ifelse(!is.na(mean),
+                             paste0(mean, " (SD ",
+                                    paste0(standard_deviation, ")")),
+                             NA
+  )) %>%
+  mutate("Variable2"= ifelse(!is.na(median),
+                             paste0(median, " (",
+                                    paste0(interquartile_range, ")")),
+                             NA
+  )) %>%
+  mutate(Variable = case_when(n == "<5" ~ "<5", TRUE ~ Variable)) %>%
+  mutate(Variable = coalesce(Variable, Variable2)) %>%
+  mutate(Variable = coalesce(Variable, n))
+
+# remove rows we dont need
+table1_resultsM <- table1_resultsM %>% 
+  #filter(!grepl("Sex: Female",var)) %>%
+  filter(!grepl("Death: Alive",var)) %>%
+  filter(!grepl("Prior_history_days_study_start",var))%>%
+  #filter(!grepl("Prior_history_years_start",var)) %>%
+  filter(!grepl("Death: Dead",var)) %>%
+  filter(!grepl("time_days",var)) %>%
+  filter(!grepl("time_years",var)) %>%
+  select(c(var, Variable, Cancer, Database, analysis, Gender ))
+
+# make into wider format for results
+table1_resultsM <- table1_resultsM %>% 
+  tidyr::pivot_wider(names_from = Database,
+                     values_from = Variable, 
+                     values_fill = NA
+  )
+
+# remove drugs for CPRD
+table1_resultsM <- table1_resultsM %>% 
+  filter(!grepl("AgentsReninAngiotensinSystem",var)) %>%
+  filter(!grepl("Antidepressants",var)) %>%
+  filter(!grepl("Antiepileptics",var))%>%
+  filter(!grepl("AntiinflammatoryAntirheumatic",var)) %>%
+  filter(!grepl("Antineoplastics",var)) %>%
+  filter(!grepl("Antipsoriatics",var)) %>%
+  filter(!grepl("Antipsychotics",var)) %>%
+  filter(!grepl("Antithrombotics",var)) %>%
+  filter(!grepl("Anxiolytics",var)) %>%
+  filter(!grepl("BetaBlockers",var)) %>%
+  filter(!grepl("CalciumChannelBlockers",var)) %>%
+  filter(!grepl("Diuretics",var))%>%
+  filter(!grepl("DrugsAcidRelatedDisorders",var)) %>%
+  filter(!grepl("DrugsDiabetes",var)) %>%
+  filter(!grepl("DrugsObstructiveAirwayDiseases",var)) %>%
+  filter(!grepl("HypnoticsSedatives",var)) %>%
+  filter(!grepl("Immunosuppressants",var)) %>%
+  filter(!grepl("LipidModifyingAgents",var)) %>%
+  filter(!grepl("Opioids",var)) %>%
+  filter(!grepl("Psychostimulants",var)) %>% 
+  filter(!grepl("HpyloriGIInfection",var)) %>% 
+  rename(Sex = Gender) %>% 
+  mutate(across(everything(), as.character))
+
+
+table1_results_comb <- dplyr::bind_rows(table1_results, table1_resultsF, table1_resultsM)
+
+
+saveRDS(table1_results_comb,
         here("shiny", "data", "table1_results.rds"))
+
 
