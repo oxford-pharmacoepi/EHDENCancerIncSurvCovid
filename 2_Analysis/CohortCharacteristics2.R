@@ -277,6 +277,314 @@ Pop <-Pop %>%
                         "1" = "Alive", 
                         "2" = "Dead"))
 
+# add in smoking status # former, non or smoker in anytime prior history
+# If smoking status was not recorded in year, the methods of last observation carried forward (LOCF)
+# Records of non-smoking after those for current or previous smoking were amended to former-smoking. 
+# As it was not possible to ascertain smoking status prior to CPRD records, we refer to non- rather than never-smoking.
+
+# non smoking 5 years
+Pop <-
+  Pop %>%
+  left_join(
+    Pop %>%
+      select("person_id", "outcome_start_date") %>%
+      inner_join(cdm$observation %>%
+                   filter( observation_concept_id == 4222303 |
+                             observation_concept_id ==  4144272 
+                   ) ,
+                 by=c("person_id"), copy = TRUE)  %>%
+      filter(observation_date < outcome_start_date) %>% # removes anyone with a observation after outcome
+      filter(observation_date > outcome_start_date - lubridate::days(1826) ) %>% # removes anyone with observation more than 5 years before the outcome
+      select(c(person_id, observation_date, outcome_start_date)) %>%
+      distinct() %>%
+      group_by(person_id, outcome_start_date) %>%
+      filter(observation_date == max(observation_date)) %>%
+      rename("non_smoker_date5y"="observation_date"),
+    by= c("person_id", "outcome_start_date")) %>%
+  compute()
+
+# non smoking 10 years
+Pop <-
+  Pop %>%
+  left_join(
+ Pop %>%
+  select("person_id", "outcome_start_date") %>%
+  inner_join(cdm$observation %>%
+               filter( observation_concept_id == 4222303 |
+                         observation_concept_id ==  4144272 
+                         ) ,
+             by=c("person_id"), copy = TRUE)  %>%
+  filter(observation_date < outcome_start_date) %>% # removes anyone with a observation after outcome
+  filter(observation_date > outcome_start_date - lubridate::days(3650) ) %>% # removes anyone with observation more than 10 years before the outcome
+  select(c(person_id, observation_date, outcome_start_date)) %>%
+  distinct() %>%
+  group_by(person_id, outcome_start_date) %>%
+  filter(observation_date == max(observation_date)) %>%
+  rename("non_smoker_date10y"="observation_date"),
+ by= c("person_id", "outcome_start_date")) %>%
+  compute()
+
+
+# current non smoking 5 yr
+Pop <-
+  Pop %>%
+  left_join(
+    Pop %>%
+      select("person_id", "outcome_start_date") %>%
+      inner_join(cdm$observation %>%
+                   filter(observation_concept_id == 4052464
+                   ) ,
+                 by=c("person_id"), copy = TRUE)  %>%
+      filter(observation_date < outcome_start_date) %>% # removes anyone with a observation after outcome
+      filter(observation_date > outcome_start_date - lubridate::days(1826) ) %>% # removes anyone with observation more than 5 years before the outcome
+      select(c(person_id, observation_date, outcome_start_date)) %>%
+      distinct() %>%
+      group_by(person_id, outcome_start_date) %>%
+      filter(observation_date == max(observation_date)) %>%
+      rename("current_non_smoker_date5yr"="observation_date"),
+    by= c("person_id", "outcome_start_date")) %>%
+  compute()
+
+# current non smoking 10 yr
+Pop <-
+  Pop %>%
+  left_join(
+    Pop %>%
+      select("person_id", "outcome_start_date") %>%
+      inner_join(cdm$observation %>%
+                   filter(observation_concept_id == 4052464
+                   ) ,
+                 by=c("person_id"), copy = TRUE)  %>%
+      filter(observation_date < outcome_start_date) %>% # removes anyone with a observation after outcome
+      filter(observation_date > outcome_start_date - lubridate::days(3650) ) %>% # removes anyone with observation more than 10 years before the outcome
+      select(c(person_id, observation_date, outcome_start_date)) %>%
+      distinct() %>%
+      group_by(person_id, outcome_start_date) %>%
+      filter(observation_date == max(observation_date)) %>%
+      rename("current_non_smoker_date10yr"="observation_date"),
+    by= c("person_id", "outcome_start_date")) %>%
+  compute()
+
+# Smoker any time 5 yr
+Pop <-
+  Pop %>%
+  left_join(
+    Pop %>%
+      select("person_id", "outcome_start_date") %>%
+      inner_join(cdm$observation %>%
+                   filter(
+                     observation_concept_id == 4005823 |
+                       observation_concept_id == 4298794 | 
+                       observation_concept_id == 762499 |
+                       observation_concept_id == 762498 |
+                       observation_concept_id == 37395605 |
+                       observation_concept_id == 4246415 |
+                       observation_concept_id ==  4218917 |
+                       observation_concept_id == 4209006 |
+                       observation_concept_id ==  4276526 |
+                       observation_concept_id == 4209585 |
+                       observation_concept_id == 764104 |
+                       observation_concept_id == 764103 |
+                       observation_concept_id == 4058138 |
+                       observation_concept_id == 4042037 |
+                       observation_concept_id == 4044777 |
+                       observation_concept_id == 4044776 |
+                       observation_concept_id == 4044775 |
+                       observation_concept_id == 4041511 |
+                       observation_concept_id == 4052029 |
+                       observation_concept_id == 4058136 |
+                       observation_concept_id == 4044778 |
+                       observation_concept_id == 4052030 |
+                       observation_concept_id == 4144273 |
+                       observation_concept_id == 4052947 |
+                       observation_concept_id == 4209006 |
+                       observation_concept_id == 4204653 |
+                       observation_concept_id == 44789712 |
+                       observation_concept_id == 40486518 |
+                       observation_concept_id ==4046886 |
+                       observation_concept_id == 4058137 |
+                       observation_concept_id == 4216174 |
+                       observation_concept_id == 4215409 |
+                       observation_concept_id == 4190573 |
+                       observation_concept_id == 4052948 
+                     ) ,
+                 by=c("person_id"), copy = TRUE)  %>%
+      filter(observation_date < outcome_start_date) %>% # removes anyone with a observation after outcome
+      filter(observation_date > outcome_start_date - lubridate::days(1826) ) %>% # removes anyone with observation more than 5 years before the outcome
+      select(c(person_id, observation_date, outcome_start_date)) %>%
+      distinct() %>%
+      group_by(person_id, outcome_start_date) %>%
+      filter(observation_date == max(observation_date)) %>%
+      rename("Smoker_date_5yr"="observation_date"),
+    by= c("person_id", "outcome_start_date")) %>%
+  compute()
+
+
+# Smokers current or code within 10 years
+Pop <-
+  Pop %>%
+  left_join(
+    Pop %>%
+      select("person_id", "outcome_start_date") %>%
+      inner_join(cdm$observation %>%
+                   filter(
+                     observation_concept_id == 4005823 |
+                       observation_concept_id == 4298794 | 
+                       observation_concept_id == 762499 |
+                       observation_concept_id == 762498 |
+                       observation_concept_id == 37395605 |
+                       observation_concept_id == 4246415 |
+                       observation_concept_id ==  4218917 |
+                       observation_concept_id == 4209006 |
+                       observation_concept_id ==  4276526 |
+                       observation_concept_id == 4209585 |
+                       observation_concept_id == 764104 |
+                       observation_concept_id == 764103 |
+                       observation_concept_id == 4058138 |
+                       observation_concept_id == 4042037 |
+                       observation_concept_id == 4044777 |
+                       observation_concept_id == 4044776 |
+                       observation_concept_id == 4044775 |
+                       observation_concept_id == 4041511 |
+                       observation_concept_id == 4052029 |
+                       observation_concept_id == 4058136 |
+                       observation_concept_id == 4044778 |
+                       observation_concept_id == 4052030 |
+                       observation_concept_id == 4144273 |
+                       observation_concept_id == 4052947 |
+                       observation_concept_id == 4209006 |
+                       observation_concept_id == 4204653 |
+                       observation_concept_id == 44789712 |
+                       observation_concept_id == 40486518 |
+                       observation_concept_id ==4046886 |
+                       observation_concept_id == 4058137 |
+                       observation_concept_id == 4216174 |
+                       observation_concept_id == 4215409 |
+                       observation_concept_id == 4190573 |
+                       observation_concept_id == 4052948 
+                   ) ,
+                 by=c("person_id"), copy = TRUE)  %>%
+      filter(observation_date < outcome_start_date) %>% # removes anyone with a observation after outcome
+      filter(observation_date > outcome_start_date - lubridate::days(3650) ) %>% # removes anyone with observation more than 10 years before the outcome
+      select(c(person_id, observation_date, outcome_start_date)) %>%
+      distinct() %>%
+      group_by(person_id, outcome_start_date) %>%
+      filter(observation_date == max(observation_date)) %>%
+      rename("Smoker_date_10yr"="observation_date"),
+    by= c("person_id", "outcome_start_date")) %>%
+  compute()
+
+# former smokers 5 year
+Pop <-
+  Pop %>%
+  left_join(
+    Pop %>%
+      select("person_id", "outcome_start_date") %>%
+      inner_join(cdm$observation %>%
+                   filter(
+                     observation_concept_id == 4052032 | # stopped smoking
+                       observation_concept_id == 44802805 # recently stopped smoking
+                   ) ,
+                 by=c("person_id"), copy = TRUE)  %>%
+      filter(observation_date < outcome_start_date) %>% # removes anyone with a observation after outcome
+      filter(observation_date > outcome_start_date - lubridate::days(1826) ) %>% # removes anyone with observation more than 5 years before the outcome
+      select(c(person_id, observation_date, outcome_start_date)) %>%
+      distinct() %>%
+      group_by(person_id, outcome_start_date) %>%
+      filter(observation_date == max(observation_date)) %>%
+      rename("PrevSmoker_date5y"="observation_date"),
+    by= c("person_id", "outcome_start_date")) %>%
+  compute()
+
+
+# former smokers 10 year
+Pop <-
+  Pop %>%
+  left_join(
+    Pop %>%
+      select("person_id", "outcome_start_date") %>%
+      inner_join(cdm$observation %>%
+                   filter(
+                     observation_concept_id == 4052032 | # stopped smoking
+                       observation_concept_id == 44802805 # recently stopped smoking
+                   ) ,
+                 by=c("person_id"), copy = TRUE)  %>%
+      filter(observation_date < outcome_start_date) %>% # removes anyone with a observation after outcome
+      filter(observation_date > outcome_start_date - lubridate::days(3650) ) %>% # removes anyone with observation more than 10 years before the outcome
+      select(c(person_id, observation_date, outcome_start_date)) %>%
+      distinct() %>%
+      group_by(person_id, outcome_start_date) %>%
+      filter(observation_date == max(observation_date)) %>%
+      rename("PrevSmoker_date10y"="observation_date"),
+    by= c("person_id", "outcome_start_date")) %>%
+  compute()
+
+
+
+
+# rules for updating smoking status
+# if only smoking codes == SMOKER, non smoker == NON SMOKER
+# Never-smokers were re-assigned as former-smokers if there were contradictory preceding smoking codes
+# previous smokers were assigned smokers if date of smoking was after previous smoking code 
+
+# Smoking status using 5 years worth of previous data
+# create a new variable for previous and if those who say non smoking convert to former/previous smoker
+Pop <- Pop %>% mutate(PrevSmoker_date5y1 = ifelse(!is.na(PrevSmoker_date5y), non_smoker_date5y, PrevSmoker_date5y))
+Pop <- Pop %>% mutate(PrevSmoker_date5y1 = replace(PrevSmoker_date5y1, !is.na(PrevSmoker_date5y1), "2Former"))
+Pop <- Pop %>% mutate(PrevSmoker_date5y1 = replace(PrevSmoker_date5y1, !is.na(PrevSmoker_date5y), "2Former"))
+
+# remove previous entries if the have a smoking date after previous
+Pop <- Pop %>% mutate(Smokernow = Smoker_date_5yr > PrevSmoker_date5y )
+Pop <- Pop %>% mutate(PrevSmoker_date5y1 = replace(PrevSmoker_date5y1, Smokernow == TRUE, NA))
+
+# convert smoking into a character variable
+Pop <- Pop %>% mutate(Smoker_date_5yr1 = as.character(Smoker_date_5yr))
+Pop <- Pop %>% mutate(Smoker_date_5yr1 = replace(Smoker_date_5yr1, !is.na(Smoker_date_5yr1), "3Smoker"))
+
+# convert non smokers into non smoker
+Pop <- Pop %>% mutate(non_smoker_date5y1 = as.character(non_smoker_date5y))
+Pop <- Pop %>% mutate(non_smoker_date5y1 = replace(non_smoker_date5y1, !is.na(non_smoker_date5y1), "1Non Smoker"))
+
+Pop <- Pop %>% mutate(current_non_smoker_date5yr1 = as.character(current_non_smoker_date5yr))
+Pop <- Pop %>% mutate(current_non_smoker_date5yr1 = replace(current_non_smoker_date5yr1, !is.na(current_non_smoker_date5yr1), "1Non Smoker"))
+
+# merge all to get smoking status in past 5 years
+Pop <- Pop %>% mutate(smoking_status5yr = coalesce(PrevSmoker_date5y1, Smoker_date_5yr1))
+Pop <- Pop %>% mutate(smoking_status5yr = coalesce(smoking_status5yr, non_smoker_date5y1))
+Pop <- Pop %>% mutate(smoking_status5yr = coalesce(smoking_status5yr, current_non_smoker_date5yr1))
+# replace those with missing observations with "Missing"
+Pop <- Pop %>% mutate(smoking_status5yr = replace(smoking_status5yr, is.na(smoking_status5yr), "4Missing"))
+
+
+
+# Smoking status 10 years previous
+Pop <- Pop %>% mutate(PrevSmoker_date10y1 = ifelse(!is.na(PrevSmoker_date10y), non_smoker_date10y, PrevSmoker_date10y))
+Pop <- Pop %>% mutate(PrevSmoker_date10y1 = replace(PrevSmoker_date10y1, !is.na(PrevSmoker_date10y1), "2Former"))
+Pop <- Pop %>% mutate(PrevSmoker_date10y1 = replace(PrevSmoker_date10y1, !is.na(PrevSmoker_date10y), "2Former"))
+
+# remove previous entries if the have a smoking date after previous
+Pop <- Pop %>% mutate(Smokernow = Smoker_date_10yr > PrevSmoker_date10y )
+Pop <- Pop %>% mutate(PrevSmoker_date10y1 = replace(PrevSmoker_date10y1, Smokernow == TRUE, NA))
+
+# convert smoking into a character variable
+Pop <- Pop %>% mutate(Smoker_date_10yr1 = as.character(Smoker_date_10yr))
+Pop <- Pop %>% mutate(Smoker_date_10yr1 = replace(Smoker_date_10yr1, !is.na(Smoker_date_10yr1), "3Smoker"))
+
+# convert non smokers into non smoker
+Pop <- Pop %>% mutate(non_smoker_date10y1 = as.character(non_smoker_date10y))
+Pop <- Pop %>% mutate(non_smoker_date10y1 = replace(non_smoker_date10y1, !is.na(non_smoker_date10y1), "1Non Smoker"))
+
+Pop <- Pop %>% mutate(current_non_smoker_date10yr1 = as.character(current_non_smoker_date10yr))
+Pop <- Pop %>% mutate(current_non_smoker_date10yr1 = replace(current_non_smoker_date10yr1, !is.na(current_non_smoker_date10yr1), "1Non Smoker"))
+
+# merge all to get smoking status in past 10 years
+Pop <- Pop %>% mutate(smoking_status10yr = coalesce(PrevSmoker_date10y1, Smoker_date_10yr1))
+Pop <- Pop %>% mutate(smoking_status10yr = coalesce(smoking_status10yr, non_smoker_date10y1))
+Pop <- Pop %>% mutate(smoking_status10yr = coalesce(smoking_status10yr, current_non_smoker_date10yr1))
+# replace those with missing observations with "Missing"
+Pop <- Pop %>% mutate(smoking_status10yr = replace(smoking_status10yr, is.na(smoking_status10yr), "4Missing"))
+
+
 # medications (3 months before index date)
 # for(i in seq_along(medication_cohorts$cohort_name)){
 #   working_name <- glue::glue("{medication_cohorts$cohort_name[[i]]}")
@@ -386,6 +694,8 @@ PopFemale <- Pop %>%
 PopMale <- Pop %>% 
   filter(gender == "Male")
 
+
+
 # tidy up results for table 1
 get_summary_characteristics<-function(data){
   
@@ -424,6 +734,22 @@ get_summary_characteristics<-function(data){
                 percent=paste0(nice.num((n/nrow(data))*100),  "%")) %>%   
       rename("var"="Death") %>% 
       mutate(var=paste0("Death: ", var)),
+    
+    data %>%
+      mutate(smoking_status5yr=factor(smoking_status5yr, levels=c("1Non Smoker", "2Former", "3Smoker", "4Missing"))) %>%
+      group_by(smoking_status5yr) %>%
+      summarise(n=n(),
+                percent=paste0(nice.num((n/nrow(data))*100),  "%")) %>%
+      rename("var"="smoking_status5yr") %>%
+      mutate(var=paste0("smoking_status5yr: ", var)),
+    
+    data %>%
+      mutate(smoking_status10yr=factor(smoking_status10yr, levels=c("1Non Smoker", "2Former", "3Smoker", "4Missing"))) %>%
+      group_by(smoking_status10yr) %>%
+      summarise(n=n(),
+                percent=paste0(nice.num((n/nrow(data))*100),  "%")) %>%
+      rename("var"="smoking_status10yr") %>%
+      mutate(var=paste0("smoking_status10yr: ", var)),
     
     data %>% 
       summarise(mean=nice.num.count(mean(Prior_history_days)),
@@ -700,6 +1026,314 @@ if (grepl("CPRD", db.name) == TRUE){
     mutate(Death = recode(status, 
                           "1" = "Alive", 
                           "2" = "Dead"))
+  
+  # add in smoking status # former, non or smoker in anytime prior history
+  # If smoking status was not recorded in year, the methods of last observation carried forward (LOCF)
+  # Records of non-smoking after those for current or previous smoking were amended to former-smoking. 
+  # As it was not possible to ascertain smoking status prior to CPRD records, we refer to non- rather than never-smoking.
+  
+  # non smoking 5 years
+  Pophan <-
+    Pophan %>%
+    left_join(
+      Pophan %>%
+        select("person_id", "outcome_start_date") %>%
+        inner_join(cdm$observation %>%
+                     filter( observation_concept_id == 4222303 |
+                               observation_concept_id ==  4144272 
+                     ) ,
+                   by=c("person_id"), copy = TRUE)  %>%
+        filter(observation_date < outcome_start_date) %>% # removes anyone with a observation after outcome
+        filter(observation_date > outcome_start_date - lubridate::days(1826) ) %>% # removes anyone with observation more than 5 years before the outcome
+        select(c(person_id, observation_date, outcome_start_date)) %>%
+        distinct() %>%
+        group_by(person_id, outcome_start_date) %>%
+        filter(observation_date == max(observation_date)) %>%
+        rename("non_smoker_date5y"="observation_date"),
+      by= c("person_id", "outcome_start_date")) %>%
+    compute()
+  
+  # non smoking 10 years
+  Pophan <-
+    Pophan %>%
+    left_join(
+      Pophan %>%
+        select("person_id", "outcome_start_date") %>%
+        inner_join(cdm$observation %>%
+                     filter( observation_concept_id == 4222303 |
+                               observation_concept_id ==  4144272 
+                     ) ,
+                   by=c("person_id"), copy = TRUE)  %>%
+        filter(observation_date < outcome_start_date) %>% # removes anyone with a observation after outcome
+        filter(observation_date > outcome_start_date - lubridate::days(3650) ) %>% # removes anyone with observation more than 10 years before the outcome
+        select(c(person_id, observation_date, outcome_start_date)) %>%
+        distinct() %>%
+        group_by(person_id, outcome_start_date) %>%
+        filter(observation_date == max(observation_date)) %>%
+        rename("non_smoker_date10y"="observation_date"),
+      by= c("person_id", "outcome_start_date")) %>%
+    compute()
+  
+  
+  # current non smoking 5 yr
+  Pophan <-
+    Pophan %>%
+    left_join(
+      Pophan %>%
+        select("person_id", "outcome_start_date") %>%
+        inner_join(cdm$observation %>%
+                     filter(observation_concept_id == 4052464
+                     ) ,
+                   by=c("person_id"), copy = TRUE)  %>%
+        filter(observation_date < outcome_start_date) %>% # removes anyone with a observation after outcome
+        filter(observation_date > outcome_start_date - lubridate::days(1826) ) %>% # removes anyone with observation more than 5 years before the outcome
+        select(c(person_id, observation_date, outcome_start_date)) %>%
+        distinct() %>%
+        group_by(person_id, outcome_start_date) %>%
+        filter(observation_date == max(observation_date)) %>%
+        rename("current_non_smoker_date5yr"="observation_date"),
+      by= c("person_id", "outcome_start_date")) %>%
+    compute()
+  
+  # current non smoking 10 yr
+  Pophan <-
+    Pophan %>%
+    left_join(
+      Pophan %>%
+        select("person_id", "outcome_start_date") %>%
+        inner_join(cdm$observation %>%
+                     filter(observation_concept_id == 4052464
+                     ) ,
+                   by=c("person_id"), copy = TRUE)  %>%
+        filter(observation_date < outcome_start_date) %>% # removes anyone with a observation after outcome
+        filter(observation_date > outcome_start_date - lubridate::days(3650) ) %>% # removes anyone with observation more than 10 years before the outcome
+        select(c(person_id, observation_date, outcome_start_date)) %>%
+        distinct() %>%
+        group_by(person_id, outcome_start_date) %>%
+        filter(observation_date == max(observation_date)) %>%
+        rename("current_non_smoker_date10yr"="observation_date"),
+      by= c("person_id", "outcome_start_date")) %>%
+    compute()
+  
+  # Smoker any time 5 yr
+  Pophan <-
+    Pophan %>%
+    left_join(
+      Pophan %>%
+        select("person_id", "outcome_start_date") %>%
+        inner_join(cdm$observation %>%
+                     filter(
+                       observation_concept_id == 4005823 |
+                         observation_concept_id == 4298794 | 
+                         observation_concept_id == 762499 |
+                         observation_concept_id == 762498 |
+                         observation_concept_id == 37395605 |
+                         observation_concept_id == 4246415 |
+                         observation_concept_id ==  4218917 |
+                         observation_concept_id == 4209006 |
+                         observation_concept_id ==  4276526 |
+                         observation_concept_id == 4209585 |
+                         observation_concept_id == 764104 |
+                         observation_concept_id == 764103 |
+                         observation_concept_id == 4058138 |
+                         observation_concept_id == 4042037 |
+                         observation_concept_id == 4044777 |
+                         observation_concept_id == 4044776 |
+                         observation_concept_id == 4044775 |
+                         observation_concept_id == 4041511 |
+                         observation_concept_id == 4052029 |
+                         observation_concept_id == 4058136 |
+                         observation_concept_id == 4044778 |
+                         observation_concept_id == 4052030 |
+                         observation_concept_id == 4144273 |
+                         observation_concept_id == 4052947 |
+                         observation_concept_id == 4209006 |
+                         observation_concept_id == 4204653 |
+                         observation_concept_id == 44789712 |
+                         observation_concept_id == 40486518 |
+                         observation_concept_id ==4046886 |
+                         observation_concept_id == 4058137 |
+                         observation_concept_id == 4216174 |
+                         observation_concept_id == 4215409 |
+                         observation_concept_id == 4190573 |
+                         observation_concept_id == 4052948 
+                     ) ,
+                   by=c("person_id"), copy = TRUE)  %>%
+        filter(observation_date < outcome_start_date) %>% # removes anyone with a observation after outcome
+        filter(observation_date > outcome_start_date - lubridate::days(1826) ) %>% # removes anyone with observation more than 5 years before the outcome
+        select(c(person_id, observation_date, outcome_start_date)) %>%
+        distinct() %>%
+        group_by(person_id, outcome_start_date) %>%
+        filter(observation_date == max(observation_date)) %>%
+        rename("Smoker_date_5yr"="observation_date"),
+      by= c("person_id", "outcome_start_date")) %>%
+    compute()
+  
+  
+  # Smokers current or code within 10 years
+  Pophan <-
+    Pophan %>%
+    left_join(
+      Pophan %>%
+        select("person_id", "outcome_start_date") %>%
+        inner_join(cdm$observation %>%
+                     filter(
+                       observation_concept_id == 4005823 |
+                         observation_concept_id == 4298794 | 
+                         observation_concept_id == 762499 |
+                         observation_concept_id == 762498 |
+                         observation_concept_id == 37395605 |
+                         observation_concept_id == 4246415 |
+                         observation_concept_id ==  4218917 |
+                         observation_concept_id == 4209006 |
+                         observation_concept_id ==  4276526 |
+                         observation_concept_id == 4209585 |
+                         observation_concept_id == 764104 |
+                         observation_concept_id == 764103 |
+                         observation_concept_id == 4058138 |
+                         observation_concept_id == 4042037 |
+                         observation_concept_id == 4044777 |
+                         observation_concept_id == 4044776 |
+                         observation_concept_id == 4044775 |
+                         observation_concept_id == 4041511 |
+                         observation_concept_id == 4052029 |
+                         observation_concept_id == 4058136 |
+                         observation_concept_id == 4044778 |
+                         observation_concept_id == 4052030 |
+                         observation_concept_id == 4144273 |
+                         observation_concept_id == 4052947 |
+                         observation_concept_id == 4209006 |
+                         observation_concept_id == 4204653 |
+                         observation_concept_id == 44789712 |
+                         observation_concept_id == 40486518 |
+                         observation_concept_id ==4046886 |
+                         observation_concept_id == 4058137 |
+                         observation_concept_id == 4216174 |
+                         observation_concept_id == 4215409 |
+                         observation_concept_id == 4190573 |
+                         observation_concept_id == 4052948 
+                     ) ,
+                   by=c("person_id"), copy = TRUE)  %>%
+        filter(observation_date < outcome_start_date) %>% # removes anyone with a observation after outcome
+        filter(observation_date > outcome_start_date - lubridate::days(3650) ) %>% # removes anyone with observation more than 10 years before the outcome
+        select(c(person_id, observation_date, outcome_start_date)) %>%
+        distinct() %>%
+        group_by(person_id, outcome_start_date) %>%
+        filter(observation_date == max(observation_date)) %>%
+        rename("Smoker_date_10yr"="observation_date"),
+      by= c("person_id", "outcome_start_date")) %>%
+    compute()
+  
+  # former smokers 5 year
+  Pophan <-
+    Pophan %>%
+    left_join(
+      Pophan %>%
+        select("person_id", "outcome_start_date") %>%
+        inner_join(cdm$observation %>%
+                     filter(
+                       observation_concept_id == 4052032 | # stopped smoking
+                         observation_concept_id == 44802805 # recently stopped smoking
+                     ) ,
+                   by=c("person_id"), copy = TRUE)  %>%
+        filter(observation_date < outcome_start_date) %>% # removes anyone with a observation after outcome
+        filter(observation_date > outcome_start_date - lubridate::days(1826) ) %>% # removes anyone with observation more than 5 years before the outcome
+        select(c(person_id, observation_date, outcome_start_date)) %>%
+        distinct() %>%
+        group_by(person_id, outcome_start_date) %>%
+        filter(observation_date == max(observation_date)) %>%
+        rename("PrevSmoker_date5y"="observation_date"),
+      by= c("person_id", "outcome_start_date")) %>%
+    compute()
+  
+  
+  # former smokers 10 year
+  Pophan <-
+    Pophan %>%
+    left_join(
+      Pophan %>%
+        select("person_id", "outcome_start_date") %>%
+        inner_join(cdm$observation %>%
+                     filter(
+                       observation_concept_id == 4052032 | # stopped smoking
+                         observation_concept_id == 44802805 # recently stopped smoking
+                     ) ,
+                   by=c("person_id"), copy = TRUE)  %>%
+        filter(observation_date < outcome_start_date) %>% # removes anyone with a observation after outcome
+        filter(observation_date > outcome_start_date - lubridate::days(3650) ) %>% # removes anyone with observation more than 10 years before the outcome
+        select(c(person_id, observation_date, outcome_start_date)) %>%
+        distinct() %>%
+        group_by(person_id, outcome_start_date) %>%
+        filter(observation_date == max(observation_date)) %>%
+        rename("PrevSmoker_date10y"="observation_date"),
+      by= c("person_id", "outcome_start_date")) %>%
+    compute()
+  
+  
+  
+  
+  # rules for updating smoking status
+  # if only smoking codes == SMOKER, non smoker == NON SMOKER
+  # Never-smokers were re-assigned as former-smokers if there were contradictory preceding smoking codes
+  # previous smokers were assigned smokers if date of smoking was after previous smoking code 
+  
+  # Smoking status using 5 years worth of previous data
+  # create a new variable for previous and if those who say non smoking convert to former/previous smoker
+  Pophan <- Pophan %>% mutate(PrevSmoker_date5y1 = ifelse(!is.na(PrevSmoker_date5y), non_smoker_date5y, PrevSmoker_date5y))
+  Pophan <- Pophan %>% mutate(PrevSmoker_date5y1 = replace(PrevSmoker_date5y1, !is.na(PrevSmoker_date5y1), "2Former"))
+  Pophan <- Pophan %>% mutate(PrevSmoker_date5y1 = replace(PrevSmoker_date5y1, !is.na(PrevSmoker_date5y), "2Former"))
+  
+  # remove previous entries if the have a smoking date after previous
+  Pophan <- Pophan %>% mutate(Smokernow = Smoker_date_5yr > PrevSmoker_date5y )
+  Pophan <- Pophan %>% mutate(PrevSmoker_date5y1 = replace(PrevSmoker_date5y1, Smokernow == TRUE, NA))
+  
+  # convert smoking into a character variable
+  Pophan <- Pophan %>% mutate(Smoker_date_5yr1 = as.character(Smoker_date_5yr))
+  Pophan <- Pophan %>% mutate(Smoker_date_5yr1 = replace(Smoker_date_5yr1, !is.na(Smoker_date_5yr1), "3Smoker"))
+  
+  # convert non smokers into non smoker
+  Pophan <- Pophan %>% mutate(non_smoker_date5y1 = as.character(non_smoker_date5y))
+  Pophan <- Pophan %>% mutate(non_smoker_date5y1 = replace(non_smoker_date5y1, !is.na(non_smoker_date5y1), "1Non Smoker"))
+  
+  Pophan <- Pophan %>% mutate(current_non_smoker_date5yr1 = as.character(current_non_smoker_date5yr))
+  Pophan <- Pophan %>% mutate(current_non_smoker_date5yr1 = replace(current_non_smoker_date5yr1, !is.na(current_non_smoker_date5yr1), "1Non Smoker"))
+  
+  # merge all to get smoking status in past 5 years
+  Pophan <- Pophan %>% mutate(smoking_status5yr = coalesce(PrevSmoker_date5y1, Smoker_date_5yr1))
+  Pophan <- Pophan %>% mutate(smoking_status5yr = coalesce(smoking_status5yr, non_smoker_date5y1))
+  Pophan <- Pophan %>% mutate(smoking_status5yr = coalesce(smoking_status5yr, current_non_smoker_date5yr1))
+  # replace those with missing observations with "Missing"
+  Pophan <- Pophan %>% mutate(smoking_status5yr = replace(smoking_status5yr, is.na(smoking_status5yr), "4Missing"))
+  
+  
+  
+  # Smoking status 10 years previous
+  Pophan <- Pophan %>% mutate(PrevSmoker_date10y1 = ifelse(!is.na(PrevSmoker_date10y), non_smoker_date10y, PrevSmoker_date10y))
+  Pophan <- Pophan %>% mutate(PrevSmoker_date10y1 = replace(PrevSmoker_date10y1, !is.na(PrevSmoker_date10y1), "2Former"))
+  Pophan <- Pophan %>% mutate(PrevSmoker_date10y1 = replace(PrevSmoker_date10y1, !is.na(PrevSmoker_date10y), "2Former"))
+  
+  # remove previous entries if the have a smoking date after previous
+  Pophan <- Pophan %>% mutate(Smokernow = Smoker_date_10yr > PrevSmoker_date10y )
+  Pophan <- Pophan %>% mutate(PrevSmoker_date10y1 = replace(PrevSmoker_date10y1, Smokernow == TRUE, NA))
+  
+  # convert smoking into a character variable
+  Pophan <- Pophan %>% mutate(Smoker_date_10yr1 = as.character(Smoker_date_10yr))
+  Pophan <- Pophan %>% mutate(Smoker_date_10yr1 = replace(Smoker_date_10yr1, !is.na(Smoker_date_10yr1), "3Smoker"))
+  
+  # convert non smokers into non smoker
+  Pophan <- Pophan %>% mutate(non_smoker_date10y1 = as.character(non_smoker_date10y))
+  Pophan <- Pophan %>% mutate(non_smoker_date10y1 = replace(non_smoker_date10y1, !is.na(non_smoker_date10y1), "1Non Smoker"))
+  
+  Pophan <- Pophan %>% mutate(current_non_smoker_date10yr1 = as.character(current_non_smoker_date10yr))
+  Pophan <- Pophan %>% mutate(current_non_smoker_date10yr1 = replace(current_non_smoker_date10yr1, !is.na(current_non_smoker_date10yr1), "1Non Smoker"))
+  
+  # merge all to get smoking status in past 10 years
+  Pophan <- Pophan %>% mutate(smoking_status10yr = coalesce(PrevSmoker_date10y1, Smoker_date_10yr1))
+  Pophan <- Pophan %>% mutate(smoking_status10yr = coalesce(smoking_status10yr, non_smoker_date10y1))
+  Pophan <- Pophan %>% mutate(smoking_status10yr = coalesce(smoking_status10yr, current_non_smoker_date10yr1))
+  # replace those with missing observations with "Missing"
+  Pophan <- Pophan %>% mutate(smoking_status10yr = replace(smoking_status10yr, is.na(smoking_status10yr), "4Missing"))
+  
   
   # get the co morbidites and medication usage for subset of cohort ----
   # medications (3 months before index date)
