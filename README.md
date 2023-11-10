@@ -1,8 +1,8 @@
-Incidence and Prevalence of different cancers
+Incidence, Prevalence and Survival over time of different cancers - COVID study
 ========================================================================================================================================================
 
 ## Introduction
-This study is focussing on determining the incidence, prevalence and survival for specific cancers. We will focus on the following cancers:
+This study is focussing on determining the incidence, prevalence and survival for specific cancers from 2000 to 2022. We will focus on the following cancers:
 * Breast
 * Colorectal
 * Lung
