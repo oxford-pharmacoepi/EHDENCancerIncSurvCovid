@@ -1,7 +1,7 @@
 # KM survival analysis ---
 
 # remove people who died on the same day as the outcome
-Pop<-Pop %>%
+Pop <- Pop %>%
   filter(time_days != 0)
 
 #OUTPUT data for whole dataset and strata based on calender year
@@ -703,14 +703,6 @@ if (agestandardization == TRUE) {
       
     }
     
-    # take the results from a list (one element for each cancer) and put into dataframe for KM survival
-    # observedkmcombined <- dplyr::bind_rows(observedkm) %>%
-    #   rename(est = estimate , ucl = conf.high, lcl = conf.low ) %>%
-    #   mutate(Stratification = "None")
-    # 
-    # medkmcombined <- dplyr::bind_rows(observedmedianKM) %>%
-    #   mutate(Stratification = "None")
-    
     # generate the risk table and remove entries < 5 patients
     risktableskm <- dplyr::bind_rows(observedrisktableKM) %>%
       mutate(across(everything(), ~replace(., . ==  0 , NA))) %>%
@@ -796,7 +788,7 @@ if (agestandardization == TRUE) {
     
     # combine all the survival results -----
     
-    #risk table # error with characters and double formats
+    #risk table
     riskTableResults <- bind_rows(
       risktableskm , # all
       risktableskm_gender  
@@ -869,89 +861,3 @@ if (agestandardization == TRUE) {
                         outputFolder=here::here("Results", db.name))
   
 }
-
-
-
-
-######################################
-# KM analysis for head and neck cancer subtypes
-####################################
-# for head and neck cancer substypes
-if (grepl("CPRD", db.name) == TRUE){
-  
-  #remove those who got a diagnosis on same date as death
-  Pophan<-Pophan %>%
-    filter(time_days != 0)
-  
-  #OUTPUT data for whole dataset and strata based on calender year for head and neck
-  PopAll <- DataExtraction(dataset = Pophan)
-  
-  # create a loop which carries the analysis out on the number of calender year groups (all data plus the calender time splits)
-  SurResults <- list()
-  
-  for(l in 1:length(PopAll)) {
-    SurResults[[l]] <- SurAnalysis(dataset = PopAll[[l]],
-                                   outcomeCohort = outcome_cohorts_han)
-  }
-  
-  # extract results for the whole population
-  whole_pop_results <- list(
-    SurResults[[1]]$survival_estimates ,
-    SurResults[[1]]$risk_table_results ,
-    SurResults[[1]]$median_survival_results,
-    SurResults[[1]]$one_five_ten_survival_rates
-  )
-  
-  names(whole_pop_results) <- c(paste0("survival_estimates", db.name),
-                                paste0("risk_table_results", db.name),
-                                paste0("median_survival_results", db.name),
-                                paste0("one_five_ten_survival_rates", db.name))
-  
-  # extract calender year results
-  surres <- list()
-  rtres <- list()
-  msres <- list()
-  oftsrres <- list()
-  
-  # extract information for calender year (element 1 is whole population so start from 2:n)
-  for(q in 2:length(PopAll)) {
-    
-    surres[[q]]<-SurResults[[q]]$survival_estimates
-    rtres[[q]]<-SurResults[[q]]$risk_table_results
-    msres[[q]]<-SurResults[[q]]$median_survival_results
-    oftsrres[[q]]<-SurResults[[q]]$one_five_ten_survival_rates
-    
-  }
-  
-  # bind the results for calender years
-  survival_results_cy <- bind_rows(surres)
-  risk_table_cy <- bind_rows(rtres)
-  med_surv_results_cy <- bind_rows(msres)
-  survival_prob_cy <- bind_rows(oftsrres)
-  
-  calenderyr_results <- list(
-    survival_results_cy,
-    risk_table_cy,
-    med_surv_results_cy,
-    survival_prob_cy)
-  
-  names(calenderyr_results) <- c(paste0("survival_estimates_cy_han", db.name),
-                                 paste0("risk_table_results_cy_han", db.name),
-                                 paste0("median_survival_results_cy_han", db.name),
-                                 paste0("one_five_ten_survival_rates_cy_han", db.name))
-  
-  # zip results
-  print("Zipping results to output folder")
-  
-  #whole database
-  exportSurvivalResults(result=whole_pop_results,
-                        zipName= paste0(db.name, "WholeSurvivalResultsHan"),
-                        outputFolder=here::here("Results", db.name))
-  
-  #calender year stratification
-  exportSurvivalResults(result=calenderyr_results,
-                        zipName= paste0(db.name, "CalenderYrSurvivalResultsHan"),
-                        outputFolder=here::here("Results", db.name))
-
-}
-

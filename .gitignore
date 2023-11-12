@@ -1,19 +1,10 @@
-output/*
-output full 20_12/*
-CodeToRun_local.R
+CodeToRunLocal.R
 .Rproj.user*
 .Rhistory
 postgresql-42.2.18.jar
-Cohorts/ExposureCohorts/sql/test hosp.sql
-errorReportSql.txt
-CodeToRun_local_HM.R
 CodeToRunLocal.R
 Results*
 .Rproj.user
-CPRDAurumIPResults
-1_InstantiateCohorts/CopyOutcomeCohorts/*
-troubleshooting.R
-4_troubleshooting/*
 logfile.log
 3_QC*
 .Rprofile

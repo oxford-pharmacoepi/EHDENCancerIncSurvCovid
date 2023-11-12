@@ -1,15 +1,8 @@
 # table names----
-outcome_table_name<-paste0(outcome_table_stem,"_o") # for incidence
-prevalent_table_name<-paste0(outcome_table_stem,"_p") # for prevalence
-feature_disease_table_name <- paste0(outcome_table_stem,"_fdisease") # for disease features
-feature_disease_liver_table_name <- paste0(outcome_table_stem,"_fdiseaseliver") # for disease features
-feature_medication_table_name <- paste0(outcome_table_stem,"_fmed") # for med features
-
-
-if (grepl("CPRD", db.name) == TRUE) {
-outcome_table_name_han<-paste0(outcome_table_stem,"_o_han") # for incidence
-prevalent_table_name_han<-paste0(outcome_table_stem,"_p_han") # for prevalence
-}
+incidence_table_name <- "incidence" 
+prevalent_table_name <- "prevalence"
+feature_disease_table_name <- "conditions"
+feature_medication_table_name <- "medications"
 
 # QC plot folders ----
 qcfolder <- here::here("3_QC",db.name)
@@ -75,46 +68,21 @@ nice.num.count<-function(x) {
 
 #FUNCTION to extract the data and calculate the correct observation time and event (death) for different calender strata
 DataExtraction <- function(dataset){
-  data <-dataset
-  #for whole dataset
-  #make new end of observation period to studyEndDate parameter ----
-  # data <-dataset %>%
-  #   mutate(endOfObservation = ifelse(observation_period_end_date >= studyEndDate, studyEndDate, NA)) %>%
-  #   mutate(endOfObservation = as.Date(endOfObservation) ) %>%
-  #   mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
-  # 
-  # # binary death outcome (for survival) ---
-  # # need to take into account follow up
-  # # if death date is > database end data set death to 0
-  # data <-data %>%
-  #   mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
-  #   mutate(status= ifelse(death_date > endOfObservation , 1, status )) %>%
-  #   mutate(status= ifelse(is.na(status), 1, status ))
-  # 
-  # # calculate follow up in years
-  # data <-data %>%
-  #   mutate(time_days=as.numeric(difftime(endOfObservation,
-  #                                        outcome_start_date,
-  #                                        units="days"))) %>%
-  #   mutate(time_years=time_days/365.25)
-  # 
-  # # take "dataset" and do the code for each calender year
-  # carry out for calender year
-  # take year and split into groups based on the data available
-  #grid <- rev(seq(max(lubridate::year(lubridate::ymd(dataset$outcome_start_date))), min(lubridate::year(lubridate::ymd(dataset$cohort_start_date))),by=-5))
+  data <- dataset
   
+  #make new end of observation period to studyEndDate parameter ----
   grid <- rev(seq(2019, min(lubridate::year(lubridate::ymd(dataset$cohort_start_date))),by=-5))
   
-  # create a tool which creates 5 year age gaps but truncates at last year of study period
+  # create a tool which creates 5 year age gaps and follows up for 5 years
   # now need to create the start and end dates for each one
   startYear <- paste0(grid-4,"-01-01") # first days
   endYear <- paste0(grid,"-12-31") # end days (plus 4 to create 5 year bands)
   
-  #add on extra times for 2020-21
+  #add on extra times for 2020-22 (3 years)
   startYear <- c(startYear , "2020-01-01")
-  endYear <- c(endYear , "2021-12-31")
+  endYear <- c(endYear , "2022-12-31")
   
-  # split data into groups of calender year and put it into a list. This will create 4 groups split by calender year
+  # split data into groups of calender year and put it into a list. This will create 4 groups split by calender year of diagnosis with 5 years follow up
   calenderSplitData <- list()
   
   for(w in 1:length(endYear)){
@@ -123,18 +91,32 @@ DataExtraction <- function(dataset){
       filter( outcome_start_date >= startYear[w] &  
                 outcome_start_date <= endYear[w] )
     
-    calenderdata <- calenderdata %>%
-      mutate(endOfObservation = ifelse(observation_period_end_date >= endYear[w], endYear[w], NA)) %>%
-      mutate(endOfObservation = as.Date(endOfObservation) ) %>%
-      mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
+    if (startYear[w] == "2020-01-01"){
+      
+      calenderdata <- calenderdata %>%
+        mutate(endOfObservation = outcome_start_date + 1095.75) %>%
+        mutate(endOfObservation = dplyr::if_else(observation_period_end_date >= endOfObservation, endOfObservation, NA)) %>%
+        mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date)) %>% 
+        mutate(endOfObservation = dplyr::if_else(endOfObservation > lubridate::as_date(endYear[w]), lubridate::as_date(endYear[w]), endOfObservation))
+      
+      
+    } else {
+      
+      calenderdata <- calenderdata %>%
+        mutate(endOfObservation = outcome_start_date + 1826.25) %>%
+        mutate(endOfObservation = dplyr::if_else(observation_period_end_date >= endOfObservation, endOfObservation, NA)) %>%
+        mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date))
+      
+    }
     
     # binary death outcome (for survival) ---
     # need to take into account follow up
-    # if death date is > database end data set death to 0
+    # if death date is > database end data set death to 1
     calenderdata <- calenderdata %>%
-      mutate(status= ifelse(!is.na(death_date), 2, 1 )) %>%
-      mutate(status= ifelse(death_date > endOfObservation , 1, status )) %>%
-      mutate(status= ifelse(is.na(status), 1, status ))
+      mutate(status = dplyr::if_else(!is.na(death_date), 2, 1 )) %>%
+      mutate(status = dplyr::if_else(death_date > endOfObservation , 1, status )) %>%
+      mutate(status = dplyr::if_else(is.na(status), 1, status ))
+    
     
     # calculate follow up in years
     calenderdata <- calenderdata %>%
@@ -142,6 +124,7 @@ DataExtraction <- function(dataset){
                                            outcome_start_date,
                                            units="days"))) %>%
       mutate(time_years=time_days/365.25)
+    
     
     calenderSplitData[[w]] <- calenderdata
     
@@ -171,18 +154,17 @@ info(logger, 'GOT STUDY COHORTS')
 info(logger, 'RUNNING INCIDENCE RATE ANALYSIS')
 source(here("2_Analysis","IncidenceAnalysis1.R"))
 info(logger, 'INCIDENCE RATE ANALYSIS RAN')
-# 
+
 # Run cohort characterisation analysis ----
 info(logger, 'RUNNING COHORT CHARACTERISATION ANALYSIS')
 source(here("2_Analysis","CohortCharacteristics2.R"))
 info(logger, 'COHORT CHARACTERISATION ANALYSIS RAN')
 
-if(runSurvial == TRUE){
 # Run survival analysis -----
 info(logger, 'RUNNING SURVIVAL ANALYSIS')
 source(here("2_Analysis","SurvivalAnalysis1.R"))
 info(logger, 'SURVIVAL ANALYSIS RAN')
-}
+
 
 print("Done!")
 print("-- If all has worked, there should now be three zip folders with the incidence/prevalence and survival results for whole datasets and calender years in the output folder to share")

@@ -10,18 +10,8 @@ prevalent_cohorts <- CDMConnector::readCohortSet(here::here(
   "1_InstantiateCohorts",
   "PrevalentCohorts"))
 
-outcome_cohorts_han <- CDMConnector::readCohortSet(here::here(
-  "1_InstantiateCohorts",
-  "HeadNeckSubtypes" ,
-  "OutcomeCohorts"
-))
-
-
-prevalent_cohorts_han <- CDMConnector::readCohortSet(here::here("1_InstantiateCohorts",
-                                                                "HeadNeckSubtypes" ,
-                                                                "PrevalentCohorts"))
-
 # only instanstiate cohorts if this argument is TRUE
+instantiatedCohorts <- FALSE
 if (instantiatedCohorts == TRUE) {
   
   cdm <- CDMConnector::cdm_from_con(con = db,
@@ -37,15 +27,16 @@ if (instantiatedCohorts == TRUE) {
 
 print("Instantiating cancer cohorts")
   
-info(logger, "- getting incident outcomes")
+info(logger, "- getting incidence cohorts")
 
 cdm <- CDMConnector::generateCohortSet(cdm, 
                                        cohortSet = outcome_cohorts,
-                                       name = outcome_table_name,
+                                       computeAttrition = TRUE,
+                                       name = incidence_table_name,
                                        overwrite = TRUE
 )
 
-info(logger, "- got outcomes")
+info(logger, "- got incidence cohorts")
 
 
 # instantiate prevalent outcome cohorts
@@ -53,46 +44,12 @@ info(logger, "- getting prevalent outcomes")
 
 cdm <- CDMConnector::generateCohortSet(cdm = cdm, 
                          cohortSet = prevalent_cohorts,
+                         computeAttrition = TRUE,
                          name = prevalent_table_name,
                          overwrite = TRUE
                          
 )
 
 info(logger, "- got prevalent outcomes")
-
-
-# if running CPRD data also run the subsets of head and neck cancers for inc/prev
-if (grepl("CPRD", db.name) == TRUE) {
-  
-  print("Instantiating head and neck subtypes")
-  
-  # instantiate outcome cohorts
-  info(logger, "- getting incident outcome definitions head and neck")
-  
-  
-  info(logger, "- getting incident han outcomes")
-  
-  cdm <- CDMConnector::generateCohortSet(cdm, 
-                                         cohortSet = outcome_cohorts_han,
-                                         name = outcome_table_name_han,
-                                         overwrite = TRUE
-  )
-  
-  info(logger, "- got outcomes")
-  
-  
-  # instantiate prevalent outcome cohorts
-  info(logger, "- getting prevalent han outcomes")
-
-  
-  cdm <- CDMConnector::generateCohortSet(cdm = cdm, 
-                           cohortSet = prevalent_cohorts_han,
-                           name = prevalent_table_name_han,
-                           overwrite = TRUE
-  )
-  
-  info(logger, "- got prevalent han outcomes")
-  
-}
 
 }
