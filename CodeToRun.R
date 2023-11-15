@@ -21,9 +21,7 @@ library(bshazard)
 
 # database metadata and connection details -----
 # The name/ acronym for the database
-db.name<-"CPRDGold"
-
-"..."
+db.name<-"..."
 
 # Set output folder location -----
 # the path to a folder where the results from this analysis will be saved
