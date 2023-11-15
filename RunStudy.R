@@ -272,7 +272,7 @@ info(logger, 'SURVIVAL ANALYSIS RAN')
 
 
 print("Done!")
-print("-- If all has worked, there should now be three zip folders with the incidence/prevalence and survival results for whole datasets and calender years in the output folder to share")
+print("-- If all has worked, there should now be zip folders with the incidence/prevalence and survival results in the output folder to share")
 print("-- Thank you for running the study! :)")
 Sys.time()-start
 readLines(log_file)

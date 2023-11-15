@@ -18,6 +18,7 @@ library(ggplot2)
 library(broom)
 library(survival)
 library(bshazard)
+library(SqlRender)
 
 # database metadata and connection details -----
 # The name/ acronym for the database
