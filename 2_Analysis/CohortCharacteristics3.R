@@ -67,18 +67,26 @@ cdm$cancer_table_one <- Reduce(union_all, cancer_participants) %>%
 cdm$cancer_table_one <- new_generated_cohort_set(cohort_ref = cdm$cancer_table_one, overwrite = TRUE)
 
 cdm$cancer_table_one <- cdm$cancer_table_one %>% 
-PatientProfiles::addAge(
-  indexDate = "cohort_start_date",
-  ageName = "age",
-  ageGroup = list(c(18, 29),
-                  c(30, 39),
-                  c(40, 49),
-                  c(50, 59),
-                  c(60, 69),
-                  c(70, 79),
-                  c(80, 89),
-                  c(90, 150))) %>% 
-    PatientProfiles::addSex()
+  
+  PatientProfiles::addDemographics(
+    age = TRUE,
+    ageName = "age",
+    ageGroup =  list(
+      "age_gr" =
+        list(
+          "18 to 29" = c(18, 29),
+          "30 to 39" = c(30, 39),
+          "40 to 49" = c(40, 49),
+          "50 to 59" = c(50, 59),
+          "60 to 69" = c(60, 69),
+          "70 to 79" = c(70, 79),
+          "80 to 89" = c(80, 89),
+          "90 +" = c(90, 150)
+          
+        )
+    )
+  )
+
 
 #creating table one for characterization of cancers
 
@@ -115,7 +123,7 @@ info(logger, "SUBSETTED CDM")
   suppressWarnings(
     tableone <- cdm$cancer_table_one %>%
       PatientProfiles::summariseCharacteristics(
-        strata = list(c("sex"),c("age_group"), c("sex", "age_group" )),
+        strata = list(c("sex"),c("age_gr"), c("sex", "age_gr" )),
         minCellCount = 5,
         ageGroup = list(c(18, 29),
                             c(30, 39),

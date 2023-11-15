@@ -53,13 +53,13 @@ exportSurvivalResults <- function(result, zipName, outputFolder) {
 }
 
 #formatting for table 1
-nice.num<-function(x) {
-  trimws(format(round(x,1),
-                big.mark=",", nsmall = 1, digits=1, scientific=FALSE))}
-# printing numbers with 2 decimal place and commas 
+nice.num1<-function(x) {
+  base::trimws(format(round(x,1),
+                      big.mark=",", nsmall = 1, digits=1, scientific=FALSE))}
+
 nice.num2<-function(x) {
-  trimws(format(round(x,2),
-                big.mark=",", nsmall = 2, digits=2, scientific=FALSE))}
+  base::trimws(format(round(x,2),
+                      big.mark=",", nsmall = 2, digits=2, scientific=FALSE))}
 # for counts- without decimal place
 nice.num.count<-function(x) {
   trimws(format(x,
@@ -240,6 +240,7 @@ DataExtraction <- function(dataset){
   
 }
 
+agestandardization <- TRUE
 
 start<-Sys.time()
 
@@ -261,7 +262,7 @@ info(logger, 'INCIDENCE RATE ANALYSIS RAN')
 
 # Run cohort characterisation analysis ----
 info(logger, 'RUNNING COHORT CHARACTERISATION ANALYSIS')
-source(here("2_Analysis","CohortCharacteristics2.R"))
+source(here("2_Analysis","CohortCharacteristics3.R"))
 info(logger, 'COHORT CHARACTERISATION ANALYSIS RAN')
 
 # Run survival analysis -----
