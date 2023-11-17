@@ -41,7 +41,7 @@ inc <- estimateIncidence(
   denominatorTable = "denominator",
   outcomeTable = incidence_table_name,
   denominatorCohortId = NULL,
-  interval = c("years", "overall"),
+  interval = c("quarters", "overall"),
   outcomeWashout = Inf,
   repeatedEvents = FALSE,
   completeDatabaseIntervals = TRUE,
@@ -65,7 +65,7 @@ prev_period <- estimatePeriodPrevalence(
   denominatorTable = "denominator",
   outcomeTable = prevalent_table_name,
   outcomeLookbackDays = 0, 
-  interval = "years" ,
+  interval = "quarters" ,
   completeDatabaseIntervals = TRUE, # prev only estimate for intervals where db captures all of the interval
   fullContribution = FALSE , # individuals only required to be present for one day in interval
   minCellCount = 5,
@@ -108,7 +108,7 @@ inc_agestand <- estimateIncidence(
   denominatorTable = "denominator",
   outcomeTable = incidence_table_name,
   denominatorCohortId = NULL,
-  interval = c("years", "overall"),
+  interval = c("quarters", "overall"),
   outcomeWashout = Inf,
   repeatedEvents = FALSE,
   completeDatabaseIntervals = TRUE,
@@ -122,7 +122,7 @@ prev_period_agestand <- estimatePeriodPrevalence(
   denominatorTable = "denominator",
   outcomeTable = prevalent_table_name,
   outcomeLookbackDays = 0, 
-  interval = "years" ,
+  interval = "quarters" ,
   completeDatabaseIntervals = TRUE, # prev only estimate for intervals where db captures all of the interval
   fullContribution = FALSE , # individuals only required to be present for one day in interval
   minCellCount = 0,

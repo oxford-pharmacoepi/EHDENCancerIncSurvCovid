@@ -11,12 +11,12 @@ dplyr::left_join(cdm$death %>%
                    by = c("subject_id"= "person_id")) %>% 
   CDMConnector::computeQuery() %>% 
   dplyr::filter(cohort_start_date >= as.Date(studyStartDate)) %>% 
-  dplyr::filter(cohort_start_date <= '2022-12-31') %>% 
-  dplyr::mutate(observation_period_end_date_2022 = ifelse(observation_period_end_date >= '2022-12-31', '2022-12-31', NA)) %>%
+  dplyr::filter(cohort_start_date <= '2022-12-15') %>% 
+  dplyr::mutate(observation_period_end_date_2022 = ifelse(observation_period_end_date >= '2022-12-15', '2022-12-15', NA)) %>%
   dplyr::mutate(observation_period_end_date_2022 = as.Date(observation_period_end_date_2022) ) %>%
   dplyr::mutate(observation_period_end_date_2022 = coalesce(observation_period_end_date_2022, observation_period_end_date)) %>% 
   dplyr::mutate(status = death_date) %>% 
-  dplyr::mutate(status = ifelse(death_date > '2022-12-31', NA, status)) %>% 
+  dplyr::mutate(status = ifelse(death_date > '2022-12-15', NA, status)) %>% 
   dplyr::mutate(status = ifelse(death_date > observation_period_end_date_2022, NA, status)) %>% 
   dplyr::mutate(status = ifelse(is.na(status), 1, 2 )) %>% 
   dplyr::mutate(time_days = observation_period_end_date_2022 - cohort_start_date ) %>% 

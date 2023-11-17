@@ -22,6 +22,12 @@ RiskSetCount <- function(timeindex, survivaltime) {
   return(atrisk)
 }
 
+# measuring time in minutes using tictoc package
+toc_min <- function(tic,toc,msg="") {
+  mins <- round((((toc-tic)/60)),2)
+  outmsg <- paste0(mins, " minutes elapsed")
+}
+
 #exporting the survival results
 exportSurvivalResults <- function(result, zipName, outputFolder) {
   
@@ -256,9 +262,9 @@ source(here("1_InstantiateCohorts","InstantiateStudyCohorts.R"))
 info(logger, 'GOT STUDY COHORTS')
 
 # Run incidence rate analysis ----
-info(logger, 'RUNNING INCIDENCE RATE ANALYSIS')
-source(here("2_Analysis","IncidenceAnalysis1.R"))
-info(logger, 'INCIDENCE RATE ANALYSIS RAN')
+# info(logger, 'RUNNING INCIDENCE RATE ANALYSIS')
+# source(here("2_Analysis","IncidenceAnalysis1.R"))
+# info(logger, 'INCIDENCE RATE ANALYSIS RAN')
 
 # Run cohort characterisation analysis ----
 info(logger, 'RUNNING COHORT CHARACTERISATION ANALYSIS')
