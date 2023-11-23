@@ -15,3 +15,4 @@ networkResults*
 4_ageStandardization/CPRDGoldIPResultsAgeStandardization/CPRDGold_incidence_2023_11_19.csv
 4_ageStandardization/CPRDGoldIPResultsAgeStandardization/CPRDGold_period_prevalence_2023_11_19.csv
 shiny/data/*
+shiny/rsconnect/shinyapps.io/dpa-pde-oxford/CancerIncSurvCovid.dcf
