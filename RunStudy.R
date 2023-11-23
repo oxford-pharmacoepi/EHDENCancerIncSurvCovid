@@ -203,8 +203,9 @@ DataExtraction <- function(dataset){
     
     if (startYear[w] == "2020-01-01"){
       
+      # follow up for 1079 days (1/jan/2020 to 15/12/2022)
       calenderdata <- calenderdata %>%
-        mutate(endOfObservation = outcome_start_date + 1095.75) %>%
+        mutate(endOfObservation = outcome_start_date + 1079) %>%
         mutate(endOfObservation = dplyr::if_else(observation_period_end_date >= endOfObservation, endOfObservation, NA)) %>%
         mutate(endOfObservation = coalesce(endOfObservation, observation_period_end_date)) %>% 
         mutate(endOfObservation = dplyr::if_else(endOfObservation > lubridate::as_date(endYear[w]), lubridate::as_date(endYear[w]), endOfObservation))

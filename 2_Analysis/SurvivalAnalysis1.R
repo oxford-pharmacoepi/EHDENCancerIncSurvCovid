@@ -102,8 +102,7 @@ for(j in 1:nrow(outcome_cohorts)) {
   print(paste0("KM for observed data ", Sys.time()," for ",outcome_cohorts$cohort_name[j], " completed"))
   
   # get risk table for specific times ---
-  grid <- seq(0,floor(max(data$time_years)),by=0.5) #get the number of years every half year
-  
+  grid <- seq(0,(max(data$time_years)),by=0.5)  
   sprob <- survival::survfit(Surv(time_years, status) ~ 1, data=data) %>% 
     summary(times = grid, extend = TRUE)
   cols <- lapply(c(2:15) , function(x) sprob[x])
@@ -210,8 +209,6 @@ for(j in 1:nrow(outcome_cohorts)) {
     
     # get risk table for specific times for each sex then combine again ---
     grid <- seq(0,floor(max(data$time_years)),by=0.5) #get the number of years
-    grid <-  grid[(str_detect(grid, "[1-9]\\.5", negate = TRUE )) & (str_detect(grid, "10.5", negate = TRUE )) &
-                    (str_detect(grid, "20.5", negate = TRUE )) & (str_detect(grid, "30.5", negate = TRUE ))] # remove all the half years apart from the first half year
     sprob <- survival::survfit(Surv(time_years, status) ~ sex, data=data) %>% 
       summary(times = grid, extend = TRUE)
     cols <- lapply(c(2:16) , function(x) sprob[x])
