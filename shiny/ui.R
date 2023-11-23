@@ -13,25 +13,21 @@ ui <- dashboardPage(
         text = "Background",
         tabName = "background"
       ),
-      menuItem(
-        text = "Database",
-        tabName = "dbs",
-        menuSubItem(
-          text = "Snapshot",
-          tabName = "snapshotcdm"
-        )
 
-      ),
       
       menuItem(
         text = "Incidence",
         tabName = "incidence",
         menuSubItem(
-          text = "Plots",
+          text = "Crude Plots",
           tabName = "inc_plots"
         ),
         menuSubItem(
-          text = "Rate",
+          text = "Age Standardized Plots",
+          tabName = "inc_plots"
+        ),
+        menuSubItem(
+          text = "Incidence Results",
           tabName = "inc_rates"
         ),
         menuSubItem(
@@ -90,6 +86,15 @@ ui <- dashboardPage(
           tabName = "tableone"
         )
       ),
+      menuItem(
+        text = "Database",
+        tabName = "dbs",
+        menuSubItem(
+          text = "Snapshot",
+          tabName = "snapshotcdm"
+        )
+        
+      ),
       
       # Logo 
       tags$div(
@@ -144,10 +149,12 @@ ui <- dashboardPage(
                 
         ),
         
-        tags$h5("Any questions regarding these results or problems with this shiny app please contact",
-                tags$a(href="mailto:danielle.newby@ndorms.ox.ac.uk", "Danielle Newby")
+        tags$h5("Any questions regarding this shiny app please contact",
+                tags$a(href="mailto:danielle.newby@ndorms.ox.ac.uk", "Danielle Newby"), "and any questions regarding this study please contact the corresponding author",
+                tags$a(href="mailto:daniel.prietoalhambra@ndorms.ox.ac.uk", "Professor Daniel Prieto Alhambra")
                 
         ),
+        
         
         
         tags$hr()
@@ -157,7 +164,7 @@ ui <- dashboardPage(
       
       # cdm snapshot ------
       tabItem(
-        tags$h5("Snapshot of the cdm for each database"),
+        tags$h5("Snapshot of the cdm from database"),
         tabName = "snapshotcdm",
         htmlOutput('tbl_cdm_snaphot'),
         tags$hr(),

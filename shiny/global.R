@@ -22,17 +22,17 @@ library(bslib)
 
 mytheme <- create_theme(
   adminlte_color(
-    light_blue = "#605ca8" 
+    light_blue = "#605ca8"
   ),
   adminlte_sidebar(
     dark_bg = "#78B7C5", #  "#D8DEE9",
     dark_hover_bg = "#3B9AB2", #"#81A1C1",
     dark_color ="white" ,
     dark_submenu_bg = "#605ca8"
-  ), 
+  ),
   adminlte_global(
-    content_bg = "#eaebea" 
-    #content_bg = "white" 
+    content_bg = "#eaebea"
+    #content_bg = "white"
   ),
   adminlte_vars(
     border_color = "black",
@@ -41,9 +41,11 @@ mytheme <- create_theme(
     active_link_hover_border_color = "#112446",
     link_hover_border_color = "#112446",
     table_border_color = "black"
-    
+
   )
 )
+
+
 
 # Data prep functions -----
 # printing numbers with 3 decimal place and commas 
