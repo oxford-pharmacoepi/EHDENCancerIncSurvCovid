@@ -66,7 +66,11 @@
     },
     "CodelistGenerator": {
       "Package": "CodelistGenerator",
+<<<<<<< HEAD
       "Version": "1.7.0",
+=======
+      "Version": "2.0.0",
+>>>>>>> 008ba8929cc3354924750c2e876cf48cbda62561
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -86,7 +90,11 @@
         "tidyr",
         "tidyselect"
       ],
+<<<<<<< HEAD
       "Hash": "a2146680a0406584e4d755f8824135cd"
+=======
+      "Hash": "fab0e4f5d8eddb38001200127bc3d840"
+>>>>>>> 008ba8929cc3354924750c2e876cf48cbda62561
     },
     "DBI": {
       "Package": "DBI",
@@ -124,6 +132,30 @@
         "methods"
       ],
       "Hash": "bc727aba82bcda74db0bbe188ec6757c"
+    },
+    "DrugUtilisation": {
+      "Package": "DrugUtilisation",
+      "Version": "0.4.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "CDMConnector",
+        "DBI",
+        "PatientProfiles",
+        "R",
+        "RJSONIO",
+        "checkmate",
+        "cli",
+        "dbplyr",
+        "dplyr",
+        "glue",
+        "lubridate",
+        "magrittr",
+        "purrr",
+        "rlang",
+        "tidyr"
+      ],
+      "Hash": "7083d0a424a9d7b5aca1a4031821e3b8"
     },
     "Epi": {
       "Package": "Epi",
@@ -2510,6 +2542,17 @@
         "vctrs"
       ],
       "Hash": "a84e2cc86d07289b3b6f5069df7a004c"
+    },
+    "tictoc": {
+      "Package": "tictoc",
+      "Version": "1.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "methods"
+      ],
+      "Hash": "2c6c63f3f4f103d41cb2aae1ab1c7ce1"
     },
     "tidyr": {
       "Package": "tidyr",

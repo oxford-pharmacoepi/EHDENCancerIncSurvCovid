@@ -1,5 +1,8 @@
-renv::activate()
-renv::restore()
+# Manage project dependencies ------
+# the following will prompt you to install the various packages used in the study 
+# install.packages("renv")
+# renv::activate()
+renv:restore()
 
 # load r packages
 library(CirceR)
@@ -19,6 +22,9 @@ library(broom)
 library(survival)
 library(bshazard)
 library(SqlRender)
+library(tictoc)
+library(CodelistGenerator)
+library(DrugUtilisation)
 
 # database metadata and connection details -----
 # The name/ acronym for the database
