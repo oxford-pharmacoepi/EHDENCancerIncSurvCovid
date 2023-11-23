@@ -19,6 +19,9 @@ library(broom)
 library(survival)
 library(bshazard)
 library(SqlRender)
+library(tictoc)
+library(CodelistGenerator)
+library(DrugUtilisation)
 
 # database metadata and connection details -----
 # The name/ acronym for the database
