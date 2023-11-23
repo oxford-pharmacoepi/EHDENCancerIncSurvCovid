@@ -11,5 +11,7 @@ logfile.log
 networkResults*
 4_ageStandardization/data*
 5_tables/data*
-CancerIncidencePrevalanceShiny/shiny/data/CPRDGold (5).zip
-CancerIncidencePrevalanceShiny/data/CPRDGold (5).zip
+4_ageStandardization/CPRDGoldIPResultsAgeStandardization.zip
+4_ageStandardization/CPRDGoldIPResultsAgeStandardization/CPRDGold_incidence_2023_11_19.csv
+4_ageStandardization/CPRDGoldIPResultsAgeStandardization/CPRDGold_period_prevalence_2023_11_19.csv
+shiny/data/*
