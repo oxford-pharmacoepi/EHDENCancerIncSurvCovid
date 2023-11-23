@@ -23,6 +23,7 @@ library(survival)
 library(bshazard)
 library(SqlRender)
 library(tictoc)
+library(RPostgres)
 library(CodelistGenerator)
 library(DrugUtilisation)
 
