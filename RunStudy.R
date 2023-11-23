@@ -262,9 +262,9 @@ source(here("1_InstantiateCohorts","InstantiateStudyCohorts.R"))
 info(logger, 'GOT STUDY COHORTS')
 
 # Run incidence rate analysis ----
-# info(logger, 'RUNNING INCIDENCE RATE ANALYSIS')
-# source(here("2_Analysis","IncidenceAnalysis1.R"))
-# info(logger, 'INCIDENCE RATE ANALYSIS RAN')
+info(logger, 'RUNNING INCIDENCE RATE ANALYSIS')
+source(here("2_Analysis","IncidenceAnalysis1.R"))
+info(logger, 'INCIDENCE RATE ANALYSIS RAN')
 
 # Run cohort characterisation analysis ----
 info(logger, 'RUNNING COHORT CHARACTERISATION ANALYSIS')
