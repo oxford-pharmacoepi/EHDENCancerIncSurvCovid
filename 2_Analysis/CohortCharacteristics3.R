@@ -98,16 +98,10 @@ info(logger, "SUBSETTED CDM")
   info(logger, "INSTANTIATE MEDICATIONS")
   codelistMedications <- CodelistGenerator::codesFromConceptSet(here("1_InstantiateCohorts", "Medications"), cdm)
 
-<<<<<<< HEAD
-  cdm <- CDMConnector::generateConceptCohortSet(cdm = cdm,
-                                                conceptSet = codelistMedications,
-                                                name = "medications",
-                                                overwrite = TRUE)
-=======
+
   cdm <- DrugUtilisation::generateDrugUtilisationCohortSet(cdm = cdm, 
                                                            conceptSet = codelistMedications, 
                                                            name = "medications")
->>>>>>> 008ba8929cc3354924750c2e876cf48cbda62561
 
   info(logger, "INSTANTIATED MEDICATIONS")
 
@@ -162,7 +156,6 @@ info(logger, "CREATING TABLE ONE")
 
 # rename cancers with better formats
 tableone <- tableone %>%
-<<<<<<< HEAD
   dplyr::mutate(group_level = replace(group_level, group_level == "Cohort 1", "Breast")) %>%
   dplyr::mutate(group_level = replace(group_level, group_level == "Cohort 2", "Colorectal")) %>%
   dplyr::mutate(group_level = replace(group_level, group_level == "Cohort 3", "Esophageal")) %>% 
@@ -172,24 +165,7 @@ tableone <- tableone %>%
   dplyr::mutate(group_level = replace(group_level, group_level == "Cohort 7", "Pancreatic")) %>%
   dplyr::mutate(group_level = replace(group_level, group_level == "Cohort 8", "Prostate")) %>%
   dplyr::mutate(group_level = replace(group_level, group_level == "Cohort 9", "Stomach")) 
-=======
-  dplyr::mutate(group_level = replace(group_level, group_level == "Breastcancer", "Breast")) %>%
-  dplyr::mutate(group_level = replace(group_level, group_level == "Crc", "Colorectal")) %>%
-  dplyr::mutate(group_level = replace(group_level, group_level == "Hncancer", "Head and Neck")) %>%
-  dplyr::mutate(group_level = replace(group_level, group_level == "Livercancer", "Liver")) %>%
-  dplyr::mutate(group_level = replace(group_level, group_level == "Lungcancer", "Lung")) %>%
-  dplyr::mutate(group_level = replace(group_level, group_level == "Pancreaticcancer", "Pancreatic")) %>%
-  dplyr::mutate(group_level = replace(group_level, group_level == "Prostatecancer", "Prostate")) %>%
-  dplyr::mutate(group_level = replace(group_level, group_level == "Stomachcancer", "Stomach")) %>%
-  dplyr::mutate(variable_level = replace(variable_level, variable_level == "Breastcancer", "Breast Cancer")) %>%
-  dplyr::mutate(variable_level = replace(variable_level, variable_level == "Crc", "Colorectal Cancer")) %>%
-  dplyr::mutate(variable_level = replace(variable_level, variable_level == "Hncancer", "Head and Neck Cancer")) %>%
-  dplyr::mutate(variable_level = replace(variable_level, variable_level == "Livercancer", "Liver Cancer")) %>%
-  dplyr::mutate(variable_level = replace(variable_level, variable_level == "Lungcancer", "Lung Cancer")) %>%
-  dplyr::mutate(variable_level = replace(variable_level, variable_level == "Pancreaticcancer", "Pancreatic Cancer")) %>%
-  dplyr::mutate(variable_level = replace(variable_level, variable_level == "Prostatecancer", "Prostate Cancer")) %>%
-  dplyr::mutate(variable_level = replace(variable_level, variable_level == "Stomachcancer", "Stomach Cancer"))
->>>>>>> 008ba8929cc3354924750c2e876cf48cbda62561
+
 
 # tidy up the table ones
 # overall
@@ -312,10 +288,7 @@ tableone_age <- dplyr::bind_rows(tableone_clean_temp)
 
 # by age and sex
 tableone_clean_temp <- list()
-<<<<<<< HEAD
-=======
 
->>>>>>> 008ba8929cc3354924750c2e876cf48cbda62561
 for(tableonecancer in 1:length(unique(tableone$group_level))) {
 
   tabledata <- tableone %>%
@@ -359,21 +332,15 @@ for(tableonecancer in 1:length(unique(tableone$group_level))) {
 
   rm(tb1_temp_age_sex)
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> 008ba8929cc3354924750c2e876cf48cbda62561
 tableone_age_sex <- dplyr::bind_rows(tableone_clean_temp)
 
 
 # combine all tableone outputs
 tableone_final <- dplyr::bind_rows(tableone_overall, tableone_sex, tableone_age, tableone_age_sex)
 
-<<<<<<< HEAD
-
 # need tableones for each time period
-=======
->>>>>>> 008ba8929cc3354924750c2e876cf48cbda62561
+
 info(logger, "CREATED TABLE ONE")
 
 
