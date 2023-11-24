@@ -277,7 +277,6 @@ info(logger, 'RUNNING SURVIVAL ANALYSIS')
 source(here("2_Analysis","SurvivalAnalysis1.R"))
 info(logger, 'SURVIVAL ANALYSIS RAN')
 
-
 print("Done!")
 print("-- If all has worked, there should now be zip folders with the incidence/prevalence and survival results in the output folder to share")
 print("-- Thank you for running the study! :)")

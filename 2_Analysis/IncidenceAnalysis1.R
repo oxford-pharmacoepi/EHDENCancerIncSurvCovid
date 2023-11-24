@@ -51,7 +51,7 @@ inc <- estimateIncidence(
 )
 
 attrition_inc <- IncidencePrevalence::incidenceAttrition(inc)
-write.csv(attrition_inc, here::here(paste0(output.folder,"/", db.name, "_incidence_attrition.csv")))
+write.csv(attrition_inc, here::here(paste0(output.folder,"/", db.name, "_incidence_attrition.csv")), row.names = FALSE)
 
 print(paste0("- Got incidence: cancer populations"))
 info(logger, "- Got incidence: cancer populations")
@@ -74,7 +74,7 @@ prev_period <- estimatePeriodPrevalence(
 )
 
 attrition_prev <- IncidencePrevalence::prevalenceAttrition(prev_period)
-write.csv(attrition_prev, here::here(paste0(output.folder,"/", db.name, "_prevalence_attrition.csv")))
+write.csv(attrition_prev, here::here(paste0(output.folder,"/", db.name, "_prevalence_attrition.csv")), row.names = FALSE)
 
 print(paste0("- Got period prevalence: cancer populations"))
 info(logger, "- Got period prevalence: cancer populations")
