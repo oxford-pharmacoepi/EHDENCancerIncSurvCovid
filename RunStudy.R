@@ -114,7 +114,7 @@ reformat_table_one <- function(table_one_summary){
   
   #condition variables
   condition_var <- table_one_summary %>%
-    dplyr::filter(stringr::str_detect(variable, 'Conditions flag -inf')) %>%
+    dplyr::filter(stringr::str_detect(variable, 'Conditions')) %>%
     dplyr::select(variable_level) %>%
     dplyr::distinct() %>%
     dplyr::pull(variable_level)
@@ -131,7 +131,7 @@ reformat_table_one <- function(table_one_summary){
   
   #medication variables
   medication_var <- table_one_summary %>%
-    dplyr::filter(stringr::str_detect(variable, 'Medications flag -365')) %>%
+    dplyr::filter(stringr::str_detect(variable, 'Medications')) %>%
     dplyr::select(variable_level) %>%
     dplyr::distinct() %>%
     dplyr::pull(variable_level)
