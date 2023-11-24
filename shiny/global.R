@@ -19,6 +19,7 @@ library(fresh)
 library(plotly)
 library(ggalt)
 library(bslib)
+library(PatientProfiles)
 
 mytheme <- create_theme(
   adminlte_color(
@@ -241,36 +242,6 @@ results <- list.files(
   include.dirs = TRUE
 )
 
-# merge the prevalence estimates
-prevalence_estimates_files<-results[stringr::str_detect(results, ".csv")]
-prevalence_estimates_files<-results[stringr::str_detect(results, "period_prevalence")]
-
-prevalence_estimates <- list()
-for(i in seq_along(prevalence_estimates_files)){
-  prevalence_estimates[[i]]<-readr::read_csv(prevalence_estimates_files[[i]], 
-                                             show_col_types = FALSE)  
-}
-prevalence_estimates <- dplyr::bind_rows(prevalence_estimates)
-prevalence_estimates <- prepare_output(prevalence_estimates)
-prevalence_estimates <- prevalence_estimates %>% 
-  mutate("Prevalence (95% CI)"= ifelse(!is.na(prevalence),
-                                       paste0(paste0(nice.num3(prevalence*100), "%"), " (",
-                                              paste0(nice.num3(prevalence_95CI_lower*100), "%")," to ", 
-                                              paste0(nice.num3(prevalence_95CI_upper*100), "%"), ")"),
-                                       NA
-  ))
-
-# prevalence attrition
-prevalence_attrition_files<-results[stringr::str_detect(results, ".csv")]
-prevalence_attrition_files<-results[stringr::str_detect(results, "prevalence_attrition")]
-prevalence_attrition <- list()
-for(i in seq_along(prevalence_attrition_files)){
-  prevalence_attrition[[i]]<-readr::read_csv(prevalence_attrition_files[[i]], 
-                                             show_col_types = FALSE)  
-}
-prevalence_attrition <- dplyr::bind_rows(prevalence_attrition)
-prevalence_attrition <- prepare_output(prevalence_attrition)
-
 
 #merge incidence results together
 # incidence estimates
@@ -309,8 +280,8 @@ for(i in seq_along(survival_estimates_files)){
 survival_estimates <- dplyr::bind_rows(survival_estimates)
 survival_estimates <- prepare_output_survival(survival_estimates)
 
-
-# merge the risk table results together (whole dataset)
+# risk tables ----------
+# merge the risk table (whole dataset)
 survival_risk_table_files<-results[stringr::str_detect(results, ".csv")]
 survival_risk_table_files<-results[stringr::str_detect(results, "risk_table_results")]
 survival_risk_table_files <- survival_risk_table_files[!stringr::str_detect(survival_risk_table_files, "risk_table_results_cy")]
@@ -339,7 +310,7 @@ for(i in seq_along(survival_risk_table_cy_files)){
 survival_risk_cy_table <- dplyr::bind_rows(survival_risk_cy_table)
 survival_risk_cy_table <- prepare_output_survival(survival_risk_cy_table)
 
-
+# median and survival probabilities ------
 # median results whole database
 survival_median_files<-results[stringr::str_detect(results, ".csv")]
 survival_median_files<-results[stringr::str_detect(results, "median_survival")]
@@ -352,6 +323,7 @@ for(i in seq_along(survival_median_files)){
 survival_median_table <- dplyr::bind_rows(survival_median_table)
 survival_median_table <- prepare_output_survival(survival_median_table)
 
+
 # median results cy database
 survival_median_files_cy <-results[stringr::str_detect(results, ".csv")]
 survival_median_files_cy <-results[stringr::str_detect(results, "median_survival_results_cy")]
@@ -362,6 +334,34 @@ for(i in seq_along(survival_median_files_cy)){
 }
 survival_median_table_cy <- dplyr::bind_rows(survival_median_table_cy)
 survival_median_table_cy <- prepare_output_survival(survival_median_table_cy)
+
+
+# survival estimates -----
+# whole pop
+survival_estimates_whole <- survival_estimates %>% 
+  rename(CalendarYearGp = CalenderYearGp) %>%
+  filter(CalendarYearGp == "2000 to 2022" ) %>%
+  droplevels() 
+
+#calendar cy
+survival_estimates_cy <- survival_estimates %>%
+  rename(CalendarYearGp = CalenderYearGp) %>%
+  filter(CalendarYearGp != "2000 to 2022") %>% 
+  droplevels()
+
+
+
+# table one ------
+tableone_whole_files <- results[stringr::str_detect(results, ".csv")]
+tableone_whole_files <- results[stringr::str_detect(results, "tableone")]
+tableone_whole <- list()
+for(i in seq_along(tableone_whole_files)){
+  tableone_whole[[i]] <- readr::read_csv(tableone_whole_files[[i]],
+                                                 show_col_types = FALSE)  
+}
+patient_characteristics <- dplyr::bind_rows(tableone_whole)
+
+
 
 # round the values before turning them into characters
 # survival_median_table <-  survival_median_table %>% 
@@ -402,25 +402,33 @@ survival_median_table_cy <- prepare_output_survival(survival_median_table_cy)
 #   mutate(rmean = ifelse(events == "<5", "Result obscured", rmean)) %>% 
 #   mutate(`se(rmean)` = ifelse(events == "<5", "Result obscured", `se(rmean)`)) 
 
-# whole pop
-survival_estimates_whole <- survival_estimates %>% 
-  rename(CalendarYearGp = CalenderYearGp) %>%
-  filter(CalendarYearGp == "2000 to 2022" ) %>%
-  droplevels() 
 
-survival_risk_table_whole <- survival_risk_table %>%
-  rename(CalendarYearGp = CalenderYearGp)
-
-survival_median_table_whole <- survival_median_table %>%
-  rename(CalendarYearGp = CalenderYearGp) %>%
-  filter(CalendarYearGp == "2000 to 2022" ) %>%
-  droplevels()
-
-#calendar cy
-survival_estimates_cy <- survival_estimates %>%
-  rename(CalendarYearGp = CalenderYearGp) %>%
-  filter(CalendarYearGp != "2000 to 2022") %>% 
-  droplevels()
-
-
-
+# # merge the prevalence estimates
+# prevalence_estimates_files<-results[stringr::str_detect(results, ".csv")]
+# prevalence_estimates_files<-results[stringr::str_detect(results, "period_prevalence")]
+# 
+# prevalence_estimates <- list()
+# for(i in seq_along(prevalence_estimates_files)){
+#   prevalence_estimates[[i]]<-readr::read_csv(prevalence_estimates_files[[i]], 
+#                                              show_col_types = FALSE)  
+# }
+# prevalence_estimates <- dplyr::bind_rows(prevalence_estimates)
+# prevalence_estimates <- prepare_output(prevalence_estimates)
+# prevalence_estimates <- prevalence_estimates %>% 
+#   mutate("Prevalence (95% CI)"= ifelse(!is.na(prevalence),
+#                                        paste0(paste0(nice.num3(prevalence*100), "%"), " (",
+#                                               paste0(nice.num3(prevalence_95CI_lower*100), "%")," to ", 
+#                                               paste0(nice.num3(prevalence_95CI_upper*100), "%"), ")"),
+#                                        NA
+#   ))
+# 
+# # prevalence attrition
+# prevalence_attrition_files<-results[stringr::str_detect(results, ".csv")]
+# prevalence_attrition_files<-results[stringr::str_detect(results, "prevalence_attrition")]
+# prevalence_attrition <- list()
+# for(i in seq_along(prevalence_attrition_files)){
+#   prevalence_attrition[[i]]<-readr::read_csv(prevalence_attrition_files[[i]], 
+#                                              show_col_types = FALSE)  
+# }
+# prevalence_attrition <- dplyr::bind_rows(prevalence_attrition)
+# prevalence_attrition <- prepare_output(prevalence_attrition)

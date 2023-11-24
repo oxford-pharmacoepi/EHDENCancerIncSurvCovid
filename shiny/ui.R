@@ -14,7 +14,6 @@ ui <- dashboardPage(
         tabName = "background"
       ),
 
-      
       menuItem(
         text = "Incidence",
         tabName = "incidence",
@@ -35,7 +34,6 @@ ui <- dashboardPage(
           tabName = "inc_attrition"
         )
       ),
-      
       
       
       menuItem(
@@ -178,49 +176,38 @@ ui <- dashboardPage(
         )
       ) ,
       
-      tabItem(
-        tags$h5("Description of database details used in study"),
-        tabName = "database_details",
-        htmlOutput('tbl_database_details'),
-        tags$hr(),
-        div(
-          style = "display:inline-block",
-          downloadButton(
-            outputId = "gt_database_details_word",
-            label = "Download table as word"
-          ),
-          style = "display:inline-block; float:right"
-        )
-      ) ,
+      # tabItem(
+      #   tags$h5("Description of database details used in study"),
+      #   tabName = "database_details",
+      #   htmlOutput('tbl_database_details'),
+      #   tags$hr(),
+      #   div(
+      #     style = "display:inline-block",
+      #     downloadButton(
+      #       outputId = "gt_database_details_word",
+      #       label = "Download table as word"
+      #     ),
+      #     style = "display:inline-block; float:right"
+      #   )
+      # ) ,
+      
+      # tabItem(
+      #   tags$h5("Clinical codelists for cancers"),
+      #   tabName = "cohort_concepts",
+      #   htmlOutput('tbl_codelists'),
+      #   tags$hr(),
+      #   div(
+      #     style = "display:inline-block",
+      #     downloadButton(
+      #       outputId = "gt_codelists_word",
+      #       label = "Download table as word"
+      #     ),
+      #     style = "display:inline-block; float:right"
+      #   )
+      # ) , 
       
       tabItem(
-        tags$h5("Clinical codelists for cancers"),
-        tabName = "cohort_concepts",
-        htmlOutput('tbl_codelists'),
-        tags$hr(),
-        div(
-          style = "display:inline-block",
-          downloadButton(
-            outputId = "gt_codelists_word",
-            label = "Download table as word"
-          ),
-          style = "display:inline-block; float:right"
-        )
-      ) , 
-      
-      tabItem(
-        tabName = "cohort_attrition",
-        div(
-          style = "display: inline-block;vertical-align:top; width: 150px;",
-          pickerInput(
-            inputId = "attrition_database_name_selector",
-            label = "Database",
-            choices = unique(incidence_attrition$cdm_name),
-            selected = unique(incidence_attrition$cdm_name),
-            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
-            multiple = TRUE
-          )
-        ),
+        tabName = "inc_attrition",
         div(
           style = "display: inline-block;vertical-align:top; width: 150px;",
           pickerInput(
@@ -232,11 +219,48 @@ ui <- dashboardPage(
             multiple = TRUE
           )
         ),
-        htmlOutput('dt_cohort_attrition'),
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "attrition_sex_selector",
+            label = "Sex",
+            choices = unique(incidence_attrition$denominator_sex),
+            selected = "Both",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "attrition_age_selector",
+            label = "Age",
+            choices = unique(incidence_attrition$denominator_age_group),
+            selected = "All",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "attrition_time_selector",
+            label = "Time",
+            choices = unique(incidence_attrition$analysis_interval),
+            selected = "overall",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        htmlOutput('tbl_incidence_attrition'),
         
         div(style="display:inline-block",
             downloadButton(
-              outputId = "gt_cohort_attrition_word",
+              outputId = "dt_incidence_attrition_word",
               label = "Download table as word"
             ), 
             style="display:inline-block; float:right")
@@ -247,48 +271,45 @@ ui <- dashboardPage(
         div(
           style = "display: inline-block;vertical-align:top; width: 150px;",
           pickerInput(
-            inputId = "demographics_database_name_selector",
-            label = "Database",
-            choices = unique(incidence_attrition$cdm_name),
-            selected = unique(incidence_attrition$cdm_name),
+            inputId = "demographics_cohort_selector",
+            label = "Cancer",
+            choices = unique(patient_characteristics$group_level),
+            selected = unique(patient_characteristics$group_level),
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
           )
         ),
-        div(
-          style = "display: inline-block;vertical-align:top; width: 150px;",
-          pickerInput(
-            inputId = "demographics_sex_selector",
-            label = "Sex",
-            choices = unique(incidence_attrition$denominator_sex),
-            selected = "Both",
-            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
-            multiple = FALSE
-          )
-        ),
         
         div(
           style = "display: inline-block;vertical-align:top; width: 150px;",
           pickerInput(
-            inputId = "demographics_age_selector",
-            label = "Age",
-            choices = unique(incidence_attrition$denominator_age_group),
-            selected = "All",
+            inputId = "demographics_selector",
+            label = "Demographics",
+            choices = unique(patient_characteristics$strata_level),
+            selected = "Overall",
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
-            multiple = FALSE
+            multiple = TRUE
           )
         ),
-        htmlOutput('dt_demographics'),
         
-        div(style="display:inline-block",
-            downloadButton(
-              outputId = "gt_demographics_word",
-              label = "Download table as word"
-            ), 
-            style="display:inline-block; float:right")
+        tags$hr(),
+        gt_output("gt_patient_characteristics") %>% 
+          withSpinner()
+      ),
         
-      ) ,
-      
+        
+# 
+#         htmlOutput('dt_demographics'),
+#         
+#         div(style="display:inline-block",
+#             downloadButton(
+#               outputId = "gt_demographics_word",
+#               label = "Download table as word"
+#             ), 
+#             style="display:inline-block; float:right")
+#         
+#       ) ,
+#       
       tabItem(
         tabName = "tableone",
         div(
