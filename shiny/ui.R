@@ -26,7 +26,7 @@ ui <- dashboardPage(
           tabName = "inc_plots"
         ),
         menuSubItem(
-          text = "Incidence Results",
+          text = "Incidence Estimates",
           tabName = "inc_rates"
         ),
         menuSubItem(
