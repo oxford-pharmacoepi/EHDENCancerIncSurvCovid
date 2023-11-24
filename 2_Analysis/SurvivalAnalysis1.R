@@ -42,7 +42,7 @@ if( "IncidentProstateCancer" %in% outcome_cohorts$cohort_name == TRUE){
 }
 
 cdm$analysis <- cdm$analysis %>% 
-  filter(time_days != 0)
+  filter(time_days > 0)
 
 #update the attrition
 cdm$analysis <- CDMConnector::recordCohortAttrition(cohort = cdm$analysis,
@@ -216,7 +216,7 @@ for(j in 1:nrow(outcome_cohorts)) {
     kmsex <- do.call(data.frame, cols) %>%
       dplyr::select(c(n.risk, n.event, n.censor, strata)) %>% 
       dplyr::rename(Sex = strata) %>% 
-      dplyr::mutate(Sex = str_replace(Sex, "sex", ""))
+      dplyr::mutate(Sex = str_replace(Sex, "sex=", ""))
     
     # risk table for females       
     kmsex_f <- kmsex %>% 

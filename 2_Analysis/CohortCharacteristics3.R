@@ -111,8 +111,6 @@ cdm$cancer_table_one <- cdm$cancer_table_one %>%
     )
   )
 
-#creating table one for characterization of cancers
-#readr::write_csv(tableone, paste0(here::here(output.folder),"/", cdm_name(cdm), "_tableone_summary.csv"))
 
 # subset the CDM for analysis table to make code run quicker
 info(logger, "SUBSETTING CDM")
@@ -147,7 +145,8 @@ info(logger, "SUBSETTED CDM")
   suppressWarnings(
     tableone <- cdm$cancer_table_one %>%
       PatientProfiles::summariseCharacteristics(
-        strata = list(c("sex"),c("age_gr"), c("sex", "age_gr" )),
+        strata = list(c("sex"),
+                      c("calendar_yr_gp"), c("sex", "calendar_yr_gp")),
         minCellCount = 5,
         ageGroup = list(c(18, 29),
                             c(30, 39),
@@ -191,178 +190,179 @@ tableone <- tableone %>%
   dplyr::mutate(group_level = replace(group_level, group_level == "Cohort 8", "Prostate")) %>%
   dplyr::mutate(group_level = replace(group_level, group_level == "Cohort 9", "Stomach")) 
 
+#save table one for characterization of cancers
+readr::write_csv(tableone, paste0(here::here(output.folder),"/", cdm_name(cdm), "_tableone_summary.csv"))
 
-# tidy up the table ones
-# overall
-tableone_clean_temp <- list()
-for(tableonecancer in 1:length(unique(tableone$group_level))) {
+# # tidy up the table ones
+# # overall
+# tableone_clean_temp <- list()
+# for(tableonecancer in 1:length(unique(tableone$group_level))) {
+# 
+#   tabledata <- tableone %>%
+#     dplyr::filter(group_level == unique(tableone$group_level)[tableonecancer]) %>%
+#     dplyr::filter(strata_name == "Overall")
+# 
+#   tb1_temp <- reformat_table_one(tabledata) %>%
+#     dplyr::mutate(Cancer = unique(tabledata$group_level),
+#                   Stratification = "none",
+#                   Sex = "Both" ,
+#                   Age = "All" ,
+#                   Database = db.name)
+# 
+# 
+#   tableone_clean_temp[[tableonecancer]] <- tb1_temp
+#   rm(tb1_temp)
+# 
+# }
+# tableone_overall <- dplyr::bind_rows(tableone_clean_temp)
+# 
+# # by sex
+# tableone_clean_temp <- list()
+# for(tableonecancer in 1:length(unique(tableone$group_level))) {
+# 
+#   tabledata <- tableone %>%
+#     dplyr::filter(group_level == unique(tableone$group_level)[tableonecancer]) %>%
+#     dplyr::filter(strata_name == "sex")
+# 
+#   if(unique(tableone$group_level)[tableonecancer] != "Prostate") {
+# 
+#     tb1_tempF <- tabledata %>%
+#       dplyr::filter(strata_level == "Female") %>%
+#       reformat_table_one() %>%
+#       dplyr::mutate(Cancer = unique(tabledata$group_level),
+#                     Stratification = "Sex",
+#                     Sex = "Female" ,
+#                     Age = "All" ,
+#                     Database = db.name)
+# 
+#     tb1_tempM <- tabledata %>%
+#       dplyr::filter(strata_level == "Male") %>%
+#       reformat_table_one() %>%
+#       dplyr::mutate(Cancer = unique(tabledata$group_level),
+#                     Stratification = "Sex",
+#                     Sex = "Male" ,
+#                     Age = "All" ,
+#                     Database = db.name)
+# 
+#     #combine sexes together
+#     tb1_temp <- dplyr::bind_rows(tb1_tempF , tb1_tempM)
+# 
+#     rm(tb1_tempF, tb1_tempM)
+# 
+#   } else {
+# 
+#     tb1_tempM <- tabledata %>%
+#       dplyr::filter(strata_level == "Male") %>%
+#       reformat_table_one() %>%
+#       dplyr::mutate(Cancer = unique(tabledata$group_level),
+#                     Stratification = "Sex",
+#                     Sex = "Male" ,
+#                     Age = "All" ,
+#                     Database = db.name)
+# 
+#     tb1_temp <- tb1_tempM
+#   }
+# 
+#   tableone_clean_temp[[tableonecancer]] <- tb1_temp
+# 
+#   rm(tb1_temp )
+# 
+# }
+# tableone_sex <- dplyr::bind_rows(tableone_clean_temp)
+# 
+# # by age
+# tableone_clean_temp <- list()
+# for(tableonecancer in 1:length(unique(tableone$group_level))) {
+# 
+#   tabledata <- tableone %>%
+#     dplyr::filter(group_level == unique(tableone$group_level)[tableonecancer]) %>%
+#     dplyr::filter(strata_name == "age_gr")
+# 
+#   tb1_temp_age <- list()
+#   for(z in 1:length(unique(tabledata$strata_level))) {
+# 
+#     # because some age groups do not have data need to have try catches to make sure loop still continues even if data not available
+#     tryCatch(
+#       {
+#         tb1_temp_age[[z]] <- tabledata %>%
+#           dplyr::filter(strata_level == unique(tabledata$strata_level)[z]) %>%
+#           reformat_table_one() %>%
+#           dplyr::mutate(Cancer = unique(tabledata$group_level),
+#                         Stratification = "Age",
+#                         Sex = "Both",
+#                         Age =  unique(tabledata$strata_level)[z] ,
+#                         Database = db.name) %>%
+#           dplyr::filter(!stringr::str_detect(Description, 'Age Group:'))
+# 
+#       },
+#       error = function(e) {
+#         cat(conditionMessage(e), "Table one not carried out for ", unique(tableone$group_level)[tableonecancer], "see log for more information")
+#         info(logger, paste0(" Table one not carried out for  ",unique(tableone$group_level)[tableonecancer], " ", e))
+# 
+#       },
+#       warning = function(w){
+#         cat(conditionMessage(e), "Warning problem with table one ", unique(tableone$group_level)[tableonecancer], "see log for more information")
+#         info(logger, paste0(unique(tableone$group_level)[tableonecancer], ": ", w))}
+#     )
+#   }
+# 
+#   tableone_clean_temp[[tableonecancer]] <- dplyr::bind_rows(tb1_temp_age)
+# 
+#   rm(tb1_temp_age)
+# }
+# tableone_age <- dplyr::bind_rows(tableone_clean_temp)
+# 
+# # by age and sex
+# tableone_clean_temp <- list()
+# for(tableonecancer in 1:length(unique(tableone$group_level))) {
+# 
+#   tabledata <- tableone %>%
+#     dplyr::filter(group_level == unique(tableone$group_level)[tableonecancer]) %>%
+#     dplyr::filter(strata_name == "sex and age_gr")
+# 
+#   tb1_temp_age_sex <- list()
+# 
+#   for(z in 1:length(unique(tabledata$strata_level))) {
+# 
+#     # because some age groups do not have data need to have try catches to make sure loop still continues even if data not available
+#     tryCatch(
+#       {
+#         tb1_temp_age_sex[[z]] <- tabledata %>%
+#           dplyr::filter(strata_level == unique(tabledata$strata_level)[z]) %>%
+#           reformat_table_one() %>%
+#           dplyr::mutate(Cancer = unique(tabledata$group_level),
+#                         Stratification = "agesex",
+#                         Sex = "Both",
+#                         agesex =  unique(tabledata$strata_level)[z] ,
+#                         Database = db.name) %>%
+#           dplyr::mutate(agesex = str_replace(agesex, " and ", "_")) %>%
+#           separate(col = "agesex",
+#                    into = c("Sex", "Age"),
+#                    sep = "_") %>%
+#           dplyr::filter(!stringr::str_detect(Description, 'Age Group:'))
+# 
+#       },
+#       error = function(e) {
+#         cat(conditionMessage(e), "Table one not carried out for ", unique(tableone$group_level)[tableonecancer], "see log for more information")
+#         info(logger, paste0(" Table one not carried out for  ",unique(tableone$group_level)[tableonecancer], " ", e))
+# 
+#       },
+#       warning = function(w){
+#         cat(conditionMessage(e), "Warning problem with table one ", unique(tableone$group_level)[tableonecancer], "see log for more information")
+#         info(logger, paste0(unique(tableone$group_level)[tableonecancer], ": ", w))}
+#     )
+#   }
+# 
+#   tableone_clean_temp[[tableonecancer]] <- dplyr::bind_rows(tb1_temp_age_sex)
+# 
+#   rm(tb1_temp_age_sex)
+# }
+# tableone_age_sex <- dplyr::bind_rows(tableone_clean_temp)
+# 
+# 
+# # combine all tableone outputs
+# tableone_final <- dplyr::bind_rows(tableone_overall, tableone_sex, tableone_age, tableone_age_sex)
 
-  tabledata <- tableone %>%
-    dplyr::filter(group_level == unique(tableone$group_level)[tableonecancer]) %>%
-    dplyr::filter(strata_name == "Overall")
-
-  tb1_temp <- reformat_table_one(tabledata) %>%
-    dplyr::mutate(Cancer = unique(tabledata$group_level),
-                  Stratification = "none",
-                  Sex = "Both" ,
-                  Age = "All" ,
-                  Database = db.name)
-
-
-  tableone_clean_temp[[tableonecancer]] <- tb1_temp
-  rm(tb1_temp)
-
-}
-tableone_overall <- dplyr::bind_rows(tableone_clean_temp)
-
-# by sex
-tableone_clean_temp <- list()
-for(tableonecancer in 1:length(unique(tableone$group_level))) {
-
-  tabledata <- tableone %>%
-    dplyr::filter(group_level == unique(tableone$group_level)[tableonecancer]) %>%
-    dplyr::filter(strata_name == "sex")
-
-  if(unique(tableone$group_level)[tableonecancer] != "Prostate") {
-
-    tb1_tempF <- tabledata %>%
-      dplyr::filter(strata_level == "Female") %>%
-      reformat_table_one() %>%
-      dplyr::mutate(Cancer = unique(tabledata$group_level),
-                    Stratification = "Sex",
-                    Sex = "Female" ,
-                    Age = "All" ,
-                    Database = db.name)
-
-    tb1_tempM <- tabledata %>%
-      dplyr::filter(strata_level == "Male") %>%
-      reformat_table_one() %>%
-      dplyr::mutate(Cancer = unique(tabledata$group_level),
-                    Stratification = "Sex",
-                    Sex = "Male" ,
-                    Age = "All" ,
-                    Database = db.name)
-
-    #combine sexes together
-    tb1_temp <- dplyr::bind_rows(tb1_tempF , tb1_tempM)
-
-    rm(tb1_tempF, tb1_tempM)
-
-  } else {
-
-    tb1_tempM <- tabledata %>%
-      dplyr::filter(strata_level == "Male") %>%
-      reformat_table_one() %>%
-      dplyr::mutate(Cancer = unique(tabledata$group_level),
-                    Stratification = "Sex",
-                    Sex = "Male" ,
-                    Age = "All" ,
-                    Database = db.name)
-
-    tb1_temp <- tb1_tempM
-  }
-
-  tableone_clean_temp[[tableonecancer]] <- tb1_temp
-
-  rm(tb1_temp )
-
-}
-tableone_sex <- dplyr::bind_rows(tableone_clean_temp)
-
-# by age
-tableone_clean_temp <- list()
-for(tableonecancer in 1:length(unique(tableone$group_level))) {
-
-  tabledata <- tableone %>%
-    dplyr::filter(group_level == unique(tableone$group_level)[tableonecancer]) %>%
-    dplyr::filter(strata_name == "age_gr")
-
-  tb1_temp_age <- list()
-  for(z in 1:length(unique(tabledata$strata_level))) {
-
-    # because some age groups do not have data need to have try catches to make sure loop still continues even if data not available
-    tryCatch(
-      {
-        tb1_temp_age[[z]] <- tabledata %>%
-          dplyr::filter(strata_level == unique(tabledata$strata_level)[z]) %>%
-          reformat_table_one() %>%
-          dplyr::mutate(Cancer = unique(tabledata$group_level),
-                        Stratification = "Age",
-                        Sex = "Both",
-                        Age =  unique(tabledata$strata_level)[z] ,
-                        Database = db.name) %>%
-          dplyr::filter(!stringr::str_detect(Description, 'Age Group:'))
-
-      },
-      error = function(e) {
-        cat(conditionMessage(e), "Table one not carried out for ", unique(tableone$group_level)[tableonecancer], "see log for more information")
-        info(logger, paste0(" Table one not carried out for  ",unique(tableone$group_level)[tableonecancer], " ", e))
-
-      },
-      warning = function(w){
-        cat(conditionMessage(e), "Warning problem with table one ", unique(tableone$group_level)[tableonecancer], "see log for more information")
-        info(logger, paste0(unique(tableone$group_level)[tableonecancer], ": ", w))}
-    )
-  }
-
-  tableone_clean_temp[[tableonecancer]] <- dplyr::bind_rows(tb1_temp_age)
-
-  rm(tb1_temp_age)
-}
-tableone_age <- dplyr::bind_rows(tableone_clean_temp)
-
-# by age and sex
-tableone_clean_temp <- list()
-for(tableonecancer in 1:length(unique(tableone$group_level))) {
-
-  tabledata <- tableone %>%
-    dplyr::filter(group_level == unique(tableone$group_level)[tableonecancer]) %>%
-    dplyr::filter(strata_name == "sex and age_gr")
-
-  tb1_temp_age_sex <- list()
-
-  for(z in 1:length(unique(tabledata$strata_level))) {
-
-    # because some age groups do not have data need to have try catches to make sure loop still continues even if data not available
-    tryCatch(
-      {
-        tb1_temp_age_sex[[z]] <- tabledata %>%
-          dplyr::filter(strata_level == unique(tabledata$strata_level)[z]) %>%
-          reformat_table_one() %>%
-          dplyr::mutate(Cancer = unique(tabledata$group_level),
-                        Stratification = "agesex",
-                        Sex = "Both",
-                        agesex =  unique(tabledata$strata_level)[z] ,
-                        Database = db.name) %>%
-          dplyr::mutate(agesex = str_replace(agesex, " and ", "_")) %>%
-          separate(col = "agesex",
-                   into = c("Sex", "Age"),
-                   sep = "_") %>%
-          dplyr::filter(!stringr::str_detect(Description, 'Age Group:'))
-
-      },
-      error = function(e) {
-        cat(conditionMessage(e), "Table one not carried out for ", unique(tableone$group_level)[tableonecancer], "see log for more information")
-        info(logger, paste0(" Table one not carried out for  ",unique(tableone$group_level)[tableonecancer], " ", e))
-
-      },
-      warning = function(w){
-        cat(conditionMessage(e), "Warning problem with table one ", unique(tableone$group_level)[tableonecancer], "see log for more information")
-        info(logger, paste0(unique(tableone$group_level)[tableonecancer], ": ", w))}
-    )
-  }
-
-  tableone_clean_temp[[tableonecancer]] <- dplyr::bind_rows(tb1_temp_age_sex)
-
-  rm(tb1_temp_age_sex)
-}
-tableone_age_sex <- dplyr::bind_rows(tableone_clean_temp)
-
-
-# combine all tableone outputs
-tableone_final <- dplyr::bind_rows(tableone_overall, tableone_sex, tableone_age, tableone_age_sex)
-
-# need tableones for each time period
 
 info(logger, "CREATED TABLE ONE")
 
