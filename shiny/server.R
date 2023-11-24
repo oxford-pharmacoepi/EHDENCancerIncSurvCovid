@@ -104,6 +104,17 @@ server <-	function(input, output, session) {
     PatientProfiles::gtCharacteristics(get_patient_characteristics())
   })  
   
+  
+  output$gt_patient_characteristics_word <- downloadHandler(
+    filename = function() {
+      "patient_characteristics.docx"
+    },
+    content = function(file) {
+
+      gtsave(PatientProfiles::gtCharacteristics(get_patient_characteristics()), file)
+    }
+  )
+  
   # clinical codelists
   # output$tbl_codelists <- renderText(kable(concepts_lists) %>%
   #                                      kable_styling("striped", full_width = F) )

@@ -176,36 +176,6 @@ ui <- dashboardPage(
         )
       ) ,
       
-      # tabItem(
-      #   tags$h5("Description of database details used in study"),
-      #   tabName = "database_details",
-      #   htmlOutput('tbl_database_details'),
-      #   tags$hr(),
-      #   div(
-      #     style = "display:inline-block",
-      #     downloadButton(
-      #       outputId = "gt_database_details_word",
-      #       label = "Download table as word"
-      #     ),
-      #     style = "display:inline-block; float:right"
-      #   )
-      # ) ,
-      
-      # tabItem(
-      #   tags$h5("Clinical codelists for cancers"),
-      #   tabName = "cohort_concepts",
-      #   htmlOutput('tbl_codelists'),
-      #   tags$hr(),
-      #   div(
-      #     style = "display:inline-block",
-      #     downloadButton(
-      #       outputId = "gt_codelists_word",
-      #       label = "Download table as word"
-      #     ),
-      #     style = "display:inline-block; float:right"
-      #   )
-      # ) , 
-      
       tabItem(
         tabName = "inc_attrition",
         div(
@@ -292,24 +262,20 @@ ui <- dashboardPage(
           )
         ),
         
-        tags$hr(),
+       # tags$hr(),
         gt_output("gt_patient_characteristics") %>% 
-          withSpinner()
-      ),
+          withSpinner() ,
         
-        
-# 
-#         htmlOutput('dt_demographics'),
-#         
-#         div(style="display:inline-block",
-#             downloadButton(
-#               outputId = "gt_demographics_word",
-#               label = "Download table as word"
-#             ), 
-#             style="display:inline-block; float:right")
-#         
-#       ) ,
-#       
+
+        div(style="display:inline-block",
+            downloadButton(
+              outputId = "gt_patient_characteristics_word",
+              label = "Download table as word"
+            ),
+            style="display:inline-block; float:right")
+
+      ) ,
+
       tabItem(
         tabName = "tableone",
         div(
