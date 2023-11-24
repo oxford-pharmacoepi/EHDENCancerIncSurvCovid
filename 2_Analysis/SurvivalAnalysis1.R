@@ -61,6 +61,9 @@ attritioncdm <- CDMConnector::cohort_attrition(cdm$analysis) %>%
   dplyr::mutate(Database = cdm_name(cdm)) %>% 
   dplyr::rename(Cancer = cohort_name)
 
+readr::write_csv(attritioncdm, paste0(here::here(output.folder),"/", cdm_name(cdm), "_survival_attrition.csv"))
+
+
 # collect the dataset
 Pop <- cdm$analysis %>% collect()
 

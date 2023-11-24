@@ -29,12 +29,12 @@ cdm <- generateDenominatorCohortSet(
 print(paste0("- Got denominator: cancer populations"))
 info(logger, "- Got denominator: cancer populations")
 
-# Estimate yearly incidence -------
+# Estimate incidence -------
 print(paste0("- Getting incidence and period prevalence: cancer populations"))
 info(logger, "- Getting incidence and period prevalence: cancer populations")
 
-print(paste0("- Getting yearly incidence: cancer populations"))
-info(logger, "- Getting yearly incidence: cancer populations")
+print(paste0("- Getting incidence: cancer populations"))
+info(logger, "- Getting incidence: cancer populations")
 
 inc <- estimateIncidence(
   cdm = cdm,

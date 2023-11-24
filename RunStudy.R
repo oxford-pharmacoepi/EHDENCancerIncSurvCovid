@@ -277,8 +277,12 @@ info(logger, 'RUNNING SURVIVAL ANALYSIS')
 source(here("2_Analysis","SurvivalAnalysis1.R"))
 info(logger, 'SURVIVAL ANALYSIS RAN')
 
+snaphot_cdm <- snapshot(cdm)
+readr::write_csv(snaphot_cdm, paste0(here::here(output.folder),"/", cdm_name(cdm), "_snapshot_cdm.csv"))
+
 print("Done!")
 print("-- If all has worked, there should now be zip folders with the incidence/prevalence and survival results in the output folder to share")
 print("-- Thank you for running the study! :)")
+Sys.time()
 Sys.time()-start
 readLines(log_file)
