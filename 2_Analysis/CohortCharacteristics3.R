@@ -63,7 +63,10 @@ cdm$cancer_table_one <- Reduce(union_all, cancer_participants) %>%
 
 
 # set the cohort back into the cdm
-cdm$cancer_table_one <- new_generated_cohort_set(cohort_ref = cdm$cancer_table_one, overwrite = TRUE)
+cdm$cancer_table_one <- new_generated_cohort_set(
+  cohort_ref = cdm$cancer_table_one,
+  overwrite = TRUE
+)
 
 cdm$cancer_table_one <- cdm$cancer_table_one %>% 
   
@@ -86,8 +89,30 @@ cdm$cancer_table_one <- cdm$cancer_table_one %>%
     )
   )
 
+# bug with date for cohort_end_date so fix this
+cdm$cancer_table_one <- cdm$cancer_table_one %>% 
+  mutate(cohort_end_date = as.Date(cohort_end_date))
+
+# add grouping for stratification of year of diagnosis
+# extract year
+cdm$cancer_table_one <- cdm$cancer_table_one %>% 
+  mutate(calendar_yr_diag = lubridate::year(cohort_start_date))
+
+# create groupings
+cdm$cancer_table_one <- cdm$cancer_table_one %>% 
+  mutate(
+    calendar_yr_gp = case_when(
+      between(lubridate::year(cohort_start_date), 2000, 2004) ~ "2000 to 2004",
+      between(lubridate::year(cohort_start_date), 2005, 2009) ~ "2005 to 2009",
+      between(lubridate::year(cohort_start_date), 2010, 2014) ~ "2010 to 2014",
+      between(lubridate::year(cohort_start_date), 2015, 2019) ~ "2015 to 2019",
+      between(lubridate::year(cohort_start_date), 2020, 2022) ~ "2020 to 2022",
+      TRUE ~ NA_character_  # Default case if none of the conditions are met
+    )
+  )
 
 #creating table one for characterization of cancers
+#readr::write_csv(tableone, paste0(here::here(output.folder),"/", cdm_name(cdm), "_tableone_summary.csv"))
 
 # subset the CDM for analysis table to make code run quicker
 info(logger, "SUBSETTING CDM")
@@ -288,7 +313,6 @@ tableone_age <- dplyr::bind_rows(tableone_clean_temp)
 
 # by age and sex
 tableone_clean_temp <- list()
-
 for(tableonecancer in 1:length(unique(tableone$group_level))) {
 
   tabledata <- tableone %>%
@@ -332,7 +356,6 @@ for(tableonecancer in 1:length(unique(tableone$group_level))) {
 
   rm(tb1_temp_age_sex)
 }
-
 tableone_age_sex <- dplyr::bind_rows(tableone_clean_temp)
 
 
