@@ -50,13 +50,26 @@ mytheme <- create_theme(
 
 # Data prep functions -----
 # printing numbers with 3 decimal place and commas 
-nice.num3<-function(x) {
-  trimws(format(round(x,3),
-                big.mark=",", nsmall = 3, digits=3, scientific=FALSE))}
-
+# printing numbers with 1 decimal place and commas 
+nice.num<-function(x) {
+  trimws(format(round(x,1),
+                big.mark=",", nsmall = 1, digits=1, scientific=FALSE))}
+# printing numbers with 2 decimal place and commas 
 nice.num2<-function(x) {
   trimws(format(round(x,2),
                 big.mark=",", nsmall = 2, digits=2, scientific=FALSE))}
+# printing numbers with 3 decimal place and commas 
+nice.num3<-function(x) {
+  trimws(format(round(x,3),
+                big.mark=",", nsmall = 3, digits=3, scientific=FALSE))}
+# printing numbers with 4 decimal place and commas 
+nice.num4<-function(x) {
+  trimws(format(round(x,4),
+                big.mark=",", nsmall = 4, digits=4, scientific=FALSE))}
+# for counts- without decimal place
+nice.num.count<-function(x) {
+  trimws(format(x,
+                big.mark=",", nsmall = 0, digits=1, scientific=FALSE))}
 
 #preparing the output and renaming numbers for incidence and prevalence
 prepare_output<-function(result){
@@ -361,74 +374,21 @@ for(i in seq_along(tableone_whole_files)){
 }
 patient_characteristics <- dplyr::bind_rows(tableone_whole)
 
-
-
-# round the values before turning them into characters
-# survival_median_table <-  survival_median_table %>% 
-#   mutate(rmean = nice.num3(rmean)) %>% 
-#   mutate(`se(rmean)` = nice.num3(`se(rmean)`)) %>%
-#   mutate(median = nice.num3(median)) %>%
-#   mutate(`0.95LCL` = nice.num3(`0.95LCL`)) %>%
-#   mutate(`0.95UCL` = nice.num3(`0.95UCL`)) %>% 
-#   mutate(median = ifelse(median == "NA", NA, median)) %>% 
-#   mutate(`0.95LCL` = ifelse(`0.95LCL` == "NA", NA, `0.95LCL`)) %>% 
-#   mutate(`0.95UCL` = ifelse(`0.95UCL` == "NA", NA, `0.95UCL`)) 
-
-# 
-# #if events less than 5 turn the result into NA
-# survival_median_table <-  
-#   survival_median_table %>% 
-#   mutate(events = ifelse(events <= 5, "<5", events)) %>% 
-#   mutate(median = ifelse(events == "<5", " ", median)) %>% 
-#   mutate(records = ifelse(events == "<5", " ", records)) %>% 
-#   mutate(n.max = ifelse(events == "<5", " ", n.max)) %>% 
-#   mutate(n.start = ifelse(events == "<5", " ", n.start)) %>% 
-#   mutate(rmean = ifelse(events == "<5", " ", rmean)) %>% 
-#   mutate(`se(rmean)` = ifelse(events == "<5", " ", `se(rmean)`)) %>% 
-#   mutate(`0.95LCL` = ifelse(events == "<5", " ", `0.95LCL`)) %>% 
-#   mutate(`0.95UCL` = ifelse(events == "<5", " ",`0.95UCL`)) 
-# 
-# # put reason for obscuring i.e. median not achieved
-# 
-# survival_median_table <-  
-#   survival_median_table %>% 
-#   mutate(median = ifelse(is.na(`0.95UCL`) == TRUE, "Not achieved", median)) %>% 
-#   mutate(`0.95LCL` = ifelse(is.na(`0.95LCL`) == TRUE, "Not calculated", `0.95LCL`)) %>% 
-#   mutate(`0.95UCL` = ifelse(is.na(`0.95UCL`) == TRUE, "Not calculated",`0.95UCL`)) %>% 
-#   mutate(`0.95LCL` = ifelse(median == "Not achieved", "Not calculated",`0.95LCL`)) %>% 
-#   mutate(`0.95LCL` = ifelse(events == "<5", "Result obscured",`0.95LCL`))%>% 
-#   mutate(`0.95UCL` = ifelse(events == "<5", "Result obscured",`0.95UCL`)) %>% 
-#   mutate(median = ifelse(events == "<5", "Result obscured",median))%>% 
-#   mutate(rmean = ifelse(events == "<5", "Result obscured", rmean)) %>% 
-#   mutate(`se(rmean)` = ifelse(events == "<5", "Result obscured", `se(rmean)`)) 
-
-
-# # merge the prevalence estimates
-# prevalence_estimates_files<-results[stringr::str_detect(results, ".csv")]
-# prevalence_estimates_files<-results[stringr::str_detect(results, "period_prevalence")]
-# 
-# prevalence_estimates <- list()
-# for(i in seq_along(prevalence_estimates_files)){
-#   prevalence_estimates[[i]]<-readr::read_csv(prevalence_estimates_files[[i]], 
-#                                              show_col_types = FALSE)  
-# }
-# prevalence_estimates <- dplyr::bind_rows(prevalence_estimates)
-# prevalence_estimates <- prepare_output(prevalence_estimates)
-# prevalence_estimates <- prevalence_estimates %>% 
-#   mutate("Prevalence (95% CI)"= ifelse(!is.na(prevalence),
-#                                        paste0(paste0(nice.num3(prevalence*100), "%"), " (",
-#                                               paste0(nice.num3(prevalence_95CI_lower*100), "%")," to ", 
-#                                               paste0(nice.num3(prevalence_95CI_upper*100), "%"), ")"),
-#                                        NA
-#   ))
-# 
-# # prevalence attrition
-# prevalence_attrition_files<-results[stringr::str_detect(results, ".csv")]
-# prevalence_attrition_files<-results[stringr::str_detect(results, "prevalence_attrition")]
-# prevalence_attrition <- list()
-# for(i in seq_along(prevalence_attrition_files)){
-#   prevalence_attrition[[i]]<-readr::read_csv(prevalence_attrition_files[[i]], 
-#                                              show_col_types = FALSE)  
-# }
-# prevalence_attrition <- dplyr::bind_rows(prevalence_attrition)
-# prevalence_attrition <- prepare_output(prevalence_attrition)
+# cdm snapshot ------
+snapshot_files <- results[stringr::str_detect(results, ".csv")]
+snapshot_files <- results[stringr::str_detect(results, "snapshot")]
+snapshotcdm <- list()
+for(i in seq_along(snapshot_files)){
+  snapshotcdm[[i]] <- readr::read_csv(snapshot_files[[i]],
+                                      show_col_types = FALSE)
+}
+snapshotcdm <- bind_rows(snapshotcdm) %>% 
+  select("cdm_name", "person_count", "observation_period_count" ,
+         "vocabulary_version") %>% 
+  mutate(person_count = nice.num.count(person_count), 
+         observation_period_count = nice.num.count(observation_period_count)) %>% 
+  dplyr::mutate(cdm_name = replace(cdm_name, cdm_name == "CPRD_GOLD", "CPRD GOLD")) %>% 
+  rename("Database name" = "cdm_name",
+         "Persons in the database" = "person_count",
+         "Number of observation periods" = "observation_period_count",
+         "OMOP CDM vocabulary version" = "vocabulary_version") 

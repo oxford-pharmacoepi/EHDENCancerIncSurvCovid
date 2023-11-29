@@ -22,8 +22,8 @@ ui <- dashboardPage(
           tabName = "inc_plots"
         ),
         menuSubItem(
-          text = "Age Standardized Plots",
-          tabName = "inc_plots"
+          text = "Standardized Plots",
+          tabName = "inc_plots_std"
         ),
         menuSubItem(
           text = "Incidence Estimates",
@@ -49,7 +49,7 @@ ui <- dashboardPage(
         ),
         
         menuSubItem(
-          text = "Survival stats",
+          text = "Survival statistics",
           tabName = "stats_results"
         ) 
       ),
@@ -59,16 +59,16 @@ ui <- dashboardPage(
         tabName = "os",
         menuSubItem(
           text = "Survival Plots",
-          tabName = "survival_results_cy"
+          tabName = "survival_resultscy"
         ),
         menuSubItem(
           text = "Risk Table",
-          tabName = "risk_results_cy"
+          tabName = "risk_resultscy"
         ),
         
         menuSubItem(
           text = "Survival stats",
-          tabName = "stats_results_cy"
+          tabName = "stats_resultscy"
         ) 
       ),
 
@@ -76,12 +76,8 @@ ui <- dashboardPage(
         text = "Characteristics",
         tabName = "char",
         menuSubItem(
-          text = "Overall Demographics",
+          text = "Demographics",
           tabName = "demographics"
-        ),
-        menuSubItem(
-          text = "Characterisation",
-          tabName = "tableone"
         )
       ),
       menuItem(
@@ -275,13 +271,38 @@ ui <- dashboardPage(
             style="display:inline-block; float:right")
 
       ) ,
-
+      
+      
       tabItem(
-        tabName = "tableone",
+        tabName = "risk_results",
         div(
           style = "display: inline-block;vertical-align:top; width: 150px;",
           pickerInput(
-            inputId = "tableone_database_name_selector",
+            inputId = "risk_table_cohort_name_selector",
+            label = "Study cohort",
+            choices = unique(incidence_attrition$outcome_cohort_name),
+            selected = "Breast",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "risk_table_sex_selector",
+            label = "Sex",
+            choices = unique(incidence_attrition$denominator_sex),
+            selected = "Both",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "risk_table_database_name_selector",
             label = "Database",
             choices = unique(incidence_attrition$cdm_name),
             selected = unique(incidence_attrition$cdm_name),
@@ -289,52 +310,243 @@ ui <- dashboardPage(
             multiple = TRUE
           )
         ),
-        div(
-          style = "display: inline-block;vertical-align:top; width: 150px;",
-          pickerInput(
-            inputId = "tableone_cohort_name_selector",
-            label = "Cancer",
-            choices = unique(incidence_attrition$outcome_cohort_name),
-            selected = "Breast",
-            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
-            multiple = FALSE
-          )
-        ),
         
-        div(
-          style = "display: inline-block;vertical-align:top; width: 150px;",
-          pickerInput(
-            inputId = "tableone_sex_selector",
-            label = "Sex",
-            choices = unique(incidence_attrition$denominator_sex),
-            selected = "Both",
-            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
-            multiple = FALSE
-          )
-        ),
-        
-        div(
-          style = "display: inline-block;vertical-align:top; width: 150px;",
-          pickerInput(
-            inputId = "tableone_age_selector",
-            label = "Age",
-            choices = unique(incidence_attrition$denominator_age_group),
-            selected = "All",
-            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
-            multiple = FALSE
-          )
-        ),
-        
-        htmlOutput('dt_tableone'),
+        htmlOutput('dt_risk_table'),
         
         div(style="display:inline-block",
             downloadButton(
-              outputId = "gt_tableone_word",
+              outputId = "gt_risk_table_word",
               label = "Download table as word"
             ), 
             style="display:inline-block; float:right")
         
       ),
+      
+      
+      tabItem(
+        tabName = "stats_results",
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "median_cohort_name_selector",
+            label = "Study cohort",
+            choices = unique(incidence_attrition$outcome_cohort_name),
+            selected = "Breast",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "median_sex_selector",
+            label = "Sex",
+            choices = unique(incidence_attrition$denominator_sex),
+            selected = "Both",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "median_database_name_selector",
+            label = "Database",
+            choices = unique(incidence_attrition$cdm_name),
+            selected = unique(incidence_attrition$cdm_name),
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        htmlOutput('dt_median_table'),
+        
+        div(style="display:inline-block",
+            downloadButton(
+              outputId = "gt_median_table_word",
+              label = "Download table as word"
+            ), 
+            style="display:inline-block; float:right")
+        
+      ),   
+      
+      tabItem(
+        tabName = "risk_resultscy",
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "risk_table_cohort_name_selector",
+            label = "Study cohort",
+            choices = unique(incidence_attrition$outcome_cohort_name),
+            selected = "Breast",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "risk_table_sex_selector",
+            label = "Sex",
+            choices = unique(incidence_attrition$denominator_sex),
+            selected = "Both",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "risk_table_database_name_selector",
+            label = "Database",
+            choices = unique(incidence_attrition$cdm_name),
+            selected = unique(incidence_attrition$cdm_name),
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        htmlOutput('dt_risk_tablecy'),
+        
+        div(style="display:inline-block",
+            downloadButton(
+              outputId = "gt_risk_tablecy_word",
+              label = "Download table as word"
+            ), 
+            style="display:inline-block; float:right")
+        
+      ),
+      
+      
+      tabItem(
+        tabName = "stats_resultscy",
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "median_cohort_name_selector",
+            label = "Study cohort",
+            choices = unique(incidence_attrition$outcome_cohort_name),
+            selected = "Breast",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "median_sex_selector",
+            label = "Sex",
+            choices = unique(incidence_attrition$denominator_sex),
+            selected = "Both",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "median_database_name_selector",
+            label = "Database",
+            choices = unique(incidence_attrition$cdm_name),
+            selected = unique(incidence_attrition$cdm_name),
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        htmlOutput('dt_median_tablecy'),
+        
+        div(style="display:inline-block",
+            downloadButton(
+              outputId = "gt_median_tablecy_word",
+              label = "Download table as word"
+            ), 
+            style="display:inline-block; float:right")
+        
+      ),   
+      
+      tabItem(
+        tabName = "survival_resultscy",
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "survival_database_selector",
+            label = "Database",
+            choices = unique(survival_estimates$Database),
+            selected = unique(survival_estimates$Database),
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "survival_cohort_name_selector",
+            label = "Cancer",
+            choices = unique(survival_estimates$Cancer),
+            selected = "Breast",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "survival_sex_selector",
+            label = "Sex",
+            choices = unique(survival_estimates$Sex),
+            selected = "Both",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(style="display: inline-block;vertical-align:top; width: 150px;",
+            pickerInput(inputId = "surv_plot_facet",
+                        label = "Facet by",
+                        choices = c("Cancer",
+                                    "Database",
+                                    "Sex"
+                        ),
+                        selected = c("Cancer", "Database" ),
+                        options = list(
+                          `actions-box` = TRUE,
+                          size = 10,
+                          `selected-text-format` = "count > 3"),
+                        multiple = TRUE,)
+        ),
+        # div(style="display: inline-block;vertical-align:top; width: 150px;",
+        #     pickerInput(inputId = "surv_plot_group",
+        #                 label = "Colour by",
+        #                 choices = c("Sex",
+        #                             "Cancer"),
+        #                 selected = c("Cancer"),
+        #                 options = list(
+        #                   `actions-box` = TRUE,
+        #                   size = 10,
+        #                   `selected-text-format` = "count > 3"),
+        #                 multiple = TRUE,)
+        #     
+        #     
+        # ),
+        div(
+          style = "width: 80vh; height: 5vh;",  # Set width to 100% for responsive design
+          checkboxInput("show_ci", "Show Confidence Intervals", value = TRUE)
+        ),
+        
+        div(
+          style = "width: 80vh; height: 95vh;",  # Set width to 100% for responsive design
+          plotOutput("survivalPlotcy")
+        )
+        
+      ),
+      
       
       tabItem(
         tabName = "survival_results",
@@ -372,25 +584,12 @@ ui <- dashboardPage(
           )
         ),
         
-        div(
-          style = "display: inline-block;vertical-align:top; width: 150px;",
-          pickerInput(
-            inputId = "survival_age_selector",
-            label = "Age",
-            choices = unique(survival_estimates$Age),
-            selected = "All",
-            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
-            multiple = TRUE
-          )
-        ),
-        
         div(style="display: inline-block;vertical-align:top; width: 150px;",
             pickerInput(inputId = "surv_plot_facet",
                         label = "Facet by",
                         choices = c("Cancer",
                                     "Database",
-                                    "Sex",
-                                    "Age"
+                                    "Sex"
                         ),
                         selected = c("Cancer", "Database" ),
                         options = list(
@@ -403,7 +602,6 @@ ui <- dashboardPage(
             pickerInput(inputId = "surv_plot_group",
                         label = "Colour by",
                         choices = c("Sex",
-                                    "Age",
                                     "Cancer"),
                         selected = c("Cancer"),
                         options = list(
@@ -411,14 +609,20 @@ ui <- dashboardPage(
                           size = 10,
                           `selected-text-format` = "count > 3"),
                         multiple = TRUE,)
-        ),
-        
-        div(
-          style = "width: 80vh; height: 95vh;",  # Set width to 100% for responsive design
-          plotOutput("survivalPlot")
-        )
-        
-      )
+      
+      
+    ),
+    div(
+      style = "width: 80vh; height: 5vh;",  # Set width to 100% for responsive design
+      checkboxInput("show_ci", "Show Confidence Intervals", value = TRUE)
+    ),
+    
+    div(
+      style = "width: 80vh; height: 95vh;",  # Set width to 100% for responsive design
+      plotOutput("survivalPlot")
+    )
+    
+  )
 
       
       # more tabs here
