@@ -11,12 +11,14 @@ ui <- dashboardPage(
     sidebarMenu(
       menuItem(
         text = "Background",
-        tabName = "background"
+        tabName = "background",
+        icon = shiny::icon("book")
       ),
 
       menuItem(
         text = "Incidence",
         tabName = "incidence",
+        icon = shiny::icon("chart-line") ,
         menuSubItem(
           text = "Crude Plots",
           tabName = "inc_plots"
@@ -39,6 +41,7 @@ ui <- dashboardPage(
       menuItem(
         text = "Overall Survival",
         tabName = "os",
+        icon = shiny::icon("skull") ,
         menuSubItem(
           text = "Survival Plots",
           tabName = "survival_results"
@@ -57,6 +60,7 @@ ui <- dashboardPage(
       menuItem(
         text = "Calendar Time Survival",
         tabName = "os",
+        icon = shiny::icon("calendar") ,
         menuSubItem(
           text = "Survival Plots",
           tabName = "survival_resultscy"
@@ -75,6 +79,7 @@ ui <- dashboardPage(
       menuItem(
         text = "Characteristics",
         tabName = "char",
+        icon = shiny::icon("hospital-user"),
         menuSubItem(
           text = "Demographics",
           tabName = "demographics"
@@ -83,6 +88,7 @@ ui <- dashboardPage(
       menuItem(
         text = "Database",
         tabName = "dbs",
+        icon = shiny::icon("database"),
         menuSubItem(
           text = "Snapshot",
           tabName = "snapshotcdm"

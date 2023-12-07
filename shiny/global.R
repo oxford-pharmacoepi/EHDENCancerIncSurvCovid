@@ -270,6 +270,26 @@ incidence_estimates <- dplyr::bind_rows(incidence_estimates)
 incidence_estimates <- prepare_output(incidence_estimates)
 
 
+# pull out female breast and male prostate
+incidence_estimates_breast <- incidence_estimates %>% 
+  filter(outcome_cohort_name == "Breast" & denominator_sex == "Female")  %>% 
+  filter(denominator_age_group == "All") 
+
+incidence_estimates_prostate <- incidence_estimates %>% 
+  filter(outcome_cohort_name == "Prostate") %>% 
+  filter(denominator_age_group == "All") 
+
+incidence_estimates <- incidence_estimates %>% 
+  filter(outcome_cohort_name != "Breast") %>% 
+  filter(outcome_cohort_name != "Prostate") %>% 
+  filter(denominator_age_group == "All") %>% 
+  filter(denominator_sex == "Both") 
+
+incidence_estimates <- bind_rows(incidence_estimates ,
+                                 incidence_estimates_breast, 
+                                 incidence_estimates_prostate)
+
+
 # incidence attrition
 incidence_attrition_files<-results[stringr::str_detect(results, ".csv")]
 incidence_attrition_files<-results[stringr::str_detect(results, "incidence_attrition")]
@@ -279,7 +299,27 @@ for(i in seq_along(incidence_attrition_files)){
                                             show_col_types = FALSE)  
 }
 incidence_attrition <- dplyr::bind_rows(incidence_attrition)
-incidence_attrition <- prepare_output(incidence_attrition)
+incidence_attrition <- prepare_output(incidence_attrition) 
+
+# pull out female breast and male prostate
+incidence_attrition_breast <- incidence_attrition %>% 
+  filter(outcome_cohort_name == "Breast" & denominator_sex == "Female")  %>% 
+  filter(denominator_age_group == "All") 
+
+incidence_attrition_prostate <- incidence_attrition %>% 
+  filter(outcome_cohort_name == "Prostate") %>% 
+  filter(denominator_age_group == "All") 
+
+incidence_attrition <- incidence_attrition %>% 
+  filter(outcome_cohort_name != "Breast") %>% 
+  filter(outcome_cohort_name != "Prostate") %>% 
+  filter(denominator_age_group == "All") %>% 
+  filter(denominator_sex == "Both") 
+
+incidence_attrition <- bind_rows(incidence_attrition ,
+                                 incidence_attrition_breast, 
+                                 incidence_attrition_prostate)
+
 
 # merge the survival results together
 survival_estimates_files <- results[stringr::str_detect(results, ".csv")]
@@ -292,6 +332,25 @@ for(i in seq_along(survival_estimates_files)){
 }
 survival_estimates <- dplyr::bind_rows(survival_estimates)
 survival_estimates <- prepare_output_survival(survival_estimates)
+
+# pull out female breast and male prostate
+survival_estimates_breast <- survival_estimates %>% 
+  filter(Cancer == "Breast" & Sex == "Female")  %>% 
+  filter(Age == "All") 
+
+survival_estimates_prostate <- survival_estimates %>% 
+  filter(Cancer == "Prostate") %>% 
+  filter(Age == "All") 
+
+survival_estimates <- survival_estimates %>% 
+  filter(Cancer != "Breast") %>% 
+  filter(Cancer != "Prostate") %>% 
+  filter(Age == "All") %>% 
+  filter(Sex == "Both")
+
+survival_estimates <- bind_rows(survival_estimates ,
+                                survival_estimates_breast, 
+                                survival_estimates_prostate)
 
 # risk tables ----------
 # merge the risk table (whole dataset)
@@ -310,6 +369,25 @@ for(i in seq_along(survival_risk_table_files)){
 survival_risk_table <- dplyr::bind_rows(survival_risk_table)
 survival_risk_table <- prepare_output_survival(survival_risk_table)
 
+# pull out female breast and male prostate
+survival_risk_table_breast <- survival_risk_table %>% 
+  filter(Cancer == "Breast" & Sex == "Female")  %>% 
+  filter(Age == "All") 
+
+survival_risk_table_prostate <- survival_risk_table %>% 
+  filter(Cancer == "Prostate") %>% 
+  filter(Age == "All") 
+
+survival_risk_table <- survival_risk_table %>% 
+  filter(Cancer != "Breast") %>% 
+  filter(Cancer != "Prostate") %>% 
+  filter(Age == "All") %>% 
+  filter(Sex == "Both")
+
+survival_risk_table <- bind_rows(survival_risk_table ,
+                                 survival_risk_table_breast, 
+                                 survival_risk_table_prostate)
+
 
 # merge the risk table results together (calender year results)
 survival_risk_table_cy_files<-results[stringr::str_detect(results, ".csv")]
@@ -323,6 +401,25 @@ for(i in seq_along(survival_risk_table_cy_files)){
 survival_risk_cy_table <- dplyr::bind_rows(survival_risk_cy_table)
 survival_risk_cy_table <- prepare_output_survival(survival_risk_cy_table)
 
+# pull out female breast and male prostate
+survival_risk_cy_table_breast <- survival_risk_cy_table %>% 
+  filter(Cancer == "Breast" & Sex == "Female")  %>% 
+  filter(Age == "All") 
+
+survival_risk_cy_table_prostate <- survival_risk_cy_table %>% 
+  filter(Cancer == "Prostate") %>% 
+  filter(Age == "All") 
+
+survival_risk_cy_table <- survival_risk_cy_table %>% 
+  filter(Cancer != "Breast") %>% 
+  filter(Cancer != "Prostate") %>% 
+  filter(Age == "All") %>% 
+  filter(Sex == "Both")
+
+survival_risk_cy_table <- bind_rows(survival_risk_cy_table ,
+                                    survival_risk_cy_table_breast, 
+                                    survival_risk_cy_table_prostate)
+
 # median and survival probabilities ------
 # median results whole database
 survival_median_files<-results[stringr::str_detect(results, ".csv")]
@@ -335,6 +432,25 @@ for(i in seq_along(survival_median_files)){
 }
 survival_median_table <- dplyr::bind_rows(survival_median_table)
 survival_median_table <- prepare_output_survival(survival_median_table)
+
+# pull out female breast and male prostate
+survival_median_table_breast <- survival_median_table %>% 
+  filter(Cancer == "Breast" & Sex == "Female")  %>% 
+  filter(Age == "All") 
+
+survival_median_table_prostate <- survival_median_table %>% 
+  filter(Cancer == "Prostate") %>% 
+  filter(Age == "All") 
+
+survival_median_table <- survival_median_table %>% 
+  filter(Cancer != "Breast") %>% 
+  filter(Cancer != "Prostate") %>% 
+  filter(Age == "All") %>% 
+  filter(Sex == "Both")
+
+survival_median_table <- bind_rows(survival_median_table ,
+                                   survival_median_table_breast, 
+                                   survival_median_table_prostate)
 
 
 # median results cy database
