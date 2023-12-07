@@ -878,10 +878,16 @@ server <-	function(input, output, session) {
           geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = Group, colour = Group), alpha = 0.3) +
           geom_line(color = "black", size = 0.25) +
           geom_vline(xintercept = as.numeric(as.Date("2020-03-23")), linetype="dotted", colour = "#ED0000FF", size = 0.8) +
-          geom_point(aes(fill = Group, colour = Group),size = 2) +
+          geom_point(aes(fill = Group, colour = Group), size = 2) +
                                     facet_wrap(vars(facet_var),ncol = 3, scales = "free_y")+
                                     scale_y_continuous(limits = c(0, NA)) +
-                                    theme_bw()
+          theme(axis.text.x = element_text(angle = 45, hjust=1),
+                panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+                strip.background = element_rect(color = "black", size = 0.6) ,
+                panel.background = element_blank() ,
+                axis.line = element_line(colour = "black", size = 0.6) ,
+                panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+                legend.position='none') 
         
         
         
