@@ -386,6 +386,56 @@ server <-	function(input, output, session) {
     }
   )
   
+  
+  
+  
+  
+  # survivalFigureData <- survivalData2 %>%
+  #   filter(Cancer == "Colorectal" |
+  #            Cancer == "Head & Neck" |
+  #            Cancer == "Liver" |
+  #            Cancer == "Lung" |
+  #            Cancer == "Oesophagus" |
+  #            Cancer == "Pancreas" |
+  #            Cancer == "Breast" |
+  #            Cancer == "Prostate" |
+  #            Cancer == "Stomach" ) %>% 
+  #   filter(time <= 2.1000000000000) %>% 
+  #   ggplot(aes(x = time,
+  #              y = est,
+  #              group = CalendarYearGp,
+  #              col = CalendarYearGp )) +
+  #   scale_y_continuous( labels = label_percent() ) +
+  #   scale_colour_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) + #blue, #red, #lightblue, #green, purple, peach, dark red, gry
+  #   scale_fill_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) +
+  #   geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
+  #   scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
+  #   geom_ribbon(aes(ymin = lcl, 
+  #                   ymax = ucl, 
+  #                   fill = CalendarYearGp), alpha = .15, color = NA, show.legend = FALSE) +
+  #   labs(x = "Time (Years)",
+  #        y = "Survival Probability",
+  #        col = "Calendar Year Group",
+  #        linetype = "Calendar Year Group") +
+  #   theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+  #         strip.background = element_rect(color = "black", size = 0.6) ,
+  #         panel.background = element_blank() ,
+  #         panel.spacing.x = unit(0.05, "cm") ,
+  #         panel.spacing.y = unit(0.1, "cm") ,
+  #         axis.text = element_text(size = 8) ,
+  #         #axis.title.y = element_text(size = 15),
+  #         #axis.title.x = element_text(size = 15),
+  #         legend.text = element_text(size=8),
+  #         legend.title = element_text(size=8),
+  #         #strip.text.x = element_text(size = 15),
+  #         axis.line = element_line(colour = "black", size = 0.6) ,
+  #         panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+  #         legend.box.spacing = unit(0, "pt") ,
+  #         legend.key = element_rect(fill = "transparent", colour = "transparent"),
+  #         legend.position='bottom') +
+  #   xlim(0, 2) +
+  #   facet_wrap(~ Cancer, scales = "free_y", ncol = 3)
+  
   # survival plots CY -------
   get_surv_plot_cy <- reactive({
 
@@ -407,7 +457,8 @@ server <-	function(input, output, session) {
 
     plot_data <- survival_estimates_cy %>%
       filter(Database %in% input$survival_database_selector) %>%
-      filter(Cancer %in% input$survival_cohort_name_selector) 
+      filter(Cancer %in% input$survival_cohort_name_selector) %>% 
+      filter(time <= 2.5000000000000)
 
     if (input$show_ci_cy) {
 
@@ -415,13 +466,39 @@ server <-	function(input, output, session) {
         plot <- plot_data %>%
           unite("Group", c(all_of(input$surv_plot_group)), remove = FALSE, sep = "; ") %>%
           unite("facet_var", c(all_of(input$surv_plot_facet)), remove = FALSE, sep = "; ") %>%
-          ggplot(aes(x = time, y = est, ymin = lcl, ymax = ucl, colour = CalendarYearGp)) +
-          geom_line() +
-          geom_ribbon(aes(ymin = lcl, ymax = ucl, colour = CalendarYearGp, fill = CalendarYearGp), alpha = 0.3) +
-          xlab("Time (Years)") +
-          ylab("Survival Function (%)") +
-          facet_wrap(vars(facet_var), ncol = 3) +
-          theme_bw(base_size = 15)
+          
+          ggplot(aes(x = time,
+                     y = est,
+                     group = CalendarYearGp,
+                     col = CalendarYearGp )) +
+          scale_y_continuous( labels = label_percent() ) +
+          scale_colour_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) + 
+          scale_fill_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) +
+          geom_line(aes(linetype = CalendarYearGp),size = 0.5) +
+          scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
+          geom_ribbon(aes(ymin = lcl, 
+                          ymax = ucl, 
+                          fill = CalendarYearGp), alpha = .15, color = NA, show.legend = FALSE) +
+          labs(x = "Time (Years)",
+               y = "Survival Probability",
+               col = "Calendar Year Group",
+               linetype = "Calendar Year Group") +
+          theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+                strip.background = element_rect(color = "black", size = 0.6) ,
+                panel.background = element_blank() ,
+                panel.spacing.x = unit(0.05, "cm") ,
+                panel.spacing.y = unit(0.1, "cm") ,
+                axis.text = element_text(size = 15) ,
+                axis.title = element_text(size = 15) ,
+                legend.text = element_text(size= 15),
+                legend.title = element_text(size= 15),
+                axis.line = element_line(colour = "black", size = 0.6) ,
+                panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+                legend.box.spacing = unit(0, "pt") ,
+                legend.key = element_rect(fill = "transparent", colour = "transparent"),
+                legend.position='bottom') +
+          xlim(0, 2.5) +
+          facet_wrap(~ Cancer, scales = "free_y", ncol = 3)
 
 
 
@@ -458,8 +535,8 @@ server <-	function(input, output, session) {
       }
 
       # Move scale_y_continuous outside of ggplot
-      plot <- plot + scale_y_continuous(labels = scales::percent,
-                                        limits = c(0, NA))
+      plot <- plot  +
+        theme(strip.text = element_text(size = 15, face = "bold"))
 
       plot
 
@@ -508,8 +585,7 @@ server <-	function(input, output, session) {
       }
 
       # Move scale_y_continuous outside of ggplot
-      plot <- plot + scale_y_continuous(labels = scales::percent,
-                                        limits = c(0, NA)
+      plot <- plot + scale_y_continuous(limits = c(0, NA)
 
       )
 
