@@ -287,7 +287,8 @@ incidence_estimates <- incidence_estimates %>%
 
 incidence_estimates <- bind_rows(incidence_estimates ,
                                  incidence_estimates_breast, 
-                                 incidence_estimates_prostate)
+                                 incidence_estimates_prostate) %>% 
+  rename(Database = cdm_name, Cancer = outcome_cohort_name)
 
 
 # incidence attrition

@@ -502,8 +502,8 @@ ui <- dashboardPage(
           pickerInput(
             inputId = "incidence_database_selector",
             label = "Database",
-            choices = unique(incidence_estimates$cdm_name),
-            selected = unique(incidence_estimates$cdm_name),
+            choices = unique(incidence_estimates$Database),
+            selected = unique(incidence_estimates$Database),
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
           )
@@ -513,8 +513,8 @@ ui <- dashboardPage(
           pickerInput(
             inputId = "incidence_cohort_name_selector",
             label = "Cancer",
-            choices = unique(incidence_estimates$outcome_cohort_name),
-            selected = unique(incidence_estimates$outcome_cohort_name),
+            choices = unique(incidence_estimates$Cancer),
+            selected = unique(incidence_estimates$Cancer),
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
           )
@@ -528,15 +528,40 @@ ui <- dashboardPage(
             choices = unique(incidence_estimates$analysis_interval),
             selected = "quarters",
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = FALSE
+          )
+        ),
+
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "incidence_start_date_selector",
+            label = "Incidence Start Date",
+            choices = as.character(unique(incidence_estimates$incidence_start_date)),
+            selected = as.character(unique(incidence_estimates$incidence_start_date)),
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
           )
+        ),
+        
+        
+        div(style="display: inline-block;vertical-align:top; width: 150px;",
+            pickerInput(inputId = "incidence_x_axis",
+                        label = "X axis",
+                        choices = c("incidence_start_date"),
+                        selected = "incidence_start_date",
+                        options = list(
+                          `actions-box` = TRUE,
+                          size = 10,
+                          `selected-text-format` = "count > 3"),
+                        multiple = FALSE,)
         ),
         
         div(style="display: inline-block;vertical-align:top; width: 150px;",
             pickerInput(inputId = "incidence_plot_facet",
                         label = "Facet by",
-                        choices = c("outcome_cohort_name"),
-                        selected = c("outcome_cohort_name" ),
+                        choices = c("Cancer"),
+                        selected = c("Cancer"),
                         options = list(
                           `actions-box` = TRUE,
                           size = 10,
@@ -547,8 +572,8 @@ ui <- dashboardPage(
         div(style="display: inline-block;vertical-align:top; width: 150px;",
             pickerInput(inputId = "incidence_plot_group",
                         label = "Colour by",
-                        choices = c("outcome_cohort_name"),
-                        selected = c("outcome_cohort_name"),
+                        choices = c("Cancer"),
+                        selected = c("Cancer"),
                         options = list(
                           `actions-box` = TRUE,
                           size = 10,
@@ -558,10 +583,10 @@ ui <- dashboardPage(
             
         ),
         
-        div(
-          style = "width: 80vh; height: 5vh;",  # Set width to 100% for responsive design
-          checkboxInput("show_ci_inc", "Show Confidence Intervals", value = TRUE)
-        ),
+        # div(
+        #   style = "width: 80vh; height: 5vh;",  # Set width to 100% for responsive design
+        #   checkboxInput("show_ci_inc", "Show Confidence Intervals", value = TRUE)
+        # ),
         
         div(
           style = "width: 80%; height: 90%;",  # Set width to 100% for responsive design
