@@ -464,6 +464,25 @@ for(i in seq_along(survival_median_files_cy)){
 survival_median_table_cy <- dplyr::bind_rows(survival_median_table_cy)
 survival_median_table_cy <- prepare_output_survival(survival_median_table_cy)
 
+# pull out female breast and male prostate
+survival_median_table_cy_breast <- survival_median_table_cy %>% 
+  filter(Cancer == "Breast" & Sex == "Female")  %>% 
+  filter(Age == "All") 
+
+survival_median_table_cy_prostate <- survival_median_table_cy %>% 
+  filter(Cancer == "Prostate") %>% 
+  filter(Age == "All") 
+
+survival_median_table_cy <- survival_median_table_cy %>% 
+  filter(Cancer != "Breast") %>% 
+  filter(Cancer != "Prostate") %>% 
+  filter(Age == "All") %>% 
+  filter(Sex == "Both")
+
+survival_median_table_cy <- bind_rows(survival_median_table_cy ,
+                                      survival_median_table_cy_breast, 
+                                      survival_median_table_cy_prostate)
+
 
 # survival estimates -----
 # whole pop
@@ -489,6 +508,32 @@ for(i in seq_along(tableone_whole_files)){
                                                  show_col_types = FALSE)  
 }
 patient_characteristics <- dplyr::bind_rows(tableone_whole)
+
+# pull out female breast and male prostate
+patient_characteristics_breast <- patient_characteristics %>% 
+  filter((group_level == "Breast" & strata_level == "Female") |
+           (group_level == "Breast" & strata_level == "Female and 2000 to 2004") |
+           (group_level == "Breast" & strata_level == "Female and 2005 to 2009") |
+           (group_level == "Breast" & strata_level == "Female and 2010 to 2014") |
+           (group_level == "Breast" & strata_level == "Female and 2015 to 2019") |
+           (group_level == "Breast" & strata_level == "Female and 2020 to 2022")  ) 
+
+patient_characteristics_prostate <- patient_characteristics %>% 
+  filter((group_level == "Prostate" & strata_level == "Male") |
+           (group_level == "Prostate" & strata_level == "Male and 2000 to 2004") |
+           (group_level == "Prostate" & strata_level == "Male and 2005 to 2009") |
+           (group_level == "Prostate" & strata_level == "Male and 2010 to 2014") |
+           (group_level == "Prostate" & strata_level == "Male and 2015 to 2019") |
+           (group_level == "Prostate" & strata_level == "Male and 2020 to 2022")  ) 
+
+patient_characteristics <- patient_characteristics %>% 
+  filter(group_level != "Breast") %>% 
+  filter(group_level != "Prostate") %>% 
+  filter(strata_name == "Overall" | strata_name == "calendar_yr_gp" )
+
+patient_characteristics <- bind_rows(patient_characteristics ,
+                                     patient_characteristics_breast, 
+                                     patient_characteristics_prostate)
 
 # cdm snapshot ------
 snapshot_files <- results[stringr::str_detect(results, ".csv")]

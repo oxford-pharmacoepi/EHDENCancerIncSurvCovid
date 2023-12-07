@@ -22,8 +22,6 @@ server <-	function(input, output, session) {
   get_table_attrition <-reactive({
     
     table <- incidence_attrition %>% 
-      filter(denominator_sex %in% input$attrition_sex_selector) %>% 
-      filter(denominator_age_group %in% input$attrition_age_selector) %>% 
       filter(outcome_cohort_name %in% input$attrition_cohort_name_selector) %>% 
       filter(analysis_interval %in% input$attrition_time_selector)
     
@@ -96,15 +94,11 @@ server <-	function(input, output, session) {
     validate(
       need(input$risk_table_database_name_selector != "", "Please select a database")
     )
-    validate(
-      need(input$risk_table_sex_selector != "", "Please select a sex")
-    )
     
  
     table <- survival_risk_table %>%
       filter(Cancer %in% input$risk_table_cohort_name_selector) %>%
-      filter(Database %in% input$risk_table_database_name_selector) %>% 
-      filter(Sex %in% input$risk_table_sex_selector)
+      filter(Database %in% input$risk_table_database_name_selector) 
     
     table
     
@@ -136,15 +130,11 @@ server <-	function(input, output, session) {
     validate(
       need(input$median_database_name_selector != "", "Please select a database")
     )
-    validate(
-      need(input$median_sex_selector != "", "Please select a sex")
-    )
 
 
     table <- survival_median_table %>%
       filter(Cancer %in% input$median_cohort_name_selector) %>%
-      filter(Database %in% input$median_database_name_selector) %>%
-      filter(Sex %in% input$median_sex_selector)
+      filter(Database %in% input$median_database_name_selector)
 
     table
 
@@ -174,9 +164,6 @@ server <-	function(input, output, session) {
     validate(
       need(input$survival_database_selector != "", "Please select a database")
     )
-    validate(
-      need(input$survival_sex_selector != "", "Please select a sex")
-    )
     
     validate(
       need(input$surv_plot_group != "", "Please select a group to colour by")
@@ -189,8 +176,7 @@ server <-	function(input, output, session) {
     
     plot_data <- survival_estimates_whole %>%
       filter(Database %in% input$survival_database_selector) %>%
-      filter(Cancer %in% input$survival_cohort_name_selector) %>%
-      filter(Sex %in% input$survival_sex_selector) 
+      filter(Cancer %in% input$survival_cohort_name_selector) 
     
     if (input$show_ci) {
       
@@ -203,8 +189,8 @@ server <-	function(input, output, session) {
           geom_ribbon(aes(ymin = lcl, ymax = ucl, fill = Group, colour = Group), alpha = 0.3) +
           xlab("Time (Years)") +
           ylab("Survival Function (%)") +
-          facet_wrap(vars(facet_var), ncol = 2) +
-          theme_bw() 
+          facet_wrap(vars(facet_var), ncol = 3) +
+          theme_bw(base_size = 15) 
         
         
         
@@ -216,7 +202,7 @@ server <-	function(input, output, session) {
           geom_ribbon(aes(ymin = lcl, ymax = ucl, fill = Group, colour = Group), alpha = 0.3) +
           xlab("Time (Years)") +
           ylab("Survival Function (%)") +
-          theme_bw() 
+          theme_bw(base_size = 15) 
         
       } else if (is.null(input$surv_plot_group) && !is.null(input$surv_plot_facet)) {
         plot <- plot_data %>%
@@ -226,8 +212,8 @@ server <-	function(input, output, session) {
           geom_ribbon(aes(ymin = lcl, ymax = ucl, fill = Group, colour = Group), alpha = 0.3) +
           xlab("Time (Years)") +
           ylab("Survival Function (%)") +
-          facet_wrap(vars(facet_var), ncol = 2) +
-          theme_bw() 
+          facet_wrap(vars(facet_var), ncol = 3) +
+          theme_bw(base_size = 15) 
         
       } else {
         plot <- plot_data %>%
@@ -236,7 +222,7 @@ server <-	function(input, output, session) {
           geom_ribbon(aes(ymin = lcl, ymax = ucl, fill = Group, colour = Group), alpha = 0.3) +
           xlab("Time (Years)") +
           ylab("Survival Function (%)") +
-          theme_bw() 
+          theme_bw(base_size = 15) 
         
       }
       
@@ -256,8 +242,8 @@ server <-	function(input, output, session) {
           geom_line() +
           xlab("Time (Years)") +
           ylab("Survival Function (%)") +
-          facet_wrap(vars(facet_var), ncol = 2) +
-          theme_bw() 
+          facet_wrap(vars(facet_var), ncol = 3) +
+          theme_bw(base_size = 15) 
         
         
         
@@ -268,7 +254,7 @@ server <-	function(input, output, session) {
           geom_line() +
           xlab("Time (Years)") +
           ylab("Survival Function (%)") +
-          theme_bw() 
+          theme_bw(base_size = 15) 
         
       } else if (is.null(input$surv_plot_group) && !is.null(input$surv_plot_facet)) {
         plot <- plot_data %>%
@@ -277,8 +263,8 @@ server <-	function(input, output, session) {
           geom_line() +
           xlab("Time (Years)") +
           ylab("Survival Function (%)") +
-          facet_wrap(vars(facet_var), ncol = 2) +
-          theme_bw() 
+          facet_wrap(vars(facet_var), ncol = 3) +
+          theme_bw(base_size = 15) 
         
       } else {
         plot <- plot_data %>%
@@ -286,7 +272,7 @@ server <-	function(input, output, session) {
           geom_line() +
           xlab("Time (Years)") +
           ylab("Survival Function (%)") +
-          theme_bw() 
+          theme_bw(base_size = 15) 
         
       }
       
@@ -310,6 +296,22 @@ server <-	function(input, output, session) {
   output$survivalPlot <- renderPlot(
     get_surv_plot()
   )
+  
+  output$survival_download_plot <- downloadHandler(
+    filename = function() {
+      "Survival_plot.png"
+    },
+    content = function(file) {
+      ggsave(
+        file,
+        get_surv_plot(),
+        width = as.numeric(input$survival_download_width),
+        height = as.numeric(input$survival_download_height),
+        dpi = as.numeric(input$survival_download_dpi),
+        units = "cm"
+      )
+    }
+  )
  
   
   
@@ -323,15 +325,11 @@ server <-	function(input, output, session) {
     validate(
       need(input$risk_table_database_name_selector != "", "Please select a database")
     )
-    validate(
-      need(input$risk_table_sex_selector != "", "Please select a sex")
-    )
-    
+
     
     table <- survival_risk_cy_table %>%
       filter(Cancer %in% input$risk_table_cohort_name_selector) %>%
-      filter(Database %in% input$risk_table_database_name_selector) %>% 
-      filter(Sex %in% input$risk_table_sex_selector)
+      filter(Database %in% input$risk_table_database_name_selector) 
     
     table
     
@@ -363,15 +361,11 @@ server <-	function(input, output, session) {
     validate(
       need(input$median_database_name_selector != "", "Please select a database")
     )
-    validate(
-      need(input$median_sex_selector != "", "Please select a sex")
-    )
     
     
     table <- survival_median_table_cy %>%
       filter(Cancer %in% input$median_cohort_name_selector) %>%
-      filter(Database %in% input$median_database_name_selector) %>%
-      filter(Sex %in% input$median_sex_selector)
+      filter(Database %in% input$median_database_name_selector) 
     
     table
     
@@ -401,10 +395,11 @@ server <-	function(input, output, session) {
     validate(
       need(input$survival_database_selector != "", "Please select a database")
     )
+    
     validate(
-      need(input$survival_sex_selector != "", "Please select a sex")
+      need(input$surv_plot_facet != "", "Please select a group to colour by")
     )
-
+    
     validate(
       need(input$surv_plot_facet != "", "Please select a group to facet by")
     )
@@ -412,10 +407,9 @@ server <-	function(input, output, session) {
 
     plot_data <- survival_estimates_cy %>%
       filter(Database %in% input$survival_database_selector) %>%
-      filter(Cancer %in% input$survival_cohort_name_selector) %>%
-      filter(Sex %in% input$survival_sex_selector)
+      filter(Cancer %in% input$survival_cohort_name_selector) 
 
-    if (input$show_ci) {
+    if (input$show_ci_cy) {
 
       if (!is.null(input$surv_plot_group) && !is.null(input$surv_plot_facet)) {
         plot <- plot_data %>%
@@ -423,11 +417,11 @@ server <-	function(input, output, session) {
           unite("facet_var", c(all_of(input$surv_plot_facet)), remove = FALSE, sep = "; ") %>%
           ggplot(aes(x = time, y = est, ymin = lcl, ymax = ucl, colour = CalendarYearGp)) +
           geom_line() +
-          geom_ribbon(aes(ymin = lcl, ymax = ucl, colour = CalendarYearGp), alpha = 0.3) +
+          geom_ribbon(aes(ymin = lcl, ymax = ucl, colour = CalendarYearGp, fill = CalendarYearGp), alpha = 0.3) +
           xlab("Time (Years)") +
           ylab("Survival Function (%)") +
-          facet_wrap(vars(facet_var), ncol = 2) +
-          theme_bw()
+          facet_wrap(vars(facet_var), ncol = 3) +
+          theme_bw(base_size = 15)
 
 
 
@@ -436,30 +430,30 @@ server <-	function(input, output, session) {
           unite("Group", c(all_of(input$surv_plot_group)), remove = FALSE, sep = "; ") %>%
           ggplot(aes(x = time, y = est, ymin = lcl, ymax = ucl, colour = CalendarYearGp)) +
           geom_line() +
-          geom_ribbon(aes(ymin = lcl, ymax = ucl, colour = CalendarYearGp), alpha = 0.3) +
+          geom_ribbon(aes(ymin = lcl, ymax = ucl, colour = CalendarYearGp, fill = CalendarYearGp), alpha = 0.3) +
           xlab("Time (Years)") +
           ylab("Survival Function (%)") +
-          theme_bw()
+          theme_bw(base_size = 15)
 
       } else if (is.null(input$surv_plot_group) && !is.null(input$surv_plot_facet)) {
         plot <- plot_data %>%
           unite("facet_var", c(all_of(input$surv_plot_facet)), remove = FALSE, sep = "; ") %>%
           ggplot(aes(x = time, y = est, ymin = lcl, ymax = ucl, group = Group, colour = CalendarYearGp)) +
           geom_line() +
-          geom_ribbon(aes(ymin = lcl, ymax = ucl, colour = CalendarYearGp), alpha = 0.3) +
+          geom_ribbon(aes(ymin = lcl, ymax = ucl, colour = CalendarYearGp, fill = CalendarYearGp), alpha = 0.3) +
           xlab("Time (Years)") +
           ylab("Survival Function (%)") +
-          facet_wrap(vars(facet_var), ncol = 2) +
-          theme_bw()
+          facet_wrap(vars(facet_var), ncol = 3) +
+          theme_bw(base_size = 15)
 
       } else {
         plot <- plot_data %>%
           ggplot(aes(x = time, y = est, ymin = lcl, ymax = ucl, group = Group, colour = CalendarYearGp)) +
           geom_line() +
-          geom_ribbon(aes(ymin = lcl, ymax = ucl, colour = CalendarYearGp), alpha = 0.3) +
+          geom_ribbon(aes(ymin = lcl, ymax = ucl, colour = CalendarYearGp, fill = CalendarYearGp), alpha = 0.3) +
           xlab("Time (Years)") +
           ylab("Survival Function (%)") +
-          theme_bw()
+          theme_bw(base_size = 15)
 
       }
 
@@ -479,8 +473,8 @@ server <-	function(input, output, session) {
           geom_line() +
           xlab("Time (Years)") +
           ylab("Survival Function (%)") +
-          facet_wrap(vars(facet_var), ncol = 2) +
-          theme_bw()
+          facet_wrap(vars(facet_var), ncol = 3) +
+          theme_bw(base_size = 15)
 
 
 
@@ -491,7 +485,7 @@ server <-	function(input, output, session) {
           geom_line() +
           xlab("Time (Years)") +
           ylab("Survival Function (%)") +
-          theme_bw()
+          theme_bw(base_size = 15)
 
       } else if (is.null(input$surv_plot_group) && !is.null(input$surv_plot_facet)) {
         plot <- plot_data %>%
@@ -500,8 +494,8 @@ server <-	function(input, output, session) {
           geom_line() +
           xlab("Time (Years)") +
           ylab("Survival Function (%)") +
-          facet_wrap(vars(facet_var), ncol = 2) +
-          theme_bw()
+          facet_wrap(vars(facet_var), ncol = 3) +
+          theme_bw(base_size = 15)
 
       } else {
         plot <- plot_data %>%
@@ -509,7 +503,7 @@ server <-	function(input, output, session) {
           geom_line() +
           xlab("Time (Years)") +
           ylab("Survival Function (%)") +
-          theme_bw()
+          theme_bw(base_size = 15)
 
       }
 
@@ -534,77 +528,21 @@ server <-	function(input, output, session) {
     get_surv_plot_cy()
   )
 
-  
-  
-  
-  
-  
-  # output$plot_survival_estimates_cy<- renderPlotly({
-  #   
-  #   table<-get_survival_estimates_cy()
-  #   validate(need(ncol(table)>1,
-  #                 "No results for selected inputs"))
-  #   
-  #   if(is.null(input$survival_plot_group_cy)){
-  #     if(!is.null(input$survival_plot_facet_cy)){
-  #       p<-table %>%
-  #         unite("facet_var",
-  #               c(all_of(input$survival_plot_facet_cy)), remove = FALSE, sep = "; ") %>%
-  #         ggplot(aes_string(x=input$time, y="est", colour="CalendarYearGp")) +
-  #         geom_line() +
-  #         facet_wrap(vars(facet_var),ncol = 2)+
-  #         scale_y_continuous(limits = c(NA, 1) ) +
-  #         theme_bw()
-  #     } else{
-  #       p<-table %>%
-  #         ggplot(aes_string(x=input$time, y="est", colour="CalendarYearGp")) +
-  #         scale_y_continuous(
-  #           limits = c(NA, 1)
-  #         ) +
-  #         theme_bw()
-  #     }
-  #   }
-  #   
-  #   
-  #   if(!is.null(input$survival_plot_group_cy) ){
-  #     
-  #     if(is.null(input$survival_plot_facet_cy) ){
-  #       p<-table %>%
-  #         unite("Group",
-  #               c(all_of(input$survival_plot_group_cy)), remove = FALSE, sep = "; ") %>%
-  #         ggplot(aes_string(x=input$time, y="est",
-  #                           group="Group",
-  #                           colour="Group")) +
-  #         geom_line() +
-  #         theme_bw()
-  #     }
-  #     
-  #     if(!is.null(input$survival_plot_facet_cy) ){
-  #       if(!is.null(input$survival_plot_group_cy) ){
-  #         p<-table %>%
-  #           unite("Group",
-  #                 c(all_of(input$survival_plot_group_cy)), remove = FALSE, sep = "; ") %>%
-  #           unite("facet_var",
-  #                 c(all_of(input$survival_plot_facet_cy)), remove = FALSE, sep = "; ") %>%
-  #           ggplot(aes_string(x=input$time, y="est",
-  #                             group="Group",
-  #                             colour="Group")) +
-  #           geom_line() +
-  #           facet_wrap(vars(facet_var_cy),ncol = 2)+
-  #           scale_y_continuous(limits = c(NA, 1) )  +
-  #           theme_bw()
-  #       }
-  #     }
-  #     
-  #   }
-  #   
-  #   p
-  #   
-  # })    
-  
-  
-  
-   
+  output$survival_cy_download_plot <- downloadHandler(
+    filename = function() {
+      "Survival_calendar_time_plot.png"
+    },
+    content = function(file) {
+      ggsave(
+        file,
+        get_surv_plot_cy(),
+        width = as.numeric(input$survival_download_width),
+        height = as.numeric(input$survival_download_height),
+        dpi = as.numeric(input$survival_download_dpi),
+        units = "cm"
+      )
+    }
+  )
   
    
 }
