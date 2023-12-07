@@ -496,7 +496,7 @@ ui <- dashboardPage(
       
       
       tabItem(
-        tabName = "Crude Plots",
+        tabName = "inc_plots",
         div(
           style = "display: inline-block;vertical-align:top; width: 150px;",
           pickerInput(
@@ -535,8 +535,8 @@ ui <- dashboardPage(
         div(style="display: inline-block;vertical-align:top; width: 150px;",
             pickerInput(inputId = "incidence_plot_facet",
                         label = "Facet by",
-                        choices = c("Cancer"),
-                        selected = c("Cancer" ),
+                        choices = c("outcome_cohort_name"),
+                        selected = c("outcome_cohort_name" ),
                         options = list(
                           `actions-box` = TRUE,
                           size = 10,
@@ -547,8 +547,8 @@ ui <- dashboardPage(
         div(style="display: inline-block;vertical-align:top; width: 150px;",
             pickerInput(inputId = "incidence_plot_group",
                         label = "Colour by",
-                        choices = c("Cancer"),
-                        selected = c("Cancer"),
+                        choices = c("outcome_cohort_name"),
+                        selected = c("outcome_cohort_name"),
                         options = list(
                           `actions-box` = TRUE,
                           size = 10,
@@ -573,7 +573,7 @@ ui <- dashboardPage(
           div("Height:", style = "display: inline-block; font-weight: bold; margin-right: 5px;"),
           div(
             style = "display: inline-block;",
-            textInput("incidence_download_heightcy", "", 30, width = "50px")
+            textInput("incidence_download_height", "", 30, width = "50px")
           ),
           div("cm", style = "display: inline-block; margin-right: 25px;"),
           div("Width:", style = "display: inline-block; font-weight: bold; margin-right: 5px;"),

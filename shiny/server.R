@@ -874,148 +874,48 @@ server <-	function(input, output, session) {
         plot <- plot_data %>%
           unite("Group", c(all_of(input$incidence_plot_group)), remove = FALSE, sep = "; ") %>%
           unite("facet_var", c(all_of(input$incidence_plot_facet)), remove = FALSE, sep = "; ") %>%
-          
-          ggplot(aes(x = time,
-                     y = est,
-                     group = CalendarYearGp,
-                     col = CalendarYearGp )) +
-          scale_y_continuous( labels = label_percent() ) +
-          scale_colour_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) + 
-          scale_fill_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) +
-          scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
-          geom_ribbon(aes(ymin = lcl, 
-                          ymax = ucl, 
-                          fill = CalendarYearGp), alpha = .15, color = NA, show.legend = FALSE) +
-          labs(x = "Time (Years)",
-               y = "Survival Probability",
-               col = "Calendar Year Group",
-               linetype = "Calendar Year Group") +
-          theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
-                strip.background = element_rect(color = "black", size = 0.6) ,
-                panel.background = element_blank() ,
-                panel.spacing.x = unit(0.05, "cm") ,
-                panel.spacing.y = unit(0.1, "cm") ,
-                axis.text = element_text(size = 15) ,
-                axis.title = element_text(size = 15) ,
-                legend.text = element_text(size= 15),
-                legend.title = element_text(size= 15),
-                axis.line = element_line(colour = "black", size = 0.6) ,
-                panel.grid.major = element_line(color = "darkgray", size = 0.2, linetype = "dashed"),
-                legend.box.spacing = unit(0, "pt") ,
-                legend.key = element_rect(fill = "transparent", colour = "transparent"),
-                legend.position='bottom') +
-          geom_line(aes(linetype = CalendarYearGp),size = 0.85) +
-          xlim(0, 2.5) +
-          facet_wrap(~ Cancer, scales = "free_y", ncol = 3)
-        
-        
+          ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
+                                                      ymin = "incidence_100000_pys_95CI_lower",
+                                                      ymax = "incidence_100000_pys_95CI_upper")) +
+                                    geom_point(position=position_dodge(width=1))+
+                                    geom_errorbar(width=0) +
+                                    facet_wrap(vars(facet_var),ncol = 2)+
+                                    scale_y_continuous(limits = c(0, NA)) +
+                                    theme_bw()
+ 
         
       } else if (!is.null(input$incidence_plot_group) && is.null(input$incidence_plot_facet)) {
         plot <- plot_data %>%
           unite("Group", c(all_of(input$incidence_plot_group)), remove = FALSE, sep = "; ") %>%
-          ggplot(aes(x = time,
-                     y = est,
-                     group = CalendarYearGp,
-                     col = CalendarYearGp )) +
-          scale_y_continuous( labels = label_percent() ) +
-          scale_colour_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) + 
-          scale_fill_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) +
-          scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
-          geom_ribbon(aes(ymin = lcl, 
-                          ymax = ucl, 
-                          fill = CalendarYearGp), alpha = .15, color = NA, show.legend = FALSE) +
-          labs(x = "Time (Years)",
-               y = "Survival Probability",
-               col = "Calendar Year Group",
-               linetype = "Calendar Year Group") +
-          theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
-                strip.background = element_rect(color = "black", size = 0.6) ,
-                panel.background = element_blank() ,
-                panel.spacing.x = unit(0.05, "cm") ,
-                panel.spacing.y = unit(0.1, "cm") ,
-                axis.text = element_text(size = 15) ,
-                axis.title = element_text(size = 15) ,
-                legend.text = element_text(size= 15),
-                legend.title = element_text(size= 15),
-                axis.line = element_line(colour = "black", size = 0.6) ,
-                panel.grid.major = element_line(color = "darkgray", size = 0.2, linetype = "dashed"),
-                legend.box.spacing = unit(0, "pt") ,
-                legend.key = element_rect(fill = "transparent", colour = "transparent"),
-                legend.position='bottom') +
-          geom_line(aes(linetype = CalendarYearGp),size = 0.85) +
-          xlim(0, 2.5) +
-          facet_wrap(~ Cancer, scales = "free_y", ncol = 3)
+          ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
+                            ymin = "incidence_100000_pys_95CI_lower",
+                            ymax = "incidence_100000_pys_95CI_upper")) +
+          geom_point(position=position_dodge(width=1))+
+          geom_errorbar(width=0) +
+          scale_y_continuous(limits = c(0, NA) ) +
+          theme_bw()
         
       } else if (is.null(input$incidence_plot_group) && !is.null(input$incidence_plot_facet)) {
         plot <- plot_data %>%
           unite("facet_var", c(all_of(input$incidence_plot_facet)), remove = FALSE, sep = "; ") %>%
-          ggplot(aes(x = time,
-                     y = est,
-                     group = CalendarYearGp,
-                     col = CalendarYearGp )) +
-          scale_y_continuous( labels = label_percent() ) +
-          scale_colour_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) + 
-          scale_fill_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) +
-          scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
-          geom_ribbon(aes(ymin = lcl, 
-                          ymax = ucl, 
-                          fill = CalendarYearGp), alpha = .15, color = NA, show.legend = FALSE) +
-          labs(x = "Time (Years)",
-               y = "Survival Probability",
-               col = "Calendar Year Group",
-               linetype = "Calendar Year Group") +
-          theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
-                strip.background = element_rect(color = "black", size = 0.6) ,
-                panel.background = element_blank() ,
-                panel.spacing.x = unit(0.05, "cm") ,
-                panel.spacing.y = unit(0.1, "cm") ,
-                axis.text = element_text(size = 15) ,
-                axis.title = element_text(size = 15) ,
-                legend.text = element_text(size= 15),
-                legend.title = element_text(size= 15),
-                axis.line = element_line(colour = "black", size = 0.6) ,
-                panel.grid.major = element_line(color = "darkgray", size = 0.2, linetype = "dashed"),
-                legend.box.spacing = unit(0, "pt") ,
-                legend.key = element_rect(fill = "transparent", colour = "transparent"),
-                legend.position='bottom') +
-          geom_line(aes(linetype = CalendarYearGp),size = 0.85) +
-          xlim(0, 2.5) 
+          ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
+                            ymin = "incidence_100000_pys_95CI_lower",
+                            ymax = "incidence_100000_pys_95CI_upper")) +
+          geom_point(position=position_dodge(width=1))+
+          geom_errorbar(width=0) +
+          facet_wrap(vars(facet_var),ncol = 2)+
+          scale_y_continuous(limits = c(0, NA)) +
+          theme_bw()
         
       } else {
         plot <- plot_data %>%
-          ggplot(aes(x = time,
-                     y = est,
-                     group = CalendarYearGp,
-                     col = CalendarYearGp )) +
-          scale_y_continuous( labels = label_percent() ) +
-          scale_colour_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) + 
-          scale_fill_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) +
-          #geom_line(aes(linetype = CalendarYearGp),size = 0.85) +
-          scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
-          geom_ribbon(aes(ymin = lcl, 
-                          ymax = ucl, 
-                          fill = CalendarYearGp), alpha = .15, color = NA, show.legend = FALSE) +
-          labs(x = "Time (Years)",
-               y = "Survival Probability",
-               col = "Calendar Year Group",
-               linetype = "Calendar Year Group") +
-          theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
-                strip.background = element_rect(color = "black", size = 0.6) ,
-                panel.background = element_blank() ,
-                panel.spacing.x = unit(0.05, "cm") ,
-                panel.spacing.y = unit(0.1, "cm") ,
-                axis.text = element_text(size = 15) ,
-                axis.title = element_text(size = 15) ,
-                legend.text = element_text(size= 15),
-                legend.title = element_text(size= 15),
-                axis.line = element_line(colour = "black", size = 0.6) ,
-                panel.grid.major = element_line(color = "darkgray", size = 0.2, linetype = "dashed"),
-                legend.box.spacing = unit(0, "pt") ,
-                legend.key = element_rect(fill = "transparent", colour = "transparent"),
-                legend.position='bottom') +
-          geom_line(aes(linetype = CalendarYearGp),size = 0.85) +
-          xlim(0, 2.5) +
-          facet_wrap(~ Cancer, scales = "free_y", ncol = 3)
+          ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
+                            ymin = "incidence_100000_pys_95CI_lower",
+                            ymax = "incidence_100000_pys_95CI_upper")) +
+          geom_point(position=position_dodge(width=1))+
+          geom_errorbar(width = 0) +
+          scale_y_continuous(limits = c(0, NA)) +
+          theme_bw()
         
       }
       
@@ -1031,133 +931,45 @@ server <-	function(input, output, session) {
         plot <- plot_data %>%
           unite("Group", c(all_of(input$incidence_plot_group)), remove = FALSE, sep = "; ") %>%
           unite("facet_var", c(all_of(input$incidence_plot_facet)), remove = FALSE, sep = "; ") %>%
-          ggplot(aes(x = time,
-                     y = est,
-                     group = CalendarYearGp,
-                     col = CalendarYearGp )) +
-          scale_y_continuous( labels = label_percent() ) +
-          scale_colour_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) + 
-          scale_fill_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) +
-          scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
-          labs(x = "Time (Years)",
-               y = "Survival Probability",
-               col = "Calendar Year Group",
-               linetype = "Calendar Year Group") +
-          theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
-                strip.background = element_rect(color = "black", size = 0.6) ,
-                panel.background = element_blank() ,
-                panel.spacing.x = unit(0.05, "cm") ,
-                panel.spacing.y = unit(0.1, "cm") ,
-                axis.text = element_text(size = 15) ,
-                axis.title = element_text(size = 15) ,
-                legend.text = element_text(size= 15),
-                legend.title = element_text(size= 15),
-                axis.line = element_line(colour = "black", size = 0.6) ,
-                panel.grid.major = element_line(color = "darkgray", size = 0.2, linetype = "dashed"),
-                legend.box.spacing = unit(0, "pt") ,
-                legend.key = element_rect(fill = "transparent", colour = "transparent"),
-                legend.position='bottom') +
-          geom_line(aes(linetype = CalendarYearGp),size = 0.85) +
-          xlim(0, 2.5) +
-          facet_wrap(~ Cancer, scales = "free_y", ncol = 3)
+          ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
+                            ymin = "incidence_100000_pys_95CI_lower",
+                            ymax = "incidence_100000_pys_95CI_upper")) +
+          geom_point(position=position_dodge(width = 1))+
+          facet_wrap(vars(facet_var),ncol = 2)+
+          scale_y_continuous(limits = c(0, NA)) +
+          theme_bw()
         
         
         
       } else if (!is.null(input$incidence_plot_group) && is.null(input$incidence_plot_facet)) {
         plot <- plot_data %>%
           unite("Group", c(all_of(input$incidence_plot_group)), remove = FALSE, sep = "; ") %>%
-          ggplot(aes(x = time,
-                     y = est,
-                     group = CalendarYearGp,
-                     col = CalendarYearGp )) +
-          scale_y_continuous( labels = label_percent() ) +
-          scale_colour_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) + 
-          scale_fill_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) +
-          scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
-          labs(x = "Time (Years)",
-               y = "Survival Probability",
-               col = "Calendar Year Group",
-               linetype = "Calendar Year Group") +
-          theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
-                strip.background = element_rect(color = "black", size = 0.6) ,
-                panel.background = element_blank() ,
-                panel.spacing.x = unit(0.05, "cm") ,
-                panel.spacing.y = unit(0.1, "cm") ,
-                axis.text = element_text(size = 15) ,
-                axis.title = element_text(size = 15) ,
-                legend.text = element_text(size= 15),
-                legend.title = element_text(size= 15),
-                axis.line = element_line(colour = "black", size = 0.6) ,
-                panel.grid.major = element_line(color = "darkgray", size = 0.2, linetype = "dashed"),
-                legend.box.spacing = unit(0, "pt") ,
-                legend.key = element_rect(fill = "transparent", colour = "transparent"),
-                legend.position='bottom') +
-          geom_line(aes(linetype = CalendarYearGp),size = 0.85) +
-          xlim(0, 2.5) 
+          ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
+                            ymin = "incidence_100000_pys_95CI_lower",
+                            ymax = "incidence_100000_pys_95CI_upper")) +
+          geom_point(position=position_dodge(width=1))+
+          scale_y_continuous(limits = c(0, NA) ) +
+          theme_bw()
         
       } else if (is.null(input$incidence_plot_group) && !is.null(input$incidence_plot_facet)) {
         plot <- plot_data %>%
           unite("facet_var", c(all_of(input$incidence_plot_facet)), remove = FALSE, sep = "; ") %>%
-          ggplot(aes(x = time,
-                     y = est,
-                     group = CalendarYearGp,
-                     col = CalendarYearGp )) +
-          scale_y_continuous( labels = label_percent() ) +
-          scale_colour_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) + 
-          scale_fill_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) +
-          scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
-          labs(x = "Time (Years)",
-               y = "Survival Probability",
-               col = "Calendar Year Group",
-               linetype = "Calendar Year Group") +
-          theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
-                strip.background = element_rect(color = "black", size = 0.6) ,
-                panel.background = element_blank() ,
-                panel.spacing.x = unit(0.05, "cm") ,
-                panel.spacing.y = unit(0.1, "cm") ,
-                axis.text = element_text(size = 15) ,
-                axis.title = element_text(size = 15) ,
-                legend.text = element_text(size= 15),
-                legend.title = element_text(size= 15),
-                axis.line = element_line(colour = "black", size = 0.6) ,
-                panel.grid.major = element_line(color = "darkgray", size = 0.2, linetype = "dashed"),
-                legend.box.spacing = unit(0, "pt") ,
-                legend.key = element_rect(fill = "transparent", colour = "transparent"),
-                legend.position='bottom') +
-          geom_line(aes(linetype = CalendarYearGp),size = 0.85) +
-          xlim(0, 2.5) +
-          facet_wrap(~ Cancer, scales = "free_y", ncol = 3)
+          ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
+                            ymin = "incidence_100000_pys_95CI_lower",
+                            ymax = "incidence_100000_pys_95CI_upper")) +
+          geom_point(position=position_dodge(width = 1))+
+          facet_wrap(vars(facet_var),ncol = 2)+
+          scale_y_continuous(limits = c(0, NA)) +
+          theme_bw()
         
       } else {
         plot <- plot_data %>%
-          ggplot(aes(x = time,
-                     y = est,
-                     group = CalendarYearGp,
-                     col = CalendarYearGp )) +
-          scale_y_continuous( labels = label_percent() ) +
-          scale_colour_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) + 
-          scale_fill_manual(values = c("black", "black", "black", "black", "#ED0000FF", "#FDAF91FF", "#AD002AFF", "grey")) +
-          scale_linetype_manual(values = c("dotted","dashed", "dotdash", "twodash","solid", "longdash")) +
-          labs(x = "Time (Years)",
-               y = "Survival Probability",
-               col = "Calendar Year Group",
-               linetype = "Calendar Year Group") +
-          theme(panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
-                strip.background = element_rect(color = "black", size = 0.6) ,
-                panel.background = element_blank() ,
-                panel.spacing.x = unit(0.05, "cm") ,
-                panel.spacing.y = unit(0.1, "cm") ,
-                axis.text = element_text(size = 15) ,
-                axis.title = element_text(size = 15) ,
-                legend.text = element_text(size= 15),
-                legend.title = element_text(size= 15),
-                axis.line = element_line(colour = "black", size = 0.6) ,
-                panel.grid.major = element_line(color = "darkgray", size = 0.2, linetype = "dashed"),
-                legend.box.spacing = unit(0, "pt") ,
-                legend.key = element_rect(fill = "transparent", colour = "transparent"),
-                legend.position='bottom') +
-          geom_line(aes(linetype = CalendarYearGp),size = 0.85) +
-          xlim(0, 2.5) 
+          ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
+                            ymin = "incidence_100000_pys_95CI_lower",
+                            ymax = "incidence_100000_pys_95CI_upper")) +
+          geom_point(position=position_dodge(width = 1)) +
+          scale_y_continuous(limits = c(0, NA)) +
+          theme_bw()
         
       }
       
