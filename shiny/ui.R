@@ -494,6 +494,106 @@ ui <- dashboardPage(
       ),
       
       
+      
+      tabItem(
+        tabName = "Crude Plots",
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "incidence_database_selector",
+            label = "Database",
+            choices = unique(incidence_estimates$cdm_name),
+            selected = unique(incidence_estimates$cdm_name),
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "incidence_cohort_name_selector",
+            label = "Cancer",
+            choices = unique(incidence_estimates$outcome_cohort_name),
+            selected = unique(incidence_estimates$outcome_cohort_name),
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "incidence_denominator_analysis_interval_selector",
+            label = "Analysis Interval",
+            choices = unique(incidence_estimates$analysis_interval),
+            selected = "quarters",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(style="display: inline-block;vertical-align:top; width: 150px;",
+            pickerInput(inputId = "incidence_plot_facet",
+                        label = "Facet by",
+                        choices = c("Cancer"),
+                        selected = c("Cancer" ),
+                        options = list(
+                          `actions-box` = TRUE,
+                          size = 10,
+                          `selected-text-format` = "count > 3"),
+                        multiple = TRUE,)
+        ),
+        
+        div(style="display: inline-block;vertical-align:top; width: 150px;",
+            pickerInput(inputId = "incidence_plot_group",
+                        label = "Colour by",
+                        choices = c("Cancer"),
+                        selected = c("Cancer"),
+                        options = list(
+                          `actions-box` = TRUE,
+                          size = 10,
+                          `selected-text-format` = "count > 3"),
+                        multiple = TRUE,)
+            
+            
+        ),
+        
+        div(
+          style = "width: 80vh; height: 5vh;",  # Set width to 100% for responsive design
+          checkboxInput("show_ci_inc", "Show Confidence Intervals", value = TRUE)
+        ),
+        
+        div(
+          style = "width: 80%; height: 90%;",  # Set width to 100% for responsive design
+          plotOutput("incidencePlot",
+                     height = "800px"
+          ) %>%
+            withSpinner(),
+          h4("Download Figure"),
+          div("Height:", style = "display: inline-block; font-weight: bold; margin-right: 5px;"),
+          div(
+            style = "display: inline-block;",
+            textInput("incidence_download_heightcy", "", 30, width = "50px")
+          ),
+          div("cm", style = "display: inline-block; margin-right: 25px;"),
+          div("Width:", style = "display: inline-block; font-weight: bold; margin-right: 5px;"),
+          div(
+            style = "display: inline-block;",
+            textInput("incidence_download_width", "", 35, width = "50px")
+          ),
+          div("cm", style = "display: inline-block; margin-right: 25px;"),
+          div("dpi:", style = "display: inline-block; font-weight: bold; margin-right: 5px;"),
+          div(
+            style = "display: inline-block; margin-right:",
+            textInput("incidence_download_dpi", "", 600, width = "50px")
+          ),
+          downloadButton("incidence_download_plot", "Download plot")
+        )
+        
+        
+      ),
+      
+      
       tabItem(
         tabName = "survival_results",
         div(
