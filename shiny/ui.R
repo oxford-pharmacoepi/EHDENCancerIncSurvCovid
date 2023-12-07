@@ -411,7 +411,7 @@ ui <- dashboardPage(
         div(
           style = "display: inline-block;vertical-align:top; width: 150px;",
           pickerInput(
-            inputId = "survival_database_selector",
+            inputId = "survival_database_selectorcy",
             label = "Database",
             choices = unique(survival_estimates$Database),
             selected = unique(survival_estimates$Database),
@@ -422,7 +422,7 @@ ui <- dashboardPage(
         div(
           style = "display: inline-block;vertical-align:top; width: 150px;",
           pickerInput(
-            inputId = "survival_cohort_name_selector",
+            inputId = "survival_cohort_name_selectorcy",
             label = "Cancer",
             choices = unique(survival_estimates$Cancer),
             selected = unique(survival_estimates$Cancer),
@@ -432,7 +432,7 @@ ui <- dashboardPage(
         ),
         
         div(style="display: inline-block;vertical-align:top; width: 150px;",
-            pickerInput(inputId = "surv_plot_facet",
+            pickerInput(inputId = "surv_plot_facetcy",
                         label = "Facet by",
                         choices = c("Cancer"
                         ),
@@ -445,7 +445,7 @@ ui <- dashboardPage(
         ),
         
         div(style="display: inline-block;vertical-align:top; width: 150px;",
-            pickerInput(inputId = "surv_plot_group",
+            pickerInput(inputId = "surv_plot_groupcy",
                         label = "Colour by",
                         choices = c("Cancer"),
                         selected = c("Cancer"),
@@ -473,19 +473,19 @@ ui <- dashboardPage(
           div("Height:", style = "display: inline-block; font-weight: bold; margin-right: 5px;"),
           div(
             style = "display: inline-block;",
-            textInput("survival_download_height", "", 20, width = "50px")
+            textInput("survival_download_heightcy", "", 30, width = "50px")
           ),
           div("cm", style = "display: inline-block; margin-right: 25px;"),
           div("Width:", style = "display: inline-block; font-weight: bold; margin-right: 5px;"),
           div(
             style = "display: inline-block;",
-            textInput("survival_download_width", "", 25, width = "50px")
+            textInput("survival_download_widthcy", "", 35, width = "50px")
           ),
           div("cm", style = "display: inline-block; margin-right: 25px;"),
           div("dpi:", style = "display: inline-block; font-weight: bold; margin-right: 5px;"),
           div(
             style = "display: inline-block; margin-right:",
-            textInput("survival_download_dpi", "", 600, width = "50px")
+            textInput("survival_download_dpicy", "", 600, width = "50px")
           ),
           downloadButton("survival_cy_download_plot", "Download plot")
         )
@@ -559,13 +559,13 @@ ui <- dashboardPage(
       div("Height:", style = "display: inline-block; font-weight: bold; margin-right: 5px;"),
       div(
         style = "display: inline-block;",
-        textInput("survival_download_height", "", 20, width = "50px")
+        textInput("survival_download_height", "", 30, width = "50px")
       ),
       div("cm", style = "display: inline-block; margin-right: 25px;"),
       div("Width:", style = "display: inline-block; font-weight: bold; margin-right: 5px;"),
       div(
         style = "display: inline-block;",
-        textInput("survival_download_width", "", 25, width = "50px")
+        textInput("survival_download_width", "", 35, width = "50px")
       ),
       div("cm", style = "display: inline-block; margin-right: 25px;"),
       div("dpi:", style = "display: inline-block; font-weight: bold; margin-right: 5px;"),
