@@ -155,6 +155,63 @@ server <-	function(input, output, session) {
     }
   )
   
+  
+  
+  get_inc_estimates_table <- reactive({
+    
+    
+    validate(
+      need(input$inc_estimates_cohort_selector != "", "Please select a cohort")
+    )
+    validate(
+      need(input$inc_est_analysis_selector != "", "Please select analysis interval")
+    )
+    
+    
+    table <- incidence_estimates %>%
+      filter(Cancer %in% input$inc_estimates_cohort_selector) %>%
+      filter(analysis_interval %in% input$inc_est_analysis_selector) %>% 
+      relocate(Cancer) %>% 
+      select(-c(analysis_id,
+                outcome_cohort_id,
+                analysis_repeated_events,
+                analysis_min_cell_count,
+                denominator_target_cohort_name,
+                denominator_cohort_name,
+                denominator_age_group,
+                denominator_sex,
+                denominator_days_prior_observation,   
+                denominator_start_date,
+                denominator_end_date,
+                denominator_target_cohort_definition_id,
+                analysis_complete_database_intervals,
+                analysis_interval,
+                cohort_obscured,
+                result_obscured
+                
+                ))
+    
+    table
+    
+  })
+  
+  
+  output$dt_inc_est_table <- renderText(kable(get_inc_estimates_table()) %>%
+                                         kable_styling("striped", full_width = F) )
+  
+  
+  output$dt_inc_est_table_word <- downloadHandler(
+    filename = function() {
+      "incidence_estimates.docx"
+    },
+    content = function(file) {
+      x <- gt(get_inc_estimates_table())
+      gtsave(x, file)
+    }
+  )
+  
+  
+  
   # survival plots -------
   get_surv_plot <- reactive({
     

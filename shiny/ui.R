@@ -256,6 +256,83 @@ ui <- dashboardPage(
       ) ,
       
       
+      # tabItem(
+      #   tabName = "inc_rates",
+      #   div(
+      #     style = "display: inline-block;vertical-align:top; width: 150px;",
+      #     pickerInput(
+      #       inputId = "inc_estimates_cohort_selector",
+      #       label = "Cancer",
+      #       choices = unique(incidence_estimates$Cancer),
+      #       selected = unique(incidence_estimates$Cancer),
+      #       options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+      #       multiple = TRUE
+      #     )
+      #   ),
+      #   
+      #   # div(
+      #   #   style = "display: inline-block;vertical-align:top; width: 150px;",
+      #   #   pickerInput(
+      #   #     inputId = "inc_estimates_analysisi_selector",
+      #   #     label = "Analysis Interval",
+      #   #     choices = unique(incidence_estimates$analysis_interval),
+      #   #     selected = "overall",
+      #   #     options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+      #   #     multiple = TRUE
+      #   #   )
+      #   # ),
+      #   
+      #   gt_output("dt_inc_est_table") %>% 
+      #     withSpinner() ,
+      #   
+      #   
+      #   div(style="display:inline-block",
+      #       downloadButton(
+      #         outputId = "dt_inc_est_table_word",
+      #         label = "Download table as word"
+      #       ),
+      #       style="display:inline-block; float:right")
+      #   
+      # ) ,
+      
+      
+      tabItem(
+        tabName = "inc_rates",
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "inc_estimates_cohort_selector",
+            label = "Cancer",
+            choices = unique(incidence_estimates$Cancer),
+            selected = "Breast",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "inc_est_analysis_selector",
+            label = "Analysis Interval",
+            choices = unique(incidence_estimates$analysis_interval),
+            selected = "quarters",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        htmlOutput('dt_inc_est_table'),
+        
+        div(style="display:inline-block",
+            downloadButton(
+              outputId = "dt_inc_est_table_word",
+              label = "Download table as word"
+            ), 
+            style="display:inline-block; float:right")
+        
+      ),
+      
       tabItem(
         tabName = "risk_results",
         div(
