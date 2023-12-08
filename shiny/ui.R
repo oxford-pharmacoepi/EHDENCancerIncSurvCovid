@@ -583,10 +583,10 @@ ui <- dashboardPage(
             
         ),
         
-        # div(
-        #   style = "width: 80vh; height: 5vh;",  # Set width to 100% for responsive design
-        #   checkboxInput("show_ci_inc", "Show Confidence Intervals", value = TRUE)
-        # ),
+        div(
+          style = "width: 80vh; height: 5vh;",  # Set width to 100% for responsive design
+          checkboxInput("show_error_bars", "Show Ribbons", value = TRUE)
+        ),
         
         div(
           style = "width: 80%; height: 90%;",  # Set width to 100% for responsive design
