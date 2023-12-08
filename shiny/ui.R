@@ -336,9 +336,9 @@ ui <- dashboardPage(
         div(
           style = "display: inline-block;vertical-align:top; width: 150px;",
           pickerInput(
-            inputId = "risk_table_cohort_name_selector",
+            inputId = "risk_table_cohort_name_selectorcy",
             label = "Study cohort",
-            choices = unique(incidence_attrition$outcome_cohort_name),
+            choices = unique(survival_risk_cy_table$Cancer),
             selected = "Breast",
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
@@ -348,10 +348,10 @@ ui <- dashboardPage(
         div(
           style = "display: inline-block;vertical-align:top; width: 150px;",
           pickerInput(
-            inputId = "risk_table_database_name_selector",
+            inputId = "risk_table_database_name_selectorcy",
             label = "Database",
-            choices = unique(incidence_attrition$cdm_name),
-            selected = unique(incidence_attrition$cdm_name),
+            choices = unique(survival_risk_cy_table$Database),
+            selected = unique(survival_risk_cy_table$Database),
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
           )
@@ -374,9 +374,9 @@ ui <- dashboardPage(
         div(
           style = "display: inline-block;vertical-align:top; width: 150px;",
           pickerInput(
-            inputId = "median_cohort_name_selector",
+            inputId = "median_cohort_name_selectorcy",
             label = "Study cohort",
-            choices = unique(incidence_attrition$outcome_cohort_name),
+            choices = unique(survival_median_table_cy$Cancer),
             selected = "Breast",
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
@@ -386,10 +386,10 @@ ui <- dashboardPage(
         div(
           style = "display: inline-block;vertical-align:top; width: 150px;",
           pickerInput(
-            inputId = "median_database_name_selector",
+            inputId = "median_database_name_selectorcy",
             label = "Database",
-            choices = unique(incidence_attrition$cdm_name),
-            selected = unique(incidence_attrition$cdm_name),
+            choices = unique(survival_median_table_cy$Database),
+            selected = unique(survival_median_table_cy$Database),
             options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
             multiple = TRUE
           )
