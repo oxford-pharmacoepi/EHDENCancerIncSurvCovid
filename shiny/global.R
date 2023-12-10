@@ -257,10 +257,11 @@ results <- list.files(
 
 
 #merge incidence results together
-# incidence estimates
+# incidence estimates not standardized
 incidence_estimates_files<-results[stringr::str_detect(results, ".csv")]
 incidence_estimates_files<-results[!(stringr::str_detect(results, "incidence_attrition"))]
 incidence_estimates_files<-incidence_estimates_files[(stringr::str_detect(incidence_estimates_files, "incidence_"))]
+incidence_estimates_files <- incidence_estimates_files[1]
 incidence_estimates <- list()
 for(i in seq_along(incidence_estimates_files)){
   incidence_estimates[[i]]<-readr::read_csv(incidence_estimates_files[[i]], 
@@ -290,6 +291,40 @@ incidence_estimates <- bind_rows(incidence_estimates ,
                                  incidence_estimates_prostate) %>% 
   rename(Database = cdm_name, Cancer = outcome_cohort_name)
 
+# incidence for age standization
+# incidence estimates not standardized
+incidence_estimates_files_std<-results[stringr::str_detect(results, ".csv")]
+incidence_estimates_files_std<-results[!(stringr::str_detect(results, "incidence_attrition"))]
+incidence_estimates_files_std<-incidence_estimates_files_std[(stringr::str_detect(incidence_estimates_files_std, "incidence_"))]
+incidence_estimates_files_std <- incidence_estimates_files_std[2]
+incidence_estimates_std <- list()
+for(i in seq_along(incidence_estimates_files_std)){
+  incidence_estimates_std[[i]]<-readr::read_csv(incidence_estimates_files_std[[i]], 
+                                            show_col_types = FALSE)  
+}
+incidence_estimates_std <- dplyr::bind_rows(incidence_estimates_std)
+incidence_estimates_std <- prepare_output(incidence_estimates_std)
+
+
+# pull out female breast and male prostate
+incidence_estimates_breast_std <- incidence_estimates_std %>% 
+  filter(outcome_cohort_name == "Breast" & denominator_sex == "Female")  %>% 
+  filter(denominator_age_group == "All") 
+
+incidence_estimates_prostate_std <- incidence_estimates_std %>% 
+  filter(outcome_cohort_name == "Prostate") %>% 
+  filter(denominator_age_group == "All") 
+
+incidence_estimates_std <- incidence_estimates_std %>% 
+  filter(outcome_cohort_name != "Breast") %>% 
+  filter(outcome_cohort_name != "Prostate") %>% 
+  filter(denominator_age_group == "All") %>% 
+  filter(denominator_sex == "Both") 
+
+incidence_estimates_std <- bind_rows(incidence_estimates_std ,
+                                 incidence_estimates_breast_std, 
+                                 incidence_estimates_prostate_std) %>% 
+  rename(Database = cdm_name, Cancer = outcome_cohort_name)
 
 # incidence attrition
 incidence_attrition_files<-results[stringr::str_detect(results, ".csv")]

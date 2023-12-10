@@ -185,6 +185,8 @@ server <-	function(input, output, session) {
                 denominator_end_date,
                 denominator_target_cohort_definition_id,
                 analysis_complete_database_intervals,
+                analysis_outcome_washout,
+                denominator_cohort_id,
                 analysis_interval,
                 cohort_obscured,
                 result_obscured
@@ -934,11 +936,13 @@ server <-	function(input, output, session) {
           ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
                             ymin = "incidence_100000_pys_95CI_lower",
                             ymax = "incidence_100000_pys_95CI_upper")) +
-          geom_point()+
-          geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper, fill = Group, colour = Group), alpha = 0.3) +
+          geom_point(colour = "black")+
+          geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper), 
+                      alpha = 0.1, colour = "black") + 
           geom_line(color = "black", size = 0.25) +
-          geom_vline(xintercept = as.numeric(as.Date("2020-03-23")), linetype="dotted", colour = "#ED0000FF", size = 0.8) +
-          geom_point(aes(fill = Group, colour = Group), size = 2) +
+          geom_vline(xintercept = as.numeric(as.Date("2020-03-23")), linetype="solid", colour = "#ED0000FF", size = 1) +
+          labs(x = "Calendar Year", y = "Incidence Rate per 100,000 person-years") +
+          #geom_point(aes(fill = Group, colour = Group), size = 2) +
           facet_wrap(vars(facet_var),ncol = 3, scales = "free_y")+
           scale_y_continuous(limits = c(0, NA)) +
           theme(axis.text.x = element_text(angle = 45, hjust=1),
@@ -947,11 +951,9 @@ server <-	function(input, output, session) {
                 panel.background = element_blank() ,
                 axis.line = element_line(colour = "black", size = 0.6) ,
                 panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-                legend.position='none') 
-        
-        
-        
-        
+                legend.position = 'none',
+                text = element_text(size = 15))
+
         
       } else if (!is.null(input$incidence_plot_group) && is.null(input$incidence_plot_facet)) {
         plot <- plot_data %>%
@@ -959,9 +961,21 @@ server <-	function(input, output, session) {
           ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
                             ymin = "incidence_100000_pys_95CI_lower",
                             ymax = "incidence_100000_pys_95CI_upper")) +
-          geom_point()+
-          scale_y_continuous(limits = c(0, NA) ) +
-          theme_bw()
+          geom_point(colour = "black")+
+          geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper), 
+                      alpha = 0.3, colour = "black") + 
+          geom_line(color = "black", size = 0.25) +
+          geom_vline(xintercept = as.numeric(as.Date("2020-03-23")), linetype="solid", colour = "#ED0000FF", size = 1) +
+          labs(x = "Calendar Year", y = "Incidence Rate per 100,000 person-years") +
+          scale_y_continuous(limits = c(0, NA)) +
+          theme(axis.text.x = element_text(angle = 45, hjust=1),
+                panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+                strip.background = element_rect(color = "black", size = 0.6) ,
+                panel.background = element_blank() ,
+                axis.line = element_line(colour = "black", size = 0.6) ,
+                panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+                legend.position = 'none',
+                text = element_text(size = 15))
         
       } else if (is.null(input$incidence_plot_group) && !is.null(input$incidence_plot_facet)) {
         plot <- plot_data %>%
@@ -969,19 +983,43 @@ server <-	function(input, output, session) {
           ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
                             ymin = "incidence_100000_pys_95CI_lower",
                             ymax = "incidence_100000_pys_95CI_upper")) +
-          geom_point()+
+          geom_point(colour = "black")+
+          geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper), 
+                      alpha = 0.3, colour = "black") + 
+          geom_line(color = "black", size = 0.25) +
+          geom_vline(xintercept = as.numeric(as.Date("2020-03-23")), linetype="solid", colour = "#ED0000FF", size = 1) +
+          labs(x = "Calendar Year", y = "Incidence Rate per 100,000 person-years") +
           facet_wrap(vars(facet_var),ncol = 3, scales = "free_y")+
           scale_y_continuous(limits = c(0, NA)) +
-          theme_bw()
+          theme(axis.text.x = element_text(angle = 45, hjust=1),
+                panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+                strip.background = element_rect(color = "black", size = 0.6) ,
+                panel.background = element_blank() ,
+                axis.line = element_line(colour = "black", size = 0.6) ,
+                panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+                legend.position = 'none',
+                text = element_text(size = 15)) 
         
       } else {
         plot <- plot_data %>%
           ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
                             ymin = "incidence_100000_pys_95CI_lower",
                             ymax = "incidence_100000_pys_95CI_upper")) +
-          geom_point()+
+          geom_point(colour = "black")+
+          geom_ribbon(aes(ymin = incidence_100000_pys_95CI_lower, ymax = incidence_100000_pys_95CI_upper), 
+                      alpha = 0.3, colour = "black") + 
+          geom_line(color = "black", size = 0.25) +
+          geom_vline(xintercept = as.numeric(as.Date("2020-03-23")), linetype="solid", colour = "#ED0000FF", size = 1) +
+          labs(x = "Calendar Year", y = "Incidence Rate per 100,000 person-years") +
           scale_y_continuous(limits = c(0, NA)) +
-          theme_bw()
+          theme(axis.text.x = element_text(angle = 45, hjust=1),
+                panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+                strip.background = element_rect(color = "black", size = 0.6) ,
+                panel.background = element_blank() ,
+                axis.line = element_line(colour = "black", size = 0.6) ,
+                panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+                legend.position = 'none',
+                text = element_text(size = 15)) 
         
       }
       
@@ -994,7 +1032,8 @@ server <-	function(input, output, session) {
       
       plot
       
-      
+
+
       } else {
         
         
@@ -1002,59 +1041,87 @@ server <-	function(input, output, session) {
           plot <- plot_data %>%
             unite("Group", c(all_of(input$incidence_plot_group)), remove = FALSE, sep = "; ") %>%
             unite("facet_var", c(all_of(input$incidence_plot_facet)), remove = FALSE, sep = "; ") %>%
-            ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
+            ggplot(aes_string(x = input$incidence_x_axis, y = "incidence_100000_pys",
                               ymin = "incidence_100000_pys_95CI_lower",
                               ymax = "incidence_100000_pys_95CI_upper")) +
-            geom_point()+
-            geom_vline(xintercept = as.numeric(as.Date("2020-03-23")), linetype="dotted", colour = "#ED0000FF", size = 0.8) +
-            geom_point(aes(fill = Group, colour = Group), size = 2, position=position_dodge(width=1)) +
+            geom_point(position = position_dodge(width = 1)) +
+            geom_vline(xintercept = as.numeric(as.Date("2020-03-23")), linetype="solid", colour = "#ED0000FF", size = 1) +
+            labs(x = "Calendar Year", y = "Incidence Rate per 100,000 person-years") +
             scale_y_continuous(limits = c(0, NA)) +
-            geom_errorbar(aes(colour = Group), width=0, position=position_dodge(width=1)) +
-            theme(axis.text.x = element_text(angle = 45, hjust=1),
+            geom_errorbar(width = 0, position = position_dodge(width = 1)) +
+            scale_color_manual(values = "black") +  # Set the color of points and error bars
+            theme(axis.text.x = element_text(angle = 45, hjust = 1),
                   panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
-                  strip.background = element_rect(color = "black", size = 0.6) ,
-                  panel.background = element_blank() ,
-                  axis.line = element_line(colour = "black", size = 0.6) ,
+                  strip.background = element_rect(color = "black", size = 0.6),
+                  panel.background = element_blank(),
+                  axis.line = element_line(colour = "black", size = 0.6),
                   panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
-                  legend.position='none') +
-            facet_wrap(vars(facet_var),ncol = 3, scales = "free_y") 
-          
-          
-          
-          
+                  legend.position = 'none',
+                  text = element_text(size = 15)) +
+            facet_wrap(vars(facet_var), ncol = 3, scales = "free_y")
           
         } else if (!is.null(input$incidence_plot_group) && is.null(input$incidence_plot_facet)) {
           plot <- plot_data %>%
             unite("Group", c(all_of(input$incidence_plot_group)), remove = FALSE, sep = "; ") %>%
-            ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
-                              ymin = "incidence_100000_pys_95CI_lower",
-                              ymax = "incidence_100000_pys_95CI_upper")) +
-            geom_point(aes(fill = Group, colour = Group), size = 2, position=position_dodge(width=1)) +
-            geom_errorbar(aes(colour = Group), width=0, position=position_dodge(width=1)) +
-            scale_y_continuous(limits = c(0, NA) ) +
-            theme_bw()
+              ggplot(aes_string(x = input$incidence_x_axis, y = "incidence_100000_pys",
+                                ymin = "incidence_100000_pys_95CI_lower",
+                                ymax = "incidence_100000_pys_95CI_upper")) +
+              geom_point(aes(colour = "black"), size = 2, position = position_dodge(width = 1)) +
+            geom_vline(xintercept = as.numeric(as.Date("2020-03-23")), linetype="solid", colour = "#ED0000FF", size = 1) +
+            labs(x = "Calendar Year", y = "Incidence Rate per 100,000 person-years") +
+              scale_y_continuous(limits = c(0, NA)) +
+              geom_errorbar(aes(colour = "black"), width = 0, position = position_dodge(width = 1)) +
+              theme(axis.text.x = element_text(angle = 45, hjust = 1),
+                    panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+                    strip.background = element_rect(color = "black", size = 0.6),
+                    panel.background = element_blank(),
+                    axis.line = element_line(colour = "black", size = 0.6),
+                    panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+                    legend.position = 'none',
+                    text = element_text(size = 15)) 
+            
           
         } else if (is.null(input$incidence_plot_group) && !is.null(input$incidence_plot_facet)) {
           plot <- plot_data %>%
             unite("facet_var", c(all_of(input$incidence_plot_facet)), remove = FALSE, sep = "; ") %>%
-            ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
-                              ymin = "incidence_100000_pys_95CI_lower",
-                              ymax = "incidence_100000_pys_95CI_upper")) +
-            geom_point(aes(fill = Group, colour = Group), size = 2, position=position_dodge(width=1)) +
-            geom_errorbar(aes(colour = Group), width=0, position=position_dodge(width=1)) +
-            facet_wrap(vars(facet_var),ncol = 3, scales = "free_y")+
-            scale_y_continuous(limits = c(0, NA)) +
-            theme_bw()
+              ggplot(aes_string(x = input$incidence_x_axis, y = "incidence_100000_pys",
+                                ymin = "incidence_100000_pys_95CI_lower",
+                                ymax = "incidence_100000_pys_95CI_upper")) +
+              geom_point(aes(colour = "black"), size = 2, position = position_dodge(width = 1)) +
+            geom_vline(xintercept = as.numeric(as.Date("2020-03-23")), linetype="solid", colour = "#ED0000FF", size = 1) +
+            labs(x = "Calendar Year", y = "Incidence Rate per 100,000 person-years") +
+              scale_y_continuous(limits = c(0, NA)) +
+              geom_errorbar(aes(colour = "black"), width = 0, position = position_dodge(width = 1)) +
+              theme(axis.text.x = element_text(angle = 45, hjust = 1),
+                    panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+                    strip.background = element_rect(color = "black", size = 0.6),
+                    panel.background = element_blank(),
+                    axis.line = element_line(colour = "black", size = 0.6),
+                    panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+                    legend.position = 'none',
+                    text = element_text(size = 15)) +
+              facet_wrap(vars(facet_var), ncol = 3, scales = "free_y")
+            
           
         } else {
           plot <- plot_data %>%
-            ggplot(aes_string(x=input$incidence_x_axis, y="incidence_100000_pys",
+            ggplot(aes_string(x = input$incidence_x_axis, y = "incidence_100000_pys",
                               ymin = "incidence_100000_pys_95CI_lower",
                               ymax = "incidence_100000_pys_95CI_upper")) +
-            geom_point(aes(fill = Group, colour = Group), size = 2, position=position_dodge(width=1)) +
-            geom_errorbar(aes(colour = Group), width=0, position=position_dodge(width=1)) +
+            geom_point(aes(colour = "black"), size = 2, position = position_dodge(width = 1)) +
+            geom_vline(xintercept = as.numeric(as.Date("2020-03-23")), linetype="solid", colour = "#ED0000FF", size = 1) +
+            labs(x = "Calendar Year", y = "Incidence Rate per 100,000 person-years") +
             scale_y_continuous(limits = c(0, NA)) +
-            theme_bw()
+            geom_errorbar(aes(colour = "black"), width = 0, position = position_dodge(width = 1)) +
+            theme(axis.text.x = element_text(angle = 45, hjust = 1),
+                  panel.border = element_rect(color = "black", fill = NA, size = 0.6), 
+                  strip.background = element_rect(color = "black", size = 0.6),
+                  panel.background = element_blank(),
+                  axis.line = element_line(colour = "black", size = 0.6),
+                  panel.grid.major = element_line(color = "grey", size = 0.2, linetype = "dashed"),
+                  legend.position = 'none',
+                  text = element_text(size = 15))
+          
           
         }
         
