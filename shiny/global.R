@@ -335,7 +335,7 @@ for(i in seq_along(incidence_attrition_files)){
                                             show_col_types = FALSE)  
 }
 incidence_attrition <- dplyr::bind_rows(incidence_attrition)
-incidence_attrition <- prepare_output(incidence_attrition) 
+incidence_attrition <- prepare_output(incidence_attrition)
 
 # pull out female breast and male prostate
 incidence_attrition_breast <- incidence_attrition %>% 
@@ -354,7 +354,22 @@ incidence_attrition <- incidence_attrition %>%
 
 incidence_attrition <- bind_rows(incidence_attrition ,
                                  incidence_attrition_breast, 
-                                 incidence_attrition_prostate)
+                                 incidence_attrition_prostate) %>% 
+  select(-c(analysis_id,
+            outcome_cohort_id,
+            analysis_repeated_events,
+            analysis_complete_database_intervals,
+            denominator_cohort_id,                  
+            analysis_outcome_washout,
+            analysis_min_cell_count,
+            denominator_cohort_name,            
+            denominator_days_prior_observation,   
+            denominator_start_date,
+            denominator_end_date,     
+            denominator_target_cohort_definition_id,
+            denominator_target_cohort_name     
+            )) %>% 
+  relocate(outcome_cohort_name)
 
 
 # merge the survival results together
