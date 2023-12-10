@@ -389,7 +389,15 @@ for(i in 1:length(table(incidence_estimates_std$Cancer))){
 }
 
 agestandardizedinc_final <- bind_rows(agestandardizedinc) %>% 
-  mutate(Database = "CPRD GOLD")
+  mutate(Database = "CPRD GOLD") %>% 
+  rename(Crude_IR = `Crude Rate (per 1e+05)`) %>% 
+  rename(Std_IR = `Std Rate (per 1e+05)`) %>% 
+  rename(`LCL_Crude` = `95% LCL (Crude)`) %>% 
+  rename(`UCL_Crude` = `95% UCL (Crude)`) %>% 
+  rename(`LCL_Std` = `95% LCL (Std)`) %>% 
+  rename(`UCL_Std` = `95% UCL (Std)`) %>% 
+  as_tibble()
+
 
 
 # incidence attrition
