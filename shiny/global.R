@@ -333,7 +333,8 @@ incidence_estimates_std <- bind_rows(incidence_estimates_std ,
                                  incidence_estimates_breast_std, 
                                  incidence_estimates_prostate_std) %>% 
   rename(Database = cdm_name, Cancer = outcome_cohort_name) %>% 
-  rename(Agegroup = denominator_age_group)
+  rename(Agegroup = denominator_age_group) %>% 
+  filter(analysis_interval == "quarters")
 
 # read in the european age standard 2013
 ESP13 <- readr::read_csv(here("www", "ESP13.csv"), 
@@ -396,7 +397,14 @@ agestandardizedinc_final <- bind_rows(agestandardizedinc) %>%
   rename(`UCL_Crude` = `95% UCL (Crude)`) %>% 
   rename(`LCL_Std` = `95% LCL (Std)`) %>% 
   rename(`UCL_Std` = `95% UCL (Std)`) %>% 
-  as_tibble()
+  as_tibble() %>% 
+  select(c(Subgroup,
+           Std_IR,
+           LCL_Std,
+           UCL_Std, 
+           Cancer, 
+           Database 
+           ))
 
 
 

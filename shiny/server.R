@@ -212,7 +212,37 @@ server <-	function(input, output, session) {
     }
   )
   
+  get_inc_estimates_table_std <- reactive({
+    
+    
+    validate(
+      need(input$inc_estimates_cohort_selector_std != "", "Please select a cohort")
+    )
+    
+    table <- agestandardizedinc_final %>%
+      filter(Cancer %in% input$inc_estimates_cohort_selector_std) %>%
+      relocate(Cancer) %>% 
+      rename("incidence_start_date" = "Subgroup")
+   
+    
+    table
+    
+  })
   
+  
+  output$dt_inc_est_table_std <- renderText(kable(get_inc_estimates_table_std()) %>%
+                                          kable_styling("striped", full_width = F) )
+  
+  
+  output$dt_inc_est_table_word_std <- downloadHandler(
+    filename = function() {
+      "std_incidence_estimates.docx"
+    },
+    content = function(file) {
+      x <- gt(get_inc_estimates_table_std())
+      gtsave(x, file)
+    }
+  )
   
   # survival plots -------
   get_surv_plot <- reactive({

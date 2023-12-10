@@ -28,8 +28,12 @@ ui <- dashboardPage(
           tabName = "inc_plots_std"
         ),
         menuSubItem(
-          text = "Incidence Estimates",
+          text = "Crude Incidence Estimates",
           tabName = "inc_rates"
+        ),
+        menuSubItem(
+          text = "Std Incidence Estimates",
+          tabName = "inc_rates_std"
         ),
         menuSubItem(
           text = "Attrition",
@@ -287,6 +291,31 @@ ui <- dashboardPage(
         div(style="display:inline-block",
             downloadButton(
               outputId = "dt_inc_est_table_word",
+              label = "Download table as word"
+            ), 
+            style="display:inline-block; float:right")
+        
+      ),
+      
+      tabItem(
+        tabName = "inc_rates_std",
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "inc_estimates_cohort_selector_std",
+            label = "Cancer",
+            choices = unique(agestandardizedinc_final$Cancer),
+            selected = "Breast",
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        htmlOutput('dt_inc_est_table_std'),
+        
+        div(style="display:inline-block",
+            downloadButton(
+              outputId = "dt_inc_est_table_word_std",
               label = "Download table as word"
             ), 
             style="display:inline-block; float:right")
