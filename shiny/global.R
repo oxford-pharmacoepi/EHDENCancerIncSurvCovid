@@ -20,6 +20,15 @@ library(plotly)
 library(ggalt)
 library(bslib)
 library(PatientProfiles)
+library(dsr)
+
+# 
+# packageurl <- "https://cran.r-project.org/src/contrib/Archive/dsr/dsr_0.2.2.tar.gz"
+# install.packages(packageurl, repos=NULL, type="source")
+# install.packages("devtools")
+# library(devtools)
+# packageurl <- 'http://cran.r-project.org/src/contrib/Archive/frailtypack/frailtypack_3.0.1.tar.gz'
+# install.packages(packageurl, repos=NULL, type="source")
 
 mytheme <- create_theme(
   adminlte_color(
@@ -292,7 +301,6 @@ incidence_estimates <- bind_rows(incidence_estimates ,
   rename(Database = cdm_name, Cancer = outcome_cohort_name)
 
 # incidence for age standization
-# incidence estimates not standardized
 incidence_estimates_files_std<-results[stringr::str_detect(results, ".csv")]
 incidence_estimates_files_std<-results[!(stringr::str_detect(results, "incidence_attrition"))]
 incidence_estimates_files_std<-incidence_estimates_files_std[(stringr::str_detect(incidence_estimates_files_std, "incidence_"))]
@@ -309,22 +317,80 @@ incidence_estimates_std <- prepare_output(incidence_estimates_std)
 # pull out female breast and male prostate
 incidence_estimates_breast_std <- incidence_estimates_std %>% 
   filter(outcome_cohort_name == "Breast" & denominator_sex == "Female")  %>% 
-  filter(denominator_age_group == "All") 
+  filter(denominator_age_group != "All") 
 
 incidence_estimates_prostate_std <- incidence_estimates_std %>% 
   filter(outcome_cohort_name == "Prostate") %>% 
-  filter(denominator_age_group == "All") 
+  filter(denominator_age_group != "All") 
 
 incidence_estimates_std <- incidence_estimates_std %>% 
   filter(outcome_cohort_name != "Breast") %>% 
   filter(outcome_cohort_name != "Prostate") %>% 
-  filter(denominator_age_group == "All") %>% 
+  filter(denominator_age_group != "All") %>% 
   filter(denominator_sex == "Both") 
 
 incidence_estimates_std <- bind_rows(incidence_estimates_std ,
                                  incidence_estimates_breast_std, 
                                  incidence_estimates_prostate_std) %>% 
-  rename(Database = cdm_name, Cancer = outcome_cohort_name)
+  rename(Database = cdm_name, Cancer = outcome_cohort_name) %>% 
+  rename(Agegroup = denominator_age_group)
+
+# read in the european age standard 2013
+ESP13 <- readr::read_csv(here("www", "ESP13.csv"), 
+                                              show_col_types = FALSE) 
+
+#collapse ESP13 
+ESP13_updated <- ESP13 %>% 
+  filter(Agegroup != "0-4",
+         Agegroup != "5-9",
+         Agegroup != "10-14",
+         Agegroup != "15-19" ) %>% 
+  add_row(Agegroup = "18 to 29", ESP2013 = with(ESP13, sum(ESP2013[Agegroup == '20-24'| Agegroup == '25-29']))) %>% 
+  add_row(Agegroup = "30 to 39", ESP2013 = with(ESP13, sum(ESP2013[Agegroup == '30-34'| Agegroup == '35-39']))) %>% 
+  add_row(Agegroup = "40 to 49", ESP2013 = with(ESP13, sum(ESP2013[Agegroup == '40-44'| Agegroup == '45-49']))) %>% 
+  add_row(Agegroup = "50 to 59", ESP2013 = with(ESP13, sum(ESP2013[Agegroup == '50-54'| Agegroup == '55-59']))) %>% 
+  add_row(Agegroup = "60 to 69", ESP2013 = with(ESP13, sum(ESP2013[Agegroup == '60-64'| Agegroup == '65-69']))) %>% 
+  add_row(Agegroup = "70 to 79", ESP2013 = with(ESP13, sum(ESP2013[Agegroup == '70-74'| Agegroup == '75-79']))) %>% 
+  add_row(Agegroup = "80 to 89", ESP2013 = with(ESP13, sum(ESP2013[Agegroup == '80-84'| Agegroup == '85-89']))) %>% 
+  filter(Agegroup == "18 to 29" | Agegroup == "30 to 39"| Agegroup == "40 to 49"| Agegroup == "50 to 59" | Agegroup == "60 to 69" |
+           Agegroup == "70 to 79" |
+           Agegroup == "80 to 89" |
+           Agegroup == "90+" ) %>% 
+  mutate(Agegroup = replace(Agegroup, Agegroup == "90+", "90 +")) 
+
+#rename ESP column to pop (needs to be pop otherwise will not work)
+ESP13_updated <- ESP13_updated %>% 
+  rename(pop = ESP2013)
+
+#create a loop for each cancer (all cancers apart from prostate and breast are for single genders)
+agestandardizedinc <- list()
+
+for(i in 1:length(table(incidence_estimates_std$Cancer))){
+  
+  incidence_estimates_i <- incidence_estimates_std %>%
+    filter(Cancer == names(table(incidence_estimates_std$Cancer)[i]))
+  
+  agestandardizedinc[[i]] <- dsr::dsr(
+    data = incidence_estimates_i,  # specify object containing number of deaths per stratum
+    event = n_events,       # column containing number of deaths per stratum 
+    fu = person_years , # column containing number of population per stratum person years
+    subgroup = incidence_start_date,   
+    refdata = ESP13_updated, # reference population data frame, with column called pop
+    method = "gamma",      # method to calculate 95% CI
+    sig = 0.95,            # significance level
+    mp = 100000,           # we want rates per 100.000 population
+    decimals = 2) 
+  
+  agestandardizedinc[[i]] <- agestandardizedinc[[i]] %>% 
+    mutate(Cancer = names(table(incidence_estimates_std$Cancer)[i])) 
+  
+  print(paste0("age standardization for ", names(table(incidence_estimates_std$Cancer)[i]), " done"))
+  
+}
+
+agestandardizedinc_final <- bind_rows(agestandardizedinc) %>% 
+  mutate(Database = "CPRD GOLD")
+
 
 # incidence attrition
 incidence_attrition_files<-results[stringr::str_detect(results, ".csv")]
@@ -437,7 +503,11 @@ survival_risk_table <- survival_risk_table %>%
 
 survival_risk_table <- bind_rows(survival_risk_table ,
                                  survival_risk_table_breast, 
-                                 survival_risk_table_prostate)
+                                 survival_risk_table_prostate) %>% 
+  select(details,
+    "0" ,   "0.5" ,"1" ,  "2" ,   "3"   , "4" , "5" , "6" , "7" , "8"   , "9"   ,"10"   ,"11"     ,       
+         "12" , "13"  ,   "14" , "15" , "16"  ,  "17" ,  "18" ,  "19" ,  "20" ,   "21"  , "22" ,     
+         Cancer,    Sex,    Age,    Database )     
 
 
 # merge the risk table results together (calender year results)
@@ -501,7 +571,35 @@ survival_median_table <- survival_median_table %>%
 
 survival_median_table <- bind_rows(survival_median_table ,
                                    survival_median_table_breast, 
-                                   survival_median_table_prostate)
+                                   survival_median_table_prostate) %>% 
+
+rename(
+  "0.5-year Survival (95% CI)" = `Survival Rate % (95% CI) year 0.5`,
+  "1-year Survival (95% CI)" = `Survival Rate % (95% CI) year 1`,
+  "2-year Survival (95% CI)" = `Survival Rate % (95% CI) year 2`,
+  "3-year Survival (95% CI)" = `Survival Rate % (95% CI) year 3`,
+  "5-year Survival (95% CI)" = `Survival Rate % (95% CI) year 5`,
+  "Mean Survival (SE)" = `rmean in years (SE)`,
+  "Median Survival (95% CI)" = `Median Survival in Years (95% CI)`
+) %>% 
+  select(!c(
+            "se", 
+            "Sex", 
+            "rmean",
+            "median",
+            "CalenderYearGp",
+            "Survival Rate % (95% CI) year 1.5",
+            "Survival Rate % (95% CI) year 2.5",
+            "surv year 0.5" ,
+            "surv year 1" ,        
+            "surv year 1.5"  ,
+            "surv year 2"  , 
+            "surv year 2.5"  ,
+            "surv year 3"     ,                 
+            "surv year 5"    ,
+            "Method"   ,
+            "Age"))
+
 
 
 # median results cy database
@@ -532,7 +630,33 @@ survival_median_table_cy <- survival_median_table_cy %>%
 
 survival_median_table_cy <- bind_rows(survival_median_table_cy ,
                                       survival_median_table_cy_breast, 
-                                      survival_median_table_cy_prostate)
+                                      survival_median_table_cy_prostate) %>% 
+  
+  rename(
+    "0.5-year Survival (95% CI)" = `Survival Rate % (95% CI) year 0.5`,
+    "1-year Survival (95% CI)" = `Survival Rate % (95% CI) year 1`,
+    "2-year Survival (95% CI)" = `Survival Rate % (95% CI) year 2`,
+    "3-year Survival (95% CI)" = `Survival Rate % (95% CI) year 3`,
+    "5-year Survival (95% CI)" = `Survival Rate % (95% CI) year 5`,
+    "Mean Survival (SE)" = `rmean in years (SE)`,
+    "Median Survival (95% CI)" = `Median Survival in Years (95% CI)`
+  ) %>% 
+  select(!c(
+    "se", 
+    "Sex", 
+    "rmean",
+    "median",
+    "Survival Rate % (95% CI) year 1.5",
+    "Survival Rate % (95% CI) year 2.5",
+    "surv year 0.5" ,
+    "surv year 1" ,        
+    "surv year 1.5"  ,
+    "surv year 2"  , 
+    "surv year 2.5"  ,
+    "surv year 3"     ,                 
+    "surv year 5"    ,
+    "Method"   ,
+    "Age"))
 
 
 # survival estimates -----

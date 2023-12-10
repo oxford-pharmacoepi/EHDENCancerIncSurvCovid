@@ -256,46 +256,6 @@ ui <- dashboardPage(
       ) ,
       
       
-      # tabItem(
-      #   tabName = "inc_rates",
-      #   div(
-      #     style = "display: inline-block;vertical-align:top; width: 150px;",
-      #     pickerInput(
-      #       inputId = "inc_estimates_cohort_selector",
-      #       label = "Cancer",
-      #       choices = unique(incidence_estimates$Cancer),
-      #       selected = unique(incidence_estimates$Cancer),
-      #       options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
-      #       multiple = TRUE
-      #     )
-      #   ),
-      #   
-      #   # div(
-      #   #   style = "display: inline-block;vertical-align:top; width: 150px;",
-      #   #   pickerInput(
-      #   #     inputId = "inc_estimates_analysisi_selector",
-      #   #     label = "Analysis Interval",
-      #   #     choices = unique(incidence_estimates$analysis_interval),
-      #   #     selected = "overall",
-      #   #     options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
-      #   #     multiple = TRUE
-      #   #   )
-      #   # ),
-      #   
-      #   gt_output("dt_inc_est_table") %>% 
-      #     withSpinner() ,
-      #   
-      #   
-      #   div(style="display:inline-block",
-      #       downloadButton(
-      #         outputId = "dt_inc_est_table_word",
-      #         label = "Download table as word"
-      #       ),
-      #       style="display:inline-block; float:right")
-      #   
-      # ) ,
-      
-      
       tabItem(
         tabName = "inc_rates",
         div(
@@ -694,6 +654,118 @@ ui <- dashboardPage(
         
         
       ),
+      
+      tabItem(
+        tabName = "inc_plots_std",
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "incidence_database_selector_std",
+            label = "Database",
+            choices = unique(agestandardizedinc_final$Database),
+            selected = unique(agestandardizedinc_final$Database),
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = FALSE
+          )
+        ),
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "incidence_cohort_name_selector_std",
+            label = "Cancer",
+            choices = unique(agestandardizedinc_final$Cancer),
+            selected = unique(agestandardizedinc_final$Cancer),
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        div(
+          style = "display: inline-block;vertical-align:top; width: 150px;",
+          pickerInput(
+            inputId = "incidence_start_date_selector_std",
+            label = "Incidence Start Date",
+            choices = as.character(unique(agestandardizedinc_final$Subgroup)),
+            selected = as.character(unique(agestandardizedinc_final$Subgroup)),
+            options = list(`actions-box` = TRUE, size = 10, `selected-text-format` = "count > 3"),
+            multiple = TRUE
+          )
+        ),
+        
+        
+        div(style="display: inline-block;vertical-align:top; width: 150px;",
+            pickerInput(inputId = "incidence_x_axis_std",
+                        label = "X axis",
+                        choices = c("Subgroup"),
+                        selected = "Subgroup",
+                        options = list(
+                          `actions-box` = TRUE,
+                          size = 10,
+                          `selected-text-format` = "count > 3"),
+                        multiple = FALSE,)
+        ),
+        
+        div(style="display: inline-block;vertical-align:top; width: 150px;",
+            pickerInput(inputId = "incidence_plot_facet_std",
+                        label = "Facet by",
+                        choices = c("Cancer"),
+                        selected = c("Cancer"),
+                        options = list(
+                          `actions-box` = TRUE,
+                          size = 10,
+                          `selected-text-format` = "count > 3"),
+                        multiple = TRUE,)
+        ),
+        
+        div(style="display: inline-block;vertical-align:top; width: 150px;",
+            pickerInput(inputId = "incidence_plot_group_std",
+                        label = "Colour by",
+                        choices = c("Cancer"),
+                        selected = c("Cancer"),
+                        options = list(
+                          `actions-box` = TRUE,
+                          size = 10,
+                          `selected-text-format` = "count > 3"),
+                        multiple = TRUE,)
+            
+            
+        ),
+        
+        div(
+          style = "width: 80vh; height: 5vh;",  # Set width to 100% for responsive design
+          checkboxInput("show_error_bars_std", "Show Ribbons", value = TRUE)
+        ),
+        
+        div(
+          style = "width: 80%; height: 90%;",  # Set width to 100% for responsive design
+          plotOutput("incidencePlotstd",
+                     height = "800px"
+          ) %>%
+            withSpinner(),
+          h4("Download Figure"),
+          div("Height:", style = "display: inline-block; font-weight: bold; margin-right: 5px;"),
+          div(
+            style = "display: inline-block;",
+            textInput("incidence_download_heightstd", "", 30, width = "50px")
+          ),
+          div("cm", style = "display: inline-block; margin-right: 25px;"),
+          div("Width:", style = "display: inline-block; font-weight: bold; margin-right: 5px;"),
+          div(
+            style = "display: inline-block;",
+            textInput("incidence_download_widthstd", "", 35, width = "50px")
+          ),
+          div("cm", style = "display: inline-block; margin-right: 25px;"),
+          div("dpi:", style = "display: inline-block; font-weight: bold; margin-right: 5px;"),
+          div(
+            style = "display: inline-block; margin-right:",
+            textInput("incidence_download_dpistd", "", 600, width = "50px")
+          ),
+          downloadButton("incidence_download_plotstd", "Download plot")
+        )
+        
+        
+      ),
+      
       
       
       tabItem(
