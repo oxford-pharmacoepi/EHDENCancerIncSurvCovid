@@ -1428,7 +1428,7 @@ output$incidencePlotstd <- renderPlot(
   get_incidence_plot_std()
 )
 
-output$incidence_download_plot_std <- downloadHandler(
+output$incidence_download_plotstd <- downloadHandler(
   filename = function() {
     "Std_incidence_estimates_plot.png"
   },
