@@ -100,9 +100,21 @@ ui <- dashboardPage(
         
       ),
       
+      tags$div(
+        style = "position: relative; margin-top: 20px; text-align: center; margin-bottom: 0;",
+        a(img(
+          src = "Logo_HDS.png",  # Replace with the correct file name and extension
+          height = "150px",  # Adjust the height as needed
+          width = "auto"     # Let the width adjust proportionally
+        ),
+        href = "https://www.ndorms.ox.ac.uk/research/research-groups/Musculoskeletal-Pharmacoepidemiology",
+        target = "_blank"
+        )
+      ) ,
+      
       # Logo 
       tags$div(
-        style = "position: relative; margin-top: -10px; text-align: center; margin-bottom: 0;",
+        style = "position: relative; margin-top: -20px; text-align: center; margin-bottom: 0;",
         a(img(
           src = "logoOxford.png",  # Replace with the correct file name and extension
           height = "150px",  # Adjust the height as needed
@@ -112,8 +124,11 @@ ui <- dashboardPage(
         target = "_blank"
         )
       )
+      
+      
     )
   ),
+  
   
   ## body ----
   dashboardBody(
@@ -142,11 +157,11 @@ ui <- dashboardPage(
         tags$h5("The results of this study are published in the following journal:"
         ),
         tags$ol(
-          tags$li(strong("Clinical Epidemiology"),"(",tags$a(href="https://doi.org/10.2147/CLEP.S463160","Paper Link"),")" )),
+          tags$li(strong("Barclay et al (2024). The Impact of the COVID-19 Pandemic on Incidence and Short-Term Survival for Common Solid Tumours in the United Kingdom: A Cohort Analysis. Clinical Epidemiology, 16, 417–429","(",tags$a(href="https://doi.org/10.2147/CLEP.S463160","Paper Link"),")" ))),
         
         tags$h5("The analysis code used to generate these results can be found",
                 tags$a(href="https://github.com/oxford-pharmacoepi/EHDENCancerIncSurvCovid", "here"),
-                ".The cohort diagnostics including the clinical codelists for each of the 9 cancers can be found",
+                ".The cohort diagnostics including the clinical codelists for each of the nine cancers can be found",
                 tags$a(href="https://dpa-pde-oxford.shinyapps.io/CancerExtrapolationDiagnostics/", "here")
                 
         ),

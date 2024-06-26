@@ -745,6 +745,6 @@ snapshotcdm <- bind_rows(snapshotcdm) %>%
          observation_period_count = nice.num.count(observation_period_count)) %>% 
   dplyr::mutate(cdm_name = replace(cdm_name, cdm_name == "CPRD_GOLD", "CPRD GOLD")) %>% 
   rename("Database name" = "cdm_name",
-         "Persons in the database" = "person_count",
+         "Persons in the study" = "person_count",
          "Number of observation periods" = "observation_period_count",
          "OMOP CDM vocabulary version" = "vocabulary_version") 
