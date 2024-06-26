@@ -144,11 +144,11 @@ ui <- dashboardPage(
         tags$h5("The results of this study are published in the following journal:"
         ),
         tags$ol(
-          tags$li(strong("TBC"),"(",tags$a(href="https://www.ndorms.ox.ac.uk/research/research-groups/Musculoskeletal-Pharmacoepidemiology","Paper Link"),")" )),
+          tags$li(strong("Clinical Epidemiology"),"(",tags$a(href="https://doi.org/10.2147/CLEP.S463160","Paper Link"),")" )),
         
         tags$h5("The analysis code used to generate these results can be found",
                 tags$a(href="https://github.com/oxford-pharmacoepi", "here"),
-                ".The cohort diagnostics including the clinical codelists for each of the 8 cancers can be found",
+                ".The cohort diagnostics including the clinical codelists for each of the 9 cancers can be found",
                 tags$a(href="https://dpa-pde-oxford.shinyapps.io/CancerExtrapolationDiagnostics/", "here")
                 
         ),
