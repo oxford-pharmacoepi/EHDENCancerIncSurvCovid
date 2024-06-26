@@ -123,8 +123,6 @@ ui <- dashboardPage(
       tabItem(
         tabName = "background",
         h3("The impact of the COVID-19 pandemic on short-term cancer survival in the United Kingdom: a cohort analysis"),
-        tags$h4(tags$strong("Please note, the results presented here should be considered as
-                                                preliminary and subject to change.")),
         
         tags$h5(
           tags$span("Background:", style = "font-weight: bold;"),
@@ -147,7 +145,7 @@ ui <- dashboardPage(
           tags$li(strong("Clinical Epidemiology"),"(",tags$a(href="https://doi.org/10.2147/CLEP.S463160","Paper Link"),")" )),
         
         tags$h5("The analysis code used to generate these results can be found",
-                tags$a(href="https://github.com/oxford-pharmacoepi", "here"),
+                tags$a(href="https://github.com/oxford-pharmacoepi/EHDENCancerIncSurvCovid", "here"),
                 ".The cohort diagnostics including the clinical codelists for each of the 9 cancers can be found",
                 tags$a(href="https://dpa-pde-oxford.shinyapps.io/CancerExtrapolationDiagnostics/", "here")
                 
